@@ -60,8 +60,10 @@
     <Compile Include="IConsoleCommand.cs" />
     <Compile Include="Util\Converter.cs" />
     <Compile Include="Util\EnumerableExtensions.cs" />
+    <Compile Include="Util\ILogger.cs" />
     <Compile Include="Util\Logging.cs" />
     <Compile Include="Util\ConsoleFormatter.cs" />
+    <Compile Include="Util\NullLogger.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\TypeExtensions.cs" />
     <Compile Include="Commands\ViewArgsCommand.cs" />

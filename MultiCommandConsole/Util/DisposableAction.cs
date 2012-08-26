@@ -2,7 +2,7 @@ using System;
 
 namespace MultiCommandConsole.Util
 {
-	public class DisposableAction : IDisposable
+	internal class DisposableAction : IDisposable
 	{
 		readonly Action _action;
 
