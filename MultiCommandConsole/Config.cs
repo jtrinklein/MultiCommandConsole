@@ -37,7 +37,7 @@ namespace MultiCommandConsole
 		{
 			GetLoggerDelegate = delegate { return _default ?? (_default = new NullLogger()); };
 			ConsoleFormatter = new ConsoleFormatter();
-			CommandPromptText = "$: ";
+			CommandPromptText = "$";
 			ShowVierArgsCommand = false;
 		}
 	}

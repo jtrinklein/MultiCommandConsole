@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mono.Terminal;
 using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Commands
@@ -11,6 +12,7 @@ namespace MultiCommandConsole.Commands
 	{
 		readonly Engine _engine;
 		readonly ConsoleCommandRepository _consoleCommandRepository;
+		static readonly char[] ArgPrefixes = new[] { '/', '-' };
 
 		public ConsoleCommand(Engine engine, ConsoleCommandRepository consoleCommandRepository)
 		{
@@ -32,35 +34,39 @@ namespace MultiCommandConsole.Commands
 			return Enumerable.Empty<String>();
 		}
 
+		private Dictionary<string, ConsoleCommandInfo> _commandCache;
+		private Dictionary<string, List<string>> _optionCache = new Dictionary<string, List<string>>();
+
 		public void Run()
 		{
+			var le = new LineEditor(_engine.AppName, _engine.HistorySize == 0 ? 10 : _engine.HistorySize)
+			         	{
+			         		AutoCompleteEvent = (text, pos) => GetEntries(text)
+			         	};
+
 			using (_consoleCommandRepository.HideConsoleCommand())
 			{
 				var chunker = Config.ConsoleFormatter;
 				chunker.ChunckStringTo(
-					"Welcome to console mode.  You will no longer need to type the path & name of the executable.  "
-					+ "Enter commands directly at your leisure."
-					+ Environment.NewLine
-					+ "Type \"quit\" to exit."
+					"Type \"quit\" to exit."
 					+ Environment.NewLine
 					+ "Type \"cls\" to clear the console window."
 					+ Environment.NewLine
 					+ "Type \"> filename\" to redirect output to a file."
 					+ Environment.NewLine,
 					Console.Out);
-
+				
 				do
 				{
 					string[] args;
 					do
 					{
-						Console.Out.WriteLine();
-						Console.Out.Write(Config.CommandPromptText);
-						args = Console.ReadLine().SplitCmdLineArgs();
+						args = le.Edit(Config.CommandPromptText +  "> ", string.Empty).SplitCmdLineArgs();
 					} while (args.IsNullOrEmpty());
 
 					if (args[0].Equals("quit", StringComparison.OrdinalIgnoreCase))
 					{
+						le.SaveHistory();
 						return;
 					}
 
@@ -103,6 +109,48 @@ namespace MultiCommandConsole.Commands
 
 				} while (true);
 			}
+		}
+
+		private LineEditor.Completion GetEntries(string text)
+		{
+			if (_commandCache == null)
+			{
+				_commandCache = _consoleCommandRepository.Commands.ToDictionary(c => c.Attribute.Prototype.GetPrototypeArray().First());
+			}
+
+			var parts = text.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+			var commandName = parts.FirstOrDefault();
+
+			if (commandName == null)
+			{
+				return new LineEditor.Completion(string.Empty, new string[0]);
+			}
+
+			if (parts.Length == 1)
+			{
+				//looking for a command name
+				var commands = _commandCache.Keys
+					.Where(c => c.StartsWith(commandName, StringComparison.OrdinalIgnoreCase))
+					.Select(s => s.Substring(commandName.Length) + " ")
+					.ToArray();
+				return new LineEditor.Completion(commandName, commands);
+			}
+
+			var lastPart = parts.Last().TrimStart(ArgPrefixes); //remove the / or - arguments are prefixed for
+			
+			List<string> argNames;
+			if(!_optionCache.TryGetValue(commandName, out argNames))
+			{
+				var commandInfo = _commandCache[commandName];
+				_optionCache[commandName] = argNames = ArgsHelper.GetFlattenedOptionNames(commandInfo.CommandType);
+			}
+
+			var options = argNames
+				.Where(a => a.StartsWith(lastPart, StringComparison.OrdinalIgnoreCase))
+				.Where(a => !parts.Contains(a))
+				.Select(s => s.Substring(lastPart.Length) + "=")
+				.ToArray();
+			return new LineEditor.Completion(lastPart, options);
 		}
 	}
 }

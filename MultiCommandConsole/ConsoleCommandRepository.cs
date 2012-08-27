@@ -17,18 +17,26 @@ namespace MultiCommandConsole
 		private ConsoleFormatter _chunker = Config.ConsoleFormatter;
 		internal ConsoleCommand ConsoleCommand { get; set; }
 
+		private IEnumerable<ConsoleCommandInfo> _commands;
 		public IEnumerable<ConsoleCommandInfo> Commands
 		{
 			get
 			{
-				var commands = from c in _commandsByName.Values
-				               group c by c.Attribute.Prototype into grouping
-				               select grouping.First();
+				if (_commands == null)
+				{
+					var commands = from c in _commandsByName.Values
+					               group c by c.Attribute.Prototype
+					               into grouping
+					               select grouping.First();
 
-				return from c in commands
-				       let isInternal = c.CommandType.Namespace == typeof (HelpCommand).Namespace
-				       orderby isInternal descending, c.Attribute.Prototype
-				       select c;
+					_commands = from c in commands
+					            let isInternal = c.CommandType.Namespace == typeof (HelpCommand).Namespace
+					            orderby isInternal descending , c.Attribute.Prototype
+					            select c;
+
+					_commands = _commands.ToList();
+				}
+				return _commands;
 			}
 		}
 
