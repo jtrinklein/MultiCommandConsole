@@ -33,6 +33,13 @@ namespace MultiCommandConsole
 		/// </summary>
 		public static bool ShowVierArgsCommand { get; set; }
 
+		/// <summary>
+		/// In a standard dos console, Escape clears the current line. 
+		/// Setting EscapeIsAltKey to true will cause Escape to trigger the Alt modifier 
+		/// instead of clearing the current line.  This is similar to some *nix consoles.
+		/// </summary>
+		public static bool EscapeIsAltKey { get; set; }
+
 		static Config()
 		{
 			GetLoggerDelegate = delegate { return _default ?? (_default = new NullLogger()); };

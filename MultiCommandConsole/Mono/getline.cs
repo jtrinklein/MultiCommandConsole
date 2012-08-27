@@ -35,6 +35,7 @@ using System.Text;
 using System.IO;
 using System.Threading;
 using System.Reflection;
+using MultiCommandConsole;
 
 namespace Mono.Terminal {
 
@@ -635,6 +636,12 @@ namespace Mono.Terminal {
 			
 		}
 
+		void ClearLine()
+		{
+			cursor = 0;
+			CmdKillToEOF();
+		}
+
 		void CmdKillToEOF ()
 		{
 			kill_buffer = text.ToString (cursor, text.Length-cursor);
@@ -778,15 +785,22 @@ namespace Mono.Terminal {
 			ConsoleKeyInfo cki;
 
 			while (!done){
-				ConsoleModifiers mod;
-				
-				cki = Console.ReadKey (true);
-				if (cki.Key == ConsoleKey.Escape){
-					cki = Console.ReadKey (true);
 
-					mod = ConsoleModifiers.Alt;
-				} else
-					mod = cki.Modifiers;
+				cki = Console.ReadKey(true);
+				ConsoleModifiers mod = cki.Modifiers;
+
+				if (cki.Key == ConsoleKey.Escape){
+					if (Config.EscapeIsAltKey)
+					{
+						cki = Console.ReadKey(true);
+						mod = ConsoleModifiers.Alt;
+					}
+					else
+					{
+						ClearLine();
+						continue;
+					}
+				}
 				
 				bool handled = false;
 
