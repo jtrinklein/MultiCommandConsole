@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ObjectPrinter;
 
 namespace MultiCommandConsole.Example
 {
@@ -20,6 +21,34 @@ namespace MultiCommandConsole.Example
 		}
 	}
 
+	[ArgSet("logger", "manages verbosity level so commands don't have to")]
+	public class Logger
+	{
+		[Arg("quiet|q", "when specified, only errors will be logged")]
+		public bool Quiet { get; set; }
+		[Arg("verbose|v", "when specified, everything is logged.  Verbose trumps quiet.")]
+		public bool Verbose { get; set; }
+
+		public void Error(object message)
+		{
+			Console.Error.WriteLine(message);
+		}
+		public void Info(object message)
+		{
+			if (Verbose || !Quiet)
+			{
+				Console.Out.WriteLine(message);
+			}
+		}
+		public void Trace(object message)
+		{
+			if (Verbose)
+			{
+				Console.Out.WriteLine(message);
+			}
+		}
+	}
+
 	[ConsoleCommand("repeat", "repeats the entered phrase the specified number of times")]
 	public class RepeatConsoleCommand : IConsoleCommand
 	{
@@ -28,6 +57,8 @@ namespace MultiCommandConsole.Example
 
 		[Arg("times|n", "the number of times to repeat the text.  between 1 and 100")]
 		public int Times { get; set; }
+
+		public Logger Logger { get; set; }
 
 		public IEnumerable<string> GetArgValidationErrors()
 		{
@@ -52,6 +83,7 @@ namespace MultiCommandConsole.Example
 
 		public void Run()
 		{
+			Logger.Trace(this.DumpToLazyString());
 			for (int i = 0; i < Times; i++)
 			{
 				Console.Out.WriteLine(Text);
