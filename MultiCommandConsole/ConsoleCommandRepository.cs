@@ -128,11 +128,11 @@ namespace MultiCommandConsole
 			return Commands.Select(v => v.Attribute);
 		}
 
-		public IConsoleCommand LoadCommand(string[] args)
+		public CommandRunData LoadCommand(string[] args)
 		{
 			if(args.IsNullOrEmpty() || string.IsNullOrEmpty(args[0]))
 			{
-				return HelpCommand.ForCommands(Commands);
+				return new CommandRunData {Command = HelpCommand.ForCommands(Commands)};
 			}
 			
 			var firstArg = args[0].Trim().TrimStart(new []{'/','-'});
@@ -149,7 +149,7 @@ namespace MultiCommandConsole
 					{
 						return LoadCommand(new[]{args[1], args[0]});
 					}
-					return HelpCommand.ForCommands(Commands);
+					return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 				}
 
 				IConsoleCommand command;
@@ -164,14 +164,19 @@ namespace MultiCommandConsole
 				}
 
 				var validators = new List<IValidatable> { command };
-				LoadArgs(options, validators, command);
+				var setterUppers = new List<ISetupAndCleanup>();
+				if (command is ISetupAndCleanup)
+				{
+					setterUppers.Add(command as ISetupAndCleanup);
+				}
+				LoadArgs(options, validators, setterUppers, command);
 				options.Add(HelpCommand.Prototype, "show this message and exit", a => showHelp = true);
 				try
 				{
 					command.ExtraArgs = options.Parse(args.Skip(1));
 					if (showHelp)
 					{
-						return HelpCommand.ForCommand(info, command);
+						return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
 					}
 					var errors = validators.SelectMany(v => v.GetArgValidationErrors()).ToList();
 					if (errors.Count > 0)
@@ -181,23 +186,23 @@ namespace MultiCommandConsole
 							Console.Out.Write("!!! ");
 							_chunker.ChunckStringTo(error, Console.Out);
 						}
-						return HelpCommand.ForCommand(info, command);
+						return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
 					}
 				}
 				catch (Exception)
 				{
-					return HelpCommand.ForCommand(info, command);
+					return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
 				}
 
-				return command;
+				return new CommandRunData { Command = command, SetterUppers = setterUppers};
 
 			}
 
 			Console.Out.WriteLine("Unknown command: " + firstArg);
-			return HelpCommand.ForCommands(Commands);
+			return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 		}
 
-		private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, object obj)
+		private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, List<ISetupAndCleanup> setterUppers, object obj)
 		{
 			var options = ArgsHelper.GetOptions(obj.GetType()).ToList();
 
@@ -209,10 +214,14 @@ namespace MultiCommandConsole
 				{
 					validators.Add(args as IValidatable);
 				}
+				if (args is ISetupAndCleanup)
+				{
+					setterUppers.Add(args as ISetupAndCleanup);
+				}
 
 				//load all arguments in a set before assigning it to the host property.
 				//  this allows the host to act on the fully loaded set when it's assigned.
-				LoadArgs(optionSet, validators, args);
+				LoadArgs(optionSet, validators, setterUppers, args);
 				option.PropertyInfo.SetValue(obj, args, null);
 			}
 		

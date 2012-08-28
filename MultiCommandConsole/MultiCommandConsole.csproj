@@ -47,12 +47,14 @@
     <Compile Include="ArgAttribute.cs" />
     <Compile Include="ArgSetAttribute.cs" />
     <Compile Include="ArgsHelper.cs" />
+    <Compile Include="CommandRunData.cs" />
     <Compile Include="Commands\ConsoleCommand.cs" />
     <Compile Include="ConsoleCommandAttribute.cs" />
     <Compile Include="ConsoleCommandInfo.cs" />
     <Compile Include="ConsoleCommandRepository.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="EnumParserOption.cs" />
+    <Compile Include="ISetupAndCleanup.cs" />
     <Compile Include="IValidatable.cs" />
     <Compile Include="Mono\getline.cs" />
     <Compile Include="Util\DisposableAction.cs" />

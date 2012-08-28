@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Mono.Terminal;
 using MultiCommandConsole.Util;
+using ObjectPrinter;
 
 namespace MultiCommandConsole.Commands
 {
@@ -113,44 +114,64 @@ namespace MultiCommandConsole.Commands
 
 		private LineEditor.Completion GetEntries(string text)
 		{
-			if (_commandCache == null)
+			string commandName = null;
+			string[] parts = null;
+			try
 			{
-				_commandCache = _consoleCommandRepository.Commands.ToDictionary(c => c.Attribute.Prototype.GetPrototypeArray().First());
-			}
+				if (_commandCache == null)
+				{
+					_commandCache = new Dictionary<string, ConsoleCommandInfo>();
+					foreach(var command in _consoleCommandRepository.Commands)
+					{
+						foreach(var name in command.Attribute.Prototype.GetPrototypeArray())
+						{
+							_commandCache.Add(name, command);
+						}
+					}
+				}
 
-			var parts = text.Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-			var commandName = parts.FirstOrDefault();
+				parts = text.Trim().Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
 
-			if (commandName == null)
-			{
-				return new LineEditor.Completion(string.Empty, new string[0]);
-			}
+				commandName = parts.FirstOrDefault();
 
-			if (parts.Length == 1)
-			{
-				//looking for a command name
-				var commands = _commandCache.Keys
-					.Where(c => c.StartsWith(commandName, StringComparison.OrdinalIgnoreCase))
-					.Select(s => s.Substring(commandName.Length) + " ")
+				if (commandName == null)
+				{
+					return new LineEditor.Completion(string.Empty, new string[0]);
+				}
+
+				if (parts.Length == 1)
+				{
+					//looking for a command name
+					var commands = _commandCache.Keys
+						.Where(c => c.StartsWith(commandName, StringComparison.OrdinalIgnoreCase))
+						.Select(s => s.Substring(commandName.Length) + " ")
+						.ToArray();
+					return new LineEditor.Completion(commandName, commands);
+				}
+
+				var lastPart = parts.Last().TrimStart(ArgPrefixes); //remove the / or - arguments are prefixed for
+
+				List<string> argNames;
+				if (!_optionCache.TryGetValue(commandName, out argNames))
+				{
+					var commandInfo = _commandCache[commandName];
+					_optionCache[commandName] = argNames = ArgsHelper.GetFlattenedOptionNames(commandInfo.CommandType);
+				}
+
+				var options = argNames
+					.Where(a => a.StartsWith(lastPart, StringComparison.OrdinalIgnoreCase))
+					.Where(a => !parts.Contains(a))
+					.Select(s => s.Substring(lastPart.Length) + "=")
 					.ToArray();
-				return new LineEditor.Completion(commandName, commands);
+				return new LineEditor.Completion(lastPart, options);
 			}
-
-			var lastPart = parts.Last().TrimStart(ArgPrefixes); //remove the / or - arguments are prefixed for
-			
-			List<string> argNames;
-			if(!_optionCache.TryGetValue(commandName, out argNames))
+			catch (Exception e)
 			{
-				var commandInfo = _commandCache[commandName];
-				_optionCache[commandName] = argNames = ArgsHelper.GetFlattenedOptionNames(commandInfo.CommandType);
+				e.SetContext("text", text);
+				e.SetContext("commandName", commandName);
+				e.SetContext("parts", parts);
+				throw;
 			}
-
-			var options = argNames
-				.Where(a => a.StartsWith(lastPart, StringComparison.OrdinalIgnoreCase))
-				.Where(a => !parts.Contains(a))
-				.Select(s => s.Substring(lastPart.Length) + "=")
-				.ToArray();
-			return new LineEditor.Completion(lastPart, options);
 		}
 	}
 }

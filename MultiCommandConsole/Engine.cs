@@ -58,13 +58,16 @@ namespace MultiCommandConsole
 
 			try
 			{
-				var command = _commandRepository.LoadCommand(args);
+				var runData = _commandRepository.LoadCommand(args);
 
-				if (!(command is HelpCommand))
+				if (!(runData.Command is HelpCommand))
 				{
-					Log.DebugFormat("Running command: {0}", command.DumpToString());
+					Log.DebugFormat("Running command: {0}", runData.Command.DumpToString());
 				}
-				command.Run();
+				runData.SetterUppers.ForEach(su => su.Setup());
+				runData.Command.Run();
+				runData.SetterUppers.Reverse();
+				runData.SetterUppers.ForEach(su => su.Cleanup());
 			}
 			catch (TargetInvocationException e)
 			{
