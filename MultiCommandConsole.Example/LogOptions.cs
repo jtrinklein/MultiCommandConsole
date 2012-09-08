@@ -18,6 +18,7 @@ namespace MultiCommandConsole.Example
 					{Level.Fatal.Name, Level.Fatal},
 					{Level.Error.Name, Level.Error},
 					{Level.Warn.Name, Level.Warn},
+					{"Output", Level.Notice}, //this is the level the UI should output standard results to
 					{Level.Info.Name, Level.Info},
 					{Level.Debug.Name, Level.Debug},
 				};
@@ -31,29 +32,29 @@ namespace MultiCommandConsole.Example
 		public bool Quiet { get; set; }
 		[Arg("verbose", "when specified, everything is logged.")]
 		public bool Verbose { get; set; }
-		[Arg("loglevel", "allows specifying the level of verbosity to log to the client.  Valid values in order: Fatal,Error,Warn,Info,Debug")]
+		[Arg("loglevel", "allows specifying the level of verbosity to log to the client.  Valid values in order: Fatal,Error,Warn,Output,Info,Debug")]
 		public string Verbosity { get; set; }
 
-		
+
 		public IEnumerable<string> GetArgValidationErrors()
 		{
 			if (Quiet && Verbose)
 			{
-				return new[] {"Quiet and Verbose were both specified. Pick one or the other."};
+				return new[] { "quiet and verbose were both specified. Pick one or the other." };
 			}
 			if (!string.IsNullOrEmpty(Verbosity))
 			{
 				if (Quiet)
 				{
-					return new[] { "Quiet was specified while also specifying Verbosity. Pick one or the other." };
+					return new[] { "quiet was specified while also specifying loglevel. Pick one or the other." };
 				}
 				if (Verbose)
 				{
-					return new[] { "Quiet was specified while also specifying Verbosity. Pick one or the other." };
+					return new[] { "verbose was specified while also specifying loglevel. Pick one or the other." };
 				}
 				if (!Levels.TryGetValue(Verbosity, out _verbosity))
 				{
-					return new[] { "Invalid Verbosity: " + Verbosity };
+					return new[] { "Invalid loglevel: " + Verbosity };
 				}
 			}
 			return Enumerable.Empty<string>();
@@ -65,7 +66,7 @@ namespace MultiCommandConsole.Example
 
 			if (Quiet)
 			{
-				_verbosity = Level.Error;
+				_verbosity = Level.Notice;
 			}
 			else if (Verbose)
 			{
@@ -105,7 +106,7 @@ namespace MultiCommandConsole.Example
 		private static AppenderSkeleton GetConfiguredAppender(string consoleAppenderName)
 		{
 			var appenders = _hierarchy.GetAppenders();
-			return (AppenderSkeleton) appenders.FirstOrDefault(
+			return (AppenderSkeleton)appenders.FirstOrDefault(
 				a => consoleAppenderName.Equals(a.Name, StringComparison.OrdinalIgnoreCase));
 		}
 

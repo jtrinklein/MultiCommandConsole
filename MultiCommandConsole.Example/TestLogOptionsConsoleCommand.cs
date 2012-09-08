@@ -28,6 +28,8 @@ namespace MultiCommandConsole.Example
 			Log.Fatal("Fatal");
 			Log.Error("Error");
 			Log.Warn("Warn");
+			Log.ConsoleOut("console out");
+			Log.ConsoleOutFormat("console {0} {1}", "out", "format");
 			Log.Info("Info");
 			Log.Debug("Debug");
 		}
