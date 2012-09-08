@@ -62,7 +62,7 @@ namespace MultiCommandConsole
 
 				if (!(runData.Command is HelpCommand))
 				{
-					Log.DebugFormat("Running command: {0}", runData.Command.DumpToString());
+					Log.CurrentCommand(runData.Command);
 				}
 				runData.SetterUppers.ForEach(su => su.Setup());
 				runData.Command.Run();

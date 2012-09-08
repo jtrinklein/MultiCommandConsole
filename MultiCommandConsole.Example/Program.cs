@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Reflection;
+using log4net;
 
 namespace MultiCommandConsole.Example
 {
@@ -12,6 +13,7 @@ namespace MultiCommandConsole.Example
 			Config.CommandPromptText = "console";
 			Config.ShowConsoleCommand = true;
 			Config.ShowVierArgsCommand = true;
+			Config.GetLoggerDelegate = type => new Log4NetLogger(LogManager.GetLogger(type));
 			var engine = new Engine(new[] {assembly})
 			             	{
 			             		AppName="example_console",

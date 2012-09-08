@@ -2,6 +2,10 @@ namespace MultiCommandConsole.Util
 {
 	public class NullLogger : ILogger
 	{
+		public void CurrentCommand(IConsoleCommand command)
+		{
+			/*no op*/
+		}
 
 		public void Debug(string message)
 		{
