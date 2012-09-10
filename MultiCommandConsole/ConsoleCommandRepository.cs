@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Mono.Options;
 using MultiCommandConsole.Commands;
 using MultiCommandConsole.Util;
-using NDesk.Options;
 using ObjectPrinter;
 
 namespace MultiCommandConsole

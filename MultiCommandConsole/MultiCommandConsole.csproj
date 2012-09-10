@@ -57,6 +57,13 @@
     <Compile Include="ISetupAndCleanup.cs" />
     <Compile Include="IValidatable.cs" />
     <Compile Include="Mono\getline.cs" />
+    <Compile Include="NDesk\Option.cs" />
+    <Compile Include="NDesk\OptionAction.cs" />
+    <Compile Include="NDesk\OptionContext.cs" />
+    <Compile Include="NDesk\OptionException.cs" />
+    <Compile Include="NDesk\OptionSet.cs" />
+    <Compile Include="NDesk\OptionValueCollection.cs" />
+    <Compile Include="NDesk\OptionValueType.cs" />
     <Compile Include="Util\DisposableAction.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
@@ -70,10 +77,11 @@
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\TypeExtensions.cs" />
     <Compile Include="Commands\ViewArgsCommand.cs" />
-    <Compile Include="NDesk\NDesk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="NDesk\readme.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

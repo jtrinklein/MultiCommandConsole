@@ -1,5 +1,5 @@
 using System;
-using NDesk.Options;
+using Mono.Options;
 
 namespace MultiCommandConsole
 {
