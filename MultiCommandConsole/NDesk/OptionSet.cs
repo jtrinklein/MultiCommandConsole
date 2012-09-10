@@ -5,15 +5,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-#if TEST
-using NDesk.Options;
-#endif
-
-#if NDESK_OPTIONS
-namespace NDesk.Options
-#else
 namespace Mono.Options
-#endif
 {
 	public class OptionSet : KeyedCollection<string, Option>
 	{

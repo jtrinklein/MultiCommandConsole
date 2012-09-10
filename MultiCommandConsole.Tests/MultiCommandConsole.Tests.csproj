@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="ConsoleFormatterTests.cs" />
     <Compile Include="ImitateConsole.cs" />
+    <Compile Include="NDesk\Foo.cs" />
+    <Compile Include="NDesk\FooConverter.cs" />
     <Compile Include="NDesk\OptionContextTest.cs" />
     <Compile Include="NDesk\OptionSetTest.cs" />
     <Compile Include="NDesk\OptionTest.cs" />

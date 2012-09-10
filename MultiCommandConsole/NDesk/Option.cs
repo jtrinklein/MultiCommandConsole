@@ -2,23 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-#if TEST
-using NDesk.Options;
-#endif
-
-#if NDESK_OPTIONS
-namespace NDesk.Options
-#else
 namespace Mono.Options
-#endif
 {
 	public abstract class Option
 	{
-		string prototype, description;
-		string[] names;
-		OptionValueType type;
-		int count;
-		string[] separators;
+		static readonly char[] NameTerminator = new char[] { '=', ':' };
+
+		public string Prototype { get; private set; }
+		public string Description { get; private set; }
+		public OptionValueType OptionValueType { get; private set; }
+		public int MaxValueCount { get; private set; }
+
+		internal string[] Names { get; private set; }
+		internal string[] ValueSeparators { get; private set; }
 
 		protected Option(string prototype, string description)
 			: this(prototype, description, 1)
@@ -34,44 +30,38 @@ namespace Mono.Options
 			if (maxValueCount < 0)
 				throw new ArgumentOutOfRangeException("maxValueCount");
 
-			this.prototype = prototype;
-			this.names = prototype.Split('|');
-			this.description = description;
-			this.count = maxValueCount;
-			this.type = ParsePrototype();
+			this.Prototype = prototype;
+			this.Names = prototype.Split('|');
+			this.Description = description;
+			this.MaxValueCount = maxValueCount;
+			ParsePrototype();
 
-			if (this.count == 0 && type != OptionValueType.None)
+			if (this.MaxValueCount == 0 && OptionValueType != OptionValueType.None)
 				throw new ArgumentException(
-					"Cannot provide maxValueCount of 0 for OptionValueType.Required or " +
-					"OptionValueType.Optional.",
+					"Cannot provide maxValueCount of 0 for OptionValueType.Required or OptionValueType.Optional.",
 					"maxValueCount");
-			if (this.type == OptionValueType.None && maxValueCount > 1)
+			if (this.OptionValueType == OptionValueType.None && maxValueCount > 1)
 				throw new ArgumentException(
 					string.Format("Cannot provide maxValueCount of {0} for OptionValueType.None.", maxValueCount),
 					"maxValueCount");
-			if (Array.IndexOf(names, "<>") >= 0 &&
-			    ((names.Length == 1 && this.type != OptionValueType.None) ||
-			     (names.Length > 1 && this.MaxValueCount > 1)))
+			if (Array.IndexOf(Names, "<>") >= 0 &&
+			    ((Names.Length == 1 && this.OptionValueType != OptionValueType.None) ||
+			     (Names.Length > 1 && this.MaxValueCount > 1)))
 				throw new ArgumentException(
 					"The default option handler '<>' cannot require values.",
 					"prototype");
 		}
 
-		public string Prototype { get { return prototype; } }
-		public string Description { get { return description; } }
-		public OptionValueType OptionValueType { get { return type; } }
-		public int MaxValueCount { get { return count; } }
-
 		public string[] GetNames()
 		{
-			return (string[])names.Clone();
+			return (string[])Names.Clone();
 		}
 
 		public string[] GetValueSeparators()
 		{
-			if (separators == null)
+			if (ValueSeparators == null)
 				return new string[0];
-			return (string[])separators.Clone();
+			return (string[])ValueSeparators.Clone();
 		}
 
 		protected static T Parse<T>(string value, OptionContext c)
@@ -99,25 +89,20 @@ namespace Mono.Options
 			return t;
 		}
 
-		internal string[] Names { get { return names; } }
-		internal string[] ValueSeparators { get { return separators; } }
-
-		static readonly char[] NameTerminator = new char[] { '=', ':' };
-
-		private OptionValueType ParsePrototype()
+		private void ParsePrototype()
 		{
 			char type = '\0';
 			List<string> seps = new List<string>();
-			for (int i = 0; i < names.Length; ++i)
+			for (int i = 0; i < Names.Length; ++i)
 			{
-				string name = names[i];
+				string name = Names[i];
 				if (name.Length == 0)
 					throw new ArgumentException("Empty option names are not supported.", "prototype");
 
 				int end = name.IndexOfAny(NameTerminator);
 				if (end == -1)
 					continue;
-				names[i] = name.Substring(0, end);
+				Names[i] = name.Substring(0, end);
 				if (type == '\0' || type == name[end])
 					type = name[end];
 				else
@@ -128,23 +113,23 @@ namespace Mono.Options
 			}
 
 			if (type == '\0')
-				return OptionValueType.None;
+				return;
 
-			if (count <= 1 && seps.Count != 0)
+			if (MaxValueCount <= 1 && seps.Count != 0)
 				throw new ArgumentException(
-					string.Format("Cannot provide key/value separators for Options taking {0} value(s).", count),
+					string.Format("Cannot provide key/value separators for Options taking {0} value(s).", MaxValueCount),
 					"prototype");
-			if (count > 1)
+			if (MaxValueCount > 1)
 			{
 				if (seps.Count == 0)
-					this.separators = new string[] { ":", "=" };
+					this.ValueSeparators = new string[] { ":", "=" };
 				else if (seps.Count == 1 && seps[0].Length == 0)
-					this.separators = null;
+					this.ValueSeparators = null;
 				else
-					this.separators = seps.ToArray();
+					this.ValueSeparators = seps.ToArray();
 			}
 
-			return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
+			this.OptionValueType = type == '=' ? OptionValueType.Required : OptionValueType.Optional;
 		}
 
 		private static void AddSeparators(string name, int end, ICollection<string> seps)

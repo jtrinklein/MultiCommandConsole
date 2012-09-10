@@ -2,20 +2,12 @@ using System;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 
-#if TEST
-using NDesk.Options;
-#endif
-
-#if NDESK_OPTIONS
-namespace NDesk.Options
-#else
 namespace Mono.Options
-#endif
 {
 	[Serializable]
 	public class OptionException : Exception
 	{
-		private string option;
+		public string OptionName { get; private set; }
 
 		public OptionException()
 		{
@@ -24,31 +16,26 @@ namespace Mono.Options
 		public OptionException(string message, string optionName)
 			: base(message)
 		{
-			this.option = optionName;
+			this.OptionName = optionName;
 		}
 
 		public OptionException(string message, string optionName, Exception innerException)
 			: base(message, innerException)
 		{
-			this.option = optionName;
+			this.OptionName = optionName;
 		}
 
 		protected OptionException(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
-			this.option = info.GetString("OptionName");
-		}
-
-		public string OptionName
-		{
-			get { return this.option; }
+			this.OptionName = info.GetString("OptionName");
 		}
 
 		[SecurityPermission(SecurityAction.LinkDemand, SerializationFormatter = true)]
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);
-			info.AddValue("OptionName", option);
+			info.AddValue("OptionName", OptionName);
 		}
 	}
 }

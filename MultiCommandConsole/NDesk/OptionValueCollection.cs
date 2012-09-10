@@ -2,15 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-#if TEST
-using NDesk.Options;
-#endif
-
-#if NDESK_OPTIONS
-namespace NDesk.Options
-#else
 namespace Mono.Options
-#endif
 {
 	public class OptionValueCollection : IList, IList<string>
 	{

@@ -27,39 +27,36 @@
 //
 
 using System;
-
-#if NDESK_OPTIONS
-using NDesk.Options;
-#else
 using Mono.Options;
-#endif
 using NUnit.Framework;
 
-#if NDESK_OPTIONS
-namespace Tests.NDesk.Options
-#else
 namespace Tests.Mono.Options
-#endif
 {
 	[TestFixture]
-	public class OptionContextTest {
+	public class OptionContextTest
+	{
 		[Test]
-		public void Exceptions ()
+		public void Exceptions()
 		{
-			OptionSet p = new OptionSet () {
-				{ "a=", v => { /* ignore */ } },
-			};
-			OptionContext c = new OptionContext (p);
-			Utils.AssertException (typeof(InvalidOperationException),
-					"OptionContext.Option is null.",
-					c, v => { string ignore = v.OptionValues [0]; });
-			c.Option = p [0];
+			OptionSet p = new OptionSet()
+				{
+					{"a=", v =>
+						{
+							/* ignore */
+						}
+					},
+				};
+			OptionContext c = new OptionContext(p);
+			Utils.AssertException(typeof (InvalidOperationException),
+			                      "OptionContext.Option is null.",
+			                      c, v => { string ignore = v.OptionValues[0]; });
+			c.Option = p[0];
 			Utils.AssertArgumentOutOfRangeException("index",
-					c, v => { string ignore = v.OptionValues [2]; });
+			                                        c, v => { string ignore = v.OptionValues[2]; });
 			c.OptionName = "-a";
-			Utils.AssertException (typeof(OptionException),
-					"Missing required value for option '-a'.",
-					c, v => { string ignore = v.OptionValues [0]; });
+			Utils.AssertException(typeof (OptionException),
+			                      "Missing required value for option '-a'.",
+			                      c, v => { string ignore = v.OptionValues[0]; });
 		}
 	}
 }
