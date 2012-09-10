@@ -51,15 +51,10 @@ namespace Tests.Mono.Options
 			bool debug = false;
 			var p = new OptionSet()
 				{
-					{"D|define=", v => defines.Add(v)},
-					{"L|library:", v => libs.Add(v)},
+					{"D|define=", defines.Add},
+					{"L|library:", libs.Add},
 					{"Debug", v => debug = v != null},
-					{
-						"E", v =>
-							{
-								/* ignore */
-							}
-					},
+					{"E", v => {/* ignore */}},
 				};
 			p.Parse(_("-DNAME", "-D", "NAME2", "-Debug", "-L/foo", "-L", "/bar", "-EDNAME3"));
 			Assert.AreEqual(defines.Count, 3);
@@ -71,9 +66,7 @@ namespace Tests.Mono.Options
 			Assert.AreEqual(libs[0], "/foo");
 			Assert.AreEqual(libs[1], null);
 
-			Utils.AssertException(typeof (OptionException),
-			                      "Cannot bundle unregistered option '-V'.",
-			                      p, v => { v.Parse(_("-EVALUENOTSUP")); });
+			Utils.Assert<OptionException>("Cannot bundle unregistered option '-V'.", () => p.Parse(_("-EVALUENOTSUP")));
 		}
 
 		[Test]
@@ -86,6 +79,7 @@ namespace Tests.Mono.Options
 					{"a=", v => a = v},
 					{"n=", (int v) => n = v},
 				};
+
 			List<string> extra = p.Parse(_("a", "-a", "s", "-n=42", "n"));
 			Assert.AreEqual(extra.Count, 2);
 			Assert.AreEqual(extra[0], "a");
@@ -135,9 +129,7 @@ namespace Tests.Mono.Options
 			Assert.AreEqual(n.Value, 42);
 			p.Parse(_("-n"));
 			Assert.AreEqual(n.HasValue, false);
-			Utils.AssertException(typeof (OptionException),
-			                      "Could not convert string `' to type Int32 for option `-n'.",
-			                      p, v => { v.Parse(_("-n=")); });
+			Utils.Assert<OptionException>("Could not convert string `' to type Int32 for option `-n'.", () => p.Parse(_("-n=")));
 		}
 
 		[Test]
@@ -231,45 +223,26 @@ namespace Tests.Mono.Options
 					{"f=", (Foo v) => { }},
 				};
 			// missing argument
-			Utils.AssertException(typeof (OptionException),
-			                      "Missing required value for option '-a'.",
-			                      p, v => { v.Parse(_("-a")); });
+			Utils.Assert<OptionException>("Missing required value for option '-a'.", () => p.Parse(_("-a")));
+
 			// another named option while expecting one -- follow Getopt::Long
-			Utils.AssertException(null, null,
-			                      p, v => { v.Parse(_("-a", "-a")); });
+			p.Parse(_("-a", "-a")); //should work
 			Assert.AreEqual(a, "-a");
+
 			// no exception when an unregistered named option follows.
-			Utils.AssertException(null, null,
-			                      p, v => { v.Parse(_("-a", "-b")); });
+			p.Parse(_("-a", "-b")); //should work
 			Assert.AreEqual(a, "-b");
-			Utils.AssertArgumentNullException("option",
-			                                  p, v => { v.Add(null); });
+			Utils.AssertArgumentNullException("option", () => p.Add(null));
 
 			// bad type
-			Utils.AssertException(typeof (OptionException),
-			                      "Could not convert string `value' to type Int32 for option `-n'.",
-			                      p, v => { v.Parse(_("-n", "value")); });
-			Utils.AssertException(typeof (OptionException),
-			                      "Could not convert string `invalid' to type Foo for option `--f'.",
-			                      p, v => { v.Parse(_("--f", "invalid")); });
+			Utils.Assert<OptionException>("Could not convert string `value' to type Int32 for option `-n'.", () => p.Parse(_("-n", "value")));
+			Utils.Assert<OptionException>("Could not convert string `invalid' to type Foo for option `--f'.", () => p.Parse(_("--f", "invalid")));
 
 			// try to bundle with an option requiring a value
-			Utils.AssertException(typeof (OptionException),
-			                      "Cannot bundle unregistered option '-z'.",
-			                      p, v => { v.Parse(_("-cz", "extra")); });
+			Utils.Assert<OptionException>("Cannot bundle unregistered option '-z'.", () => p.Parse(_("-cz", "extra")));
 
-			Utils.AssertArgumentNullException("action",
-			                                  p, v => { v.Add("foo", (Action<string>) null); });
-			Utils.AssertException(typeof (ArgumentException),
-			                      "Cannot provide maxValueCount of 2 for OptionValueType.None." + Environment.NewLine +
-			                      "Parameter name: maxValueCount",
-			                      p, v =>
-				                      {
-					                      v.Add("foo", (k, val) =>
-						                      {
-/* ignore */
-						                      });
-				                      });
+			Utils.AssertArgumentNullException("action", () => p.Add("foo", (Action<string>) null));
+			Utils.AssertArgumentException("maxValueCount", "Cannot provide maxValueCount of 2 for OptionValueType.None.", () => p.Add("foo", (k, val) => {/* ignore */}));
 		}
 
 		[Test]
@@ -499,9 +472,7 @@ namespace Tests.Mono.Options
 			Assert.AreEqual(a["j"], "k");
 			Assert.AreEqual(a["l"], "m");
 
-			Utils.AssertException(typeof (OptionException),
-			                      "Missing required value for option '-a'.",
-			                      p, v => { v.Parse(_("-a=b")); });
+			Utils.Assert<OptionException>("Missing required value for option '-a'.", () => p.Parse(_("-a=b")));
 
 			p.Parse(_("-b", "a", "b", "c", "-b:d:e:f", "-b=g=h:i", "-b:j=k:l"));
 			Assert.AreEqual(b.Count, 4);
@@ -522,8 +493,7 @@ namespace Tests.Mono.Options
 				{
 					{"n=", (int v) => { }},
 				};
-			Utils.AssertException(typeof (OptionException), "hello!",
-			                      p, v => { v.Parse(_("-n=value")); });
+			Utils.Assert<OptionException>("hello!", () => p.Parse(_("-n=value")));
 
 			StringWriter expected = new StringWriter();
 			expected.WriteLine("  -nhello!                   hello!");
@@ -590,11 +560,8 @@ namespace Tests.Mono.Options
 			Assert.AreEqual(p.GetOptionForName("help"), p[0]);
 			Assert.AreEqual(p.GetOptionForName("invalid"), null);
 
-			Utils.AssertException(typeof (ArgumentException), "prototypes must be null!",
-			                      p, v => { v.Add("N|NUM=", (int n) => { }); });
-			Utils.AssertArgumentNullException(
-				"option",
-				p, v => { v.GetOptionForName(null); });
+			Utils.Assert<ArgumentException>("prototypes must be null!", () => p.Add("N|NUM=", (int n) => { }));
+			Utils.AssertArgumentNullException("option", () => p.GetOptionForName(null));
 		}
 
 		[Test]

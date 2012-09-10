@@ -28,29 +28,46 @@
 
 using System;
 using FluentAssertions;
+using Mono.Options;
 
 namespace Tests.Mono.Options
 {
-	static class Utils
+	public static class Utils
 	{
-		public static void AssertArgumentOutOfRangeException<T>(string argName, T a, Action<T> action)
+		public static void ShouldHaveOnlyTheseSeparators(this Option option, params string[] expectedSeparators)
 		{
-			AssertException(typeof(ArgumentOutOfRangeException), string.Format("Specified argument was out of the range of valid values.{0}Parameter name: {1}", Environment.NewLine, argName), a, action);
-		}
-		public static void AssertArgumentNullException<T>(string argName, T a, Action<T> action)
-		{
-			AssertException(typeof(ArgumentNullException), string.Format("Value cannot be null.{0}Parameter name: {1}", Environment.NewLine, argName), a, action);
+			var actualSeparators = option.GetValueSeparators();
+
+			actualSeparators.Length.Should().Be(expectedSeparators.Length);
+			actualSeparators.Should().ContainInOrder(expectedSeparators);
 		}
 
-		public static void AssertException<T>(Type exceptionType, string message, T a, Action<T> action)
+		public static void AssertArgumentOutOfRangeException(string argName, Action action)
+		{
+			AssertArg<ArgumentOutOfRangeException>(argName, "Specified argument was out of the range of valid values.", action);
+		}
+		public static void AssertArgumentNullException(string argName, Action action)
+		{
+			AssertArg<ArgumentNullException>(argName, "Value cannot be null.", action);
+		}
+		public static void AssertArgumentException(string argName, string message, Action action)
+		{
+			AssertArg<ArgumentException>(argName, message, action);
+		}
+		private static void AssertArg<TException>(string argName, string message, Action action) where TException : ArgumentException
+		{
+			Assert<TException>(string.Format("{0}{1}Parameter name: {2}", message, Environment.NewLine, argName), action);
+		}
+
+		public static void Assert<TException>(string message, Action action)
 		{
 			try
 			{
-				action(a);
+				action();
 			}
 			catch (Exception e)
 			{
-				e.GetType().Should().Be(exceptionType);
+				e.GetType().Should().Be(typeof(TException));
 				e.Message.Should().Be(message);
 			}
 		}

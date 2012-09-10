@@ -26,137 +26,54 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using Mono.Options;
 using NUnit.Framework;
 
 namespace Tests.Mono.Options
 {
-	class DefaultOption : Option {
-		public DefaultOption (string prototypes, string description)
-			: base (prototypes, description)
-		{
-		}
-
-		public DefaultOption (string prototypes, string description, int c)
-			: base (prototypes, description, c)
-		{
-		}
-
-		protected override void OnParseComplete (OptionContext c)
-		{
-			throw new NotImplementedException ();
-		}
-	}
-
 	[TestFixture]
-	public class OptionTest {
+	public class OptionTest
+	{
 		[Test]
-		public void Exceptions ()
+		public void Exceptions()
 		{
-			object p = null;
-			Utils.AssertArgumentNullException("prototype", 
-					p, v => { new DefaultOption (null, null); });
-			Utils.AssertException (typeof(ArgumentException), 
-					"Cannot be the empty string." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Empty option names are not supported." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a|b||c=", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Conflicting option types: '=' vs. ':'." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a=|b:", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"The default option handler '<>' cannot require values." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("<>=", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"The default option handler '<>' cannot require values." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("<>:", null); });
-			Utils.AssertException (null, null,
-					p, v => { new DefaultOption ("t|<>=", null, 1); });
-			Utils.AssertException (typeof(ArgumentException),
-					"The default option handler '<>' cannot require values." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("t|<>=", null, 2); });
-			Utils.AssertException (null, null,
-					p, v => { new DefaultOption ("a|b=", null, 2); });
-			Utils.AssertArgumentOutOfRangeException("maxValueCount",
-					p, v => { new DefaultOption ("a", null, -1); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Cannot provide maxValueCount of 0 for OptionValueType.Required or " +
-						"OptionValueType.Optional." + Environment.NewLine + "Parameter name: maxValueCount",
-					p, v => { new DefaultOption ("a=", null, 0); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Ill-formed name/value separator found in \"a={\"." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a={", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Ill-formed name/value separator found in \"a=}\"." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a=}", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Ill-formed name/value separator found in \"a={{}}\"." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a={{}}", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Ill-formed name/value separator found in \"a={}}\"." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a={}}", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Ill-formed name/value separator found in \"a={}{\"." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a={}{", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Cannot provide key/value separators for Options taking 1 value(s)." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a==", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Cannot provide key/value separators for Options taking 1 value(s)." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a={}", null); });
-			Utils.AssertException (typeof(ArgumentException),
-					"Cannot provide key/value separators for Options taking 1 value(s)." + Environment.NewLine + "Parameter name: prototype",
-					p, v => { new DefaultOption ("a=+-*/", null); });
-			Utils.AssertException (null, null,
-					p, v => { new DefaultOption ("a", null, 0); });
-			Utils.AssertException (null, null,
-					p, v => { new DefaultOption ("a", null, 0); });
-			Utils.AssertException (null, null, 
-					p, v => {
-						var d = new DefaultOption ("a", null);
-						Assert.AreEqual (d.GetValueSeparators ().Length, 0);
-					});
-			Utils.AssertException (null, null,
-					p, v => {
-						var d = new DefaultOption ("a=", null, 1);
-						string[] s = d.GetValueSeparators ();
-						Assert.AreEqual (s.Length, 0);
-					});
-			Utils.AssertException (null, null,
-					p, v => {
-						var d = new DefaultOption ("a=", null, 2);
-						string[] s = d.GetValueSeparators ();
-						Assert.AreEqual (s.Length, 2);
-						Assert.AreEqual (s [0], ":");
-						Assert.AreEqual (s [1], "=");
-					});
-			Utils.AssertException (null, null,
-					p, v => {
-						var d = new DefaultOption ("a={}", null, 2);
-						string[] s = d.GetValueSeparators ();
-						Assert.AreEqual (s.Length, 0);
-					});
-			Utils.AssertException (null, null,
-					p, v => {
-						var d = new DefaultOption ("a={-->}{=>}", null, 2);
-						string[] s = d.GetValueSeparators ();
-						Assert.AreEqual (s.Length, 2);
-						Assert.AreEqual (s [0], "-->");
-						Assert.AreEqual (s [1], "=>");
-					});
-			Utils.AssertException (null, null,
-					p, v => {
-						var d = new DefaultOption ("a=+-*/", null, 2);
-						string[] s = d.GetValueSeparators ();
-						Assert.AreEqual (s.Length, 4);
-						Assert.AreEqual (s [0], "+");
-						Assert.AreEqual (s [1], "-");
-						Assert.AreEqual (s [2], "*");
-						Assert.AreEqual (s [3], "/");
-					});
+			Utils.AssertArgumentNullException("prototype", () => new DefaultOption(null, null));
+			Utils.AssertArgumentException("prototype", "Cannot be the empty string.", () => new DefaultOption("", null));
+			Utils.AssertArgumentException("prototype", "Empty option names are not supported.", () => new DefaultOption("a|b||c=", null));
+			Utils.AssertArgumentException("prototype", "Conflicting option types: '=' vs. ':'.", () => new DefaultOption("a=|b:", null));
+
+			Utils.AssertArgumentException("prototype", "The default option handler '<>' cannot require values.", () => new DefaultOption("<>=", null));
+			Utils.AssertArgumentException("prototype", "The default option handler '<>' cannot require values.", () => new DefaultOption("<>:", null));
+			new DefaultOption("t|<>=", null, 1); // should work
+			Utils.AssertArgumentException("prototype", "The default option handler '<>' cannot require values.", () => new DefaultOption("t|<>=", null, 2));
+
+			new DefaultOption("a|b=", null, 2); // should work
+
+			Utils.AssertArgumentOutOfRangeException("maxValueCount", () => new DefaultOption("a", null, -1));
+			Utils.AssertArgumentException("maxValueCount",
+			                              "Cannot provide maxValueCount of 0 for OptionValueType.Required or OptionValueType.Optional.", 
+			                              () => new DefaultOption("a=", null, 0));
+
+			Utils.AssertArgumentException("prototype", "Ill-formed name/value separator found in \"a={\".", () => new DefaultOption("a={", null));
+			Utils.AssertArgumentException("prototype", "Ill-formed name/value separator found in \"a=}\".", () => new DefaultOption("a=}", null));
+			Utils.AssertArgumentException("prototype", "Ill-formed name/value separator found in \"a={{}}\".", () => new DefaultOption("a={{}}", null));
+			Utils.AssertArgumentException("prototype", "Ill-formed name/value separator found in \"a={}}\".", () => new DefaultOption("a={}}", null));
+			Utils.AssertArgumentException("prototype", "Ill-formed name/value separator found in \"a={}{\".", () => new DefaultOption("a={}{", null));
+
+			Utils.AssertArgumentException("prototype", "Cannot provide key/value separators for Options taking 1 value(s).", () => new DefaultOption("a==", null));
+			Utils.AssertArgumentException("prototype", "Cannot provide key/value separators for Options taking 1 value(s).", () => new DefaultOption("a={}", null));
+			Utils.AssertArgumentException("prototype", "Cannot provide key/value separators for Options taking 1 value(s).", () => new DefaultOption("a=+-*/", null));
+			
+			new DefaultOption("a", null, 0); // should work
+
+			var emptySeparators = new string[0];
+			new DefaultOption("a", null).ShouldHaveOnlyTheseSeparators(emptySeparators);
+			new DefaultOption("a=", null).ShouldHaveOnlyTheseSeparators(emptySeparators);
+			new DefaultOption("a=", null, 2).ShouldHaveOnlyTheseSeparators(new[] {":", "="});
+			new DefaultOption("a={}", null, 2).ShouldHaveOnlyTheseSeparators(emptySeparators);
+			new DefaultOption("a={-->}{=>}", null, 2).ShouldHaveOnlyTheseSeparators(new[] {"-->", "=>"});
+			new DefaultOption("a=+-*/", null, 2).ShouldHaveOnlyTheseSeparators(new[] {"+", "-", "*", "/"});
 		}
 	}
 }
+
 

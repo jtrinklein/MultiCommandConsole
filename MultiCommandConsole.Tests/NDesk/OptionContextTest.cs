@@ -40,23 +40,17 @@ namespace Tests.Mono.Options
 		{
 			OptionSet p = new OptionSet()
 				{
-					{"a=", v =>
-						{
-							/* ignore */
-						}
-					},
+					{"a=", v => {/* ignore */}},
 				};
+
 			OptionContext c = new OptionContext(p);
-			Utils.AssertException(typeof (InvalidOperationException),
-			                      "OptionContext.Option is null.",
-			                      c, v => { string ignore = v.OptionValues[0]; });
+			Utils.Assert<InvalidOperationException>("OptionContext.Option is null.", () => { string ignore = c.OptionValues[0]; });
+
 			c.Option = p[0];
-			Utils.AssertArgumentOutOfRangeException("index",
-			                                        c, v => { string ignore = v.OptionValues[2]; });
+			Utils.AssertArgumentOutOfRangeException("index", () => { string ignore = c.OptionValues[2]; });
+
 			c.OptionName = "-a";
-			Utils.AssertException(typeof (OptionException),
-			                      "Missing required value for option '-a'.",
-			                      c, v => { string ignore = v.OptionValues[0]; });
+			Utils.Assert<OptionException>("Missing required value for option '-a'.", () => { string ignore = c.OptionValues[0]; });
 		}
 	}
 }
