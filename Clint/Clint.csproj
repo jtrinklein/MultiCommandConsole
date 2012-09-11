@@ -39,24 +39,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandDefinition.cs" />
-    <Compile Include="Configurators\Builder\CommandBuilder.cs" />
-    <Compile Include="Configurators\Builder\Command.cs" />
-    <Compile Include="Configurators\Builder\CommandConverter.cs" />
-    <Compile Include="Configurators\Builder\Option.cs" />
-    <Compile Include="Configurators\Builder\OptionConverter.cs" />
     <Compile Include="Consoles\WinDefault\CommandLineParser.cs" />
-    <Compile Include="DisplayHelpExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
-    <Compile Include="IDisplayHelp.cs" />
-    <Compile Include="IDisplayHelpUsingDictionary.cs" />
     <Compile Include="InvalidConfigurationException.cs" />
-    <Compile Include="OptionDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Configurators\Dto\" />
-    <Folder Include="Consoles\Bash\" />
     <Folder Include="Logging\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

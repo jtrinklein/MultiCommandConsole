@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configurators\Builder\BuilderTests.cs" />
     <Compile Include="Consoles\WinDefault\CommandLineParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -58,10 +57,7 @@
       <Name>Clint</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Configurators\Dto\" />
-    <Folder Include="Consoles\Bash\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="TestCases.txt" />
   </ItemGroup>

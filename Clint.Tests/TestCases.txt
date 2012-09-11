@@ -1,2 +1,50 @@
-﻿Help output
+﻿
+-----------------------------------------------------
+COMPONENTS
+-----------------------------------------------------
+CONSOLE UI
+- history managment
+- tab completion
+- ...
+i.e.
+- bash
+- default windows console
+
+COMMAND LINE PARSING
+- ndesk
+- default windows console
+
+OUTPUT
+- help formatting
+- levels of help (powershell is good example.  ? vs --help vs --man)
+  - terse
+  - detailed
+  - examples
+
+CONFIGURATION
+- dto based
+- basically a message bus where the message is the dto
+
+
+-----------------------------------------------------
+TEST CASES
+-----------------------------------------------------
+HELP OUTPUT
 - when there is only one command - don't display a list of commands.  simply display the help for that single command.
+
+COMMAND DEFINITIONS		
+default command (no command specified - for single command cli apps)
+- no command aliases are required
+		
+several named commands
+- aliases are required for every command
+- duplicate aliases are not allowed
+		
+configure a command with
+- no args
+- 1 arg
+- several args
+- positional args
+- 
+		
+		
