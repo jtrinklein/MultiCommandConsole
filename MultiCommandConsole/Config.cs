@@ -16,6 +16,11 @@ namespace MultiCommandConsole
 		/// </summary>
 		public static Func<Type, object> ResolveTypeDelegate { get; set; }
 
+		/// <summary>
+		/// Indicates a new command is running.  <hint>This is where you should refresh any DI Container lifecycles</hint>.
+		/// </summary>
+		public static Action RunningNewCommand { get; set; }
+
 		/// <summary>The console formatter used to format messages for the console window.</summary>
 		public static ConsoleFormatter ConsoleFormatter { get; set; }
 
