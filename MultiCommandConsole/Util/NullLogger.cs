@@ -2,7 +2,7 @@ namespace MultiCommandConsole.Util
 {
 	public class NullLogger : ILogger
 	{
-		public void CurrentCommand(IConsoleCommand command)
+		public void RunCurrentCommand(IConsoleCommand command)
 		{
 			/*no op*/
 		}

@@ -13,7 +13,7 @@ namespace MultiCommandConsole.Example
 			_logger = logger;
 		}
 
-		public void CurrentCommand(IConsoleCommand command)
+		public void RunCurrentCommand(IConsoleCommand command)
 		{
 			_logger.DebugFormat("Running command {0}", command.DumpToLazyString());
 		}

@@ -56,34 +56,37 @@ namespace MultiCommandConsole
 		{
 			Log.InfoFormat("Running: {0}", string.Join(" ", args));
 
+			CommandRunData runData = null;
 			try
 			{
-				var runData = _commandRepository.LoadCommand(args);
+				runData = _commandRepository.LoadCommand(args);
 
+				runData.SetterUppers.ForEach(su => su.Setup());
 				if (!(runData.Command is HelpCommand))
 				{
-					Log.CurrentCommand(runData.Command);
+					Log.RunCurrentCommand(runData.Command);
 				}
-				runData.SetterUppers.ForEach(su => su.Setup());
 				runData.Command.Run();
 				runData.SetterUppers.Reverse();
 				runData.SetterUppers.ForEach(su => su.Cleanup());
 			}
 			catch (TargetInvocationException e)
 			{
+				if(runData != null && runData.Command != null)
+				{
+					e.SetContext("command", runData.Command);
+				}
 				var error = (e.InnerException ?? e).DumpToString();
-				Console.Out.WriteLine(error);
-				Console.Out.WriteLine();
-				Console.Out.WriteLine("See logs for more details");
 				Log.Error(error);
 				throw;
 			}
 			catch (Exception e)
 			{
+				if (runData != null && runData.Command != null)
+				{
+					e.SetContext("command", runData.Command);
+				}
 				var error = e.DumpToString();
-				Console.Out.WriteLine(error);
-				Console.Out.WriteLine();
-				Console.Out.WriteLine("See logs for more details");
 				Log.Error(error);
 				throw;
 			}
