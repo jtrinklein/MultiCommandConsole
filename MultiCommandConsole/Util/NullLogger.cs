@@ -1,3 +1,5 @@
+using System;
+
 namespace MultiCommandConsole.Util
 {
 	public class NullLogger : ILogger
@@ -22,6 +24,11 @@ namespace MultiCommandConsole.Util
 		}
 
 		public void Error(string message)
+		{
+			/*no op*/
+		}
+
+		public void ErrorFormat(Exception ex, string format, params object[] args)
 		{
 			/*no op*/
 		}

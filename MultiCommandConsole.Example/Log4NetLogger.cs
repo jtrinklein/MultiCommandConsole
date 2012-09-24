@@ -1,3 +1,4 @@
+using System;
 using MultiCommandConsole.Util;
 using ObjectPrinter;
 using log4net;
@@ -35,6 +36,11 @@ namespace MultiCommandConsole.Example
 		public void Error(string message)
 		{
 			_logger.Error(message);
+		}
+
+		public void ErrorFormat(Exception ex, string format, params object[] args)
+		{
+			_logger.Error(string.Format(format, args), ex);
 		}
 	}
 }

@@ -66,9 +66,27 @@ namespace MultiCommandConsole
 				{
 					Log.RunCurrentCommand(runData.Command);
 				}
-				runData.Command.Run();
-				runData.SetterUppers.Reverse();
-				runData.SetterUppers.ForEach(su => su.Cleanup());
+
+				try
+				{
+					runData.Command.Run();
+				}
+				finally
+				{
+					runData.SetterUppers.Reverse();
+					runData.SetterUppers.ForEach(su =>
+						{
+							try
+							{
+								su.Cleanup();
+							}
+							catch (Exception e)
+							{
+								e.SetContext("cleaner upper", su);
+								Log.ErrorFormat(e, "failed cleanup for {0}", su.GetType().Name);
+							}
+						});
+				}
 			}
 			catch (TargetInvocationException e)
 			{
