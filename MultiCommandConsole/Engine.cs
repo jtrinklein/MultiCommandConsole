@@ -56,6 +56,18 @@ namespace MultiCommandConsole
 		{
 			Log.InfoFormat("Running: {0}", string.Join(" ", args));
 
+			if (Config.RunCommand == null)
+			{
+				RunImpl(args);
+			}
+			else
+			{
+				Config.RunCommand(args, RunImpl);
+			}
+		}
+
+		private void RunImpl(string[] args)
+		{
 			CommandRunData runData = null;
 			try
 			{
@@ -90,7 +102,7 @@ namespace MultiCommandConsole
 			}
 			catch (TargetInvocationException e)
 			{
-				if(runData != null && runData.Command != null)
+				if (runData != null && runData.Command != null)
 				{
 					e.SetContext("command", runData.Command);
 				}

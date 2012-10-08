@@ -93,7 +93,6 @@ namespace MultiCommandConsole.Commands
 									{
 										args = args.Take(args.Length - 2).ToArray();
 										Console.SetOut(streamWriter);
-										Config.RunningNewCommand();
 										_engine.Run(args);
 									}
 								}
