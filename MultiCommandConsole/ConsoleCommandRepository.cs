@@ -178,7 +178,8 @@ namespace MultiCommandConsole
 					{
 						return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
 					}
-					var errors = validators.SelectMany(v => v.GetArgValidationErrors()).ToList();
+
+					var errors = validators.OrderBy(v => v is IConsoleCommand).SelectMany(v => v.GetArgValidationErrors()).ToList();
 					if (errors.Count > 0)
 					{
 						foreach (var error in errors)
