@@ -30,44 +30,52 @@ namespace MultiCommandConsole.Util
 
 			foreach (var c in consoleInput)
 			{
-				if (c == escapeChar)
+				//escape char is only an escape char when it precedes a double quote
+				switch (c)
 				{
-					prevCharIsEscapeChar = true;
-					continue;
-				}
+					case doubleQuote:
+						if (prevCharIsEscapeChar)
+						{
+							arg.Append(doubleQuote);
+						}
+						else
+						{
+							isInDoubleQuote = !isInDoubleQuote;
+						}
+						break;
+					case escapeChar:
+						if(prevCharIsEscapeChar)
+						{
+							arg.Append(escapeChar);
+						}
 
-				if (c == doubleQuote)
-				{
-					if (prevCharIsEscapeChar)
-					{
-						arg.Append(doubleQuote);
-					}
-					else
-					{
-						isInDoubleQuote = !isInDoubleQuote;
-					}
+						prevCharIsEscapeChar = true;
+						continue;
+						
+						break;
+					default:
+						if(prevCharIsEscapeChar)
+						{
+							arg.Append(escapeChar);
+							arg.Append(c);
+						}
+						else if(isInDoubleQuote)
+						{
+							arg.Append(c);
+						}
+						else if(char.IsWhiteSpace(c))
+						{
+							args.Add(arg.ToString());
+							arg.Length = 0;
+						}
+						else
+						{
+							arg.Append(c);
+						}
+						break;
 				}
-				else if (prevCharIsEscapeChar)
-				{
-					//escape char is only an escape char when it precedes a double quote
-					arg.Append(escapeChar);
-					arg.Append(c);
-				}
-				else if(isInDoubleQuote)
-				{
-					arg.Append(c);
-				}
-				else if(char.IsWhiteSpace(c))
-				{
-					args.Add(arg.ToString());
-					arg.Length = 0;
-				}
-				else
-				{
-					arg.Append(c);
-				}
-
 				prevCharIsEscapeChar = false;
+
 			}
 
 			args.Add(arg.ToString());
