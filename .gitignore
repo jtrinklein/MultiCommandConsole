@@ -1,4 +1,5 @@
 _ReSharper*
+_TeamCity*
 */bin/*
 */obj/*
 *.suo
