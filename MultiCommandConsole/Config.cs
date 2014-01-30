@@ -56,6 +56,7 @@ namespace MultiCommandConsole
 			ConsoleFormatter = new ConsoleFormatter();
 			CommandPromptText = "$";
 			ShowVierArgsCommand = false;
+		    ResolveTypeDelegate = Activator.CreateInstance;
 		}
 	}
 }

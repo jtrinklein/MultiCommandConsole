@@ -16,7 +16,7 @@ namespace MultiCommandConsole.Example
 
 		public void RunCurrentCommand(IConsoleCommand command)
 		{
-			_logger.DebugFormat("Running command {0}", command.DumpToLazyString());
+			_logger.DebugFormat("Running command {0}", command.Dump());
 		}
 
 		public void Debug(string message)

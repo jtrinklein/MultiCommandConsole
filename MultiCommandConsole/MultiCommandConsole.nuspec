@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>MultiCommandConsole</id>
+		<version>$version$</version>
+		<title>MultiCommandConsole</title>
+		<authors>Drew Burlingame</authors>
+		<owners>Drew Burlingame</owners>
+		<projectUrl>https://github.com/drewburlingame/MultiCommandConsole</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<summary>
+			Framework for creating console apps with multiple commands
+		</summary>
+		<description>
+			Framework for creating console apps with multiple commands
+		</description>
+		<references>
+			<reference file="MultiCommandConsole.dll" />
+		</references>
+		<tags>.net console</tags>
+		<releaseNotes>
+			Initial release.  
+			- This has been in a production system for nearly 2 years and has made composing our console apps with multiple commands and shared options a breeze.
+			- Uses NDesk and Mono for interfacing with the command line.  We have some oddities with history and escape keys with the Mono code, but it's never been painful for us address... but almost.
+			- Accepting Pull Requests
+		</releaseNotes>
+	</metadata>
+</package>

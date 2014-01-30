@@ -83,28 +83,32 @@ namespace MultiCommandConsole.Commands
 					{
 						try
 						{
-							if (args.Length > 2 && args[args.Length - 2] == ">")
-							{
-								var outputFile = args.Last();
-								using(var streamWriter = File.CreateText(outputFile))
-								{
-									var origConsoleOut = Console.Out;
-									using (new DisposableAction(() => Console.SetOut(origConsoleOut)))
-									{
-										args = args.Take(args.Length - 2).ToArray();
-										Console.SetOut(streamWriter);
-										_engine.Run(args);
-									}
-								}
-							}
-							else
-							{
-								_engine.Run(args);
-							}
+						    if (args.Length > 2 && args[args.Length - 2] == ">")
+						    {
+						        var outputFile = args.Last();
+						        using (var streamWriter = File.CreateText(outputFile))
+						        {
+						            var origConsoleOut = Console.Out;
+						            using (new DisposableAction(() => Console.SetOut(origConsoleOut)))
+						            {
+						                args = args.Take(args.Length - 2).ToArray();
+						                Console.SetOut(streamWriter);
+						                _engine.Run(args);
+						            }
+						        }
+						    }
+						    else
+						    {
+						        _engine.Run(args);
+						    }
 						}
 						catch
 						{
-							//Engine already printed to logs and console
+						    //Engine already printed to logs and console
+						}
+						finally
+						{
+						    le.SaveHistory();
 						}
 					}
 

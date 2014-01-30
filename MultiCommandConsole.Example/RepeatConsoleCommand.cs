@@ -41,7 +41,7 @@ namespace MultiCommandConsole.Example
 
 		public void Run()
 		{
-			Log.Debug(this.DumpToLazyString());
+			Log.Debug(this.Dump());
 
 			for (int i = 0; i < Times; i++)
 			{
