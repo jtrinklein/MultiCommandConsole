@@ -33,6 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging, Version=2.2.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Common.Logging.2.2.0\lib\net40\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Common.Logging.Core.2.2.0\lib\net40\Common.Logging.Core.dll</HintPath>
+    </Reference>
     <Reference Include="ObjectPrinter, Version=1.2.5140.3134, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ObjectPrinter.1.2.5140.3134\lib\net40\ObjectPrinter.dll</HintPath>
@@ -67,17 +75,13 @@
     <Compile Include="NDesk\OptionSet.cs" />
     <Compile Include="NDesk\OptionValueCollection.cs" />
     <Compile Include="NDesk\OptionValueType.cs" />
-    <Compile Include="Util\ConsoleLogger.cs" />
     <Compile Include="Util\DisposableAction.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="IConsoleCommand.cs" />
     <Compile Include="Util\Converter.cs" />
     <Compile Include="Util\EnumerableExtensions.cs" />
-    <Compile Include="Util\ILogger.cs" />
-    <Compile Include="Util\Logging.cs" />
     <Compile Include="Util\ConsoleFormatter.cs" />
-    <Compile Include="Util\NullLogger.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\TypeExtensions.cs" />
     <Compile Include="Commands\ViewArgsCommand.cs" />
@@ -87,7 +91,9 @@
     <Content Include="NDesk\readme.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

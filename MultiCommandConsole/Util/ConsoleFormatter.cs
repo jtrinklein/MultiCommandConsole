@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Common.Logging;
 
 namespace MultiCommandConsole.Util
 {
 	public class ConsoleFormatter
 	{
-		private static ILogger Log = Logging.GetLogger<ConsoleFormatter>();
+		private static readonly ILog Log = LogManager.GetLogger<ConsoleFormatter>();
 
 		public int OverriddenBufferWidth { get; set; }
 
-		private int _bufferWidth { get { return OverriddenBufferWidth == 0 ? GetBufferWidth() : OverriddenBufferWidth; } }
+		private int BufferWidth { get { return OverriddenBufferWidth == 0 ? GetBufferWidth() : OverriddenBufferWidth; } }
 
 		private int GetBufferWidth()
 		{
@@ -29,7 +30,7 @@ namespace MultiCommandConsole.Util
 
 		public IEnumerable<string> ChunkString(string text, int decreaseChunkBy = 0)
 		{
-			var chunkSize = _bufferWidth - decreaseChunkBy;
+			var chunkSize = BufferWidth - decreaseChunkBy;
 
 			if (chunkSize > text.Length)
 			{
@@ -45,7 +46,7 @@ namespace MultiCommandConsole.Util
 				{
 					var effectiveChunkSize = chunkSize;
 					var chunk = text.Substring(startIndex, Math.Min(chunkSize, text.Length - startIndex));
-					var newlineIndex = chunk.IndexOf(Environment.NewLine);
+					var newlineIndex = chunk.IndexOf(Environment.NewLine, StringComparison.Ordinal);
 					if (newlineIndex != -1)
 					{
 						effectiveChunkSize = newlineIndex + Environment.NewLine.Length;

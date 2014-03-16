@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ObjectPrinter;
-using log4net;
+using Common.Logging;
 
 namespace MultiCommandConsole.Example
 {

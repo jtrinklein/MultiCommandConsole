@@ -2,17 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using MultiCommandConsole.Commands;
-using MultiCommandConsole.Util;
+using Common.Logging;
 using ObjectPrinter;
 
 namespace MultiCommandConsole
 {
 	public class Engine
 	{
-		private static ILogger Log = Logging.GetLogger<Engine>();
+		private static readonly ILog Log = LogManager.GetLogger<Engine>();
 
-		private ConsoleCommandRepository _commandRepository;
+		private readonly ConsoleCommandRepository _commandRepository;
 
 		/// <summary>The name of the application.  Will be used to store console history.</summary>
 		public string AppName { get; set; }
@@ -74,10 +73,6 @@ namespace MultiCommandConsole
 				runData = _commandRepository.LoadCommand(args);
 
 				runData.SetterUppers.ForEach(su => su.Setup());
-				if (!(runData.Command is HelpCommand))
-				{
-					Log.RunCurrentCommand(runData.Command);
-				}
 
 				try
 				{
@@ -95,7 +90,7 @@ namespace MultiCommandConsole
 							catch (Exception e)
 							{
 								e.SetContext("cleaner upper", su);
-								Log.ErrorFormat(e, "failed cleanup for {0}", su.GetType().Name);
+								Log.ErrorFormat("failed cleanup for {0}", e, su.GetType().Name);
 							}
 						});
 				}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Common.Logging;
 using Mono.Options;
 using MultiCommandConsole.Commands;
 using MultiCommandConsole.Util;
@@ -11,10 +12,10 @@ namespace MultiCommandConsole
 {
 	internal class ConsoleCommandRepository
 	{
-		private static ILogger Log = Logging.GetLogger<ConsoleCommandRepository>();
+		private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
 
-		readonly Dictionary<string, ConsoleCommandInfo> _commandsByName;
-		private ConsoleFormatter _chunker = Config.ConsoleFormatter;
+		private readonly Dictionary<string, ConsoleCommandInfo> _commandsByName;
+		private readonly ConsoleFormatter _chunker = Config.ConsoleFormatter;
 		internal ConsoleCommand ConsoleCommand { get; set; }
 
 		private IEnumerable<ConsoleCommandInfo> _commands;
@@ -165,9 +166,10 @@ namespace MultiCommandConsole
 
 				var validators = new List<IValidatable> { command };
 				var setterUppers = new List<ISetupAndCleanup>();
-				if (command is ISetupAndCleanup)
+			    var setterUpper = command as ISetupAndCleanup;
+				if (setterUpper != null)
 				{
-					setterUppers.Add(command as ISetupAndCleanup);
+					setterUppers.Add(setterUpper);
 				}
 				LoadArgs(options, validators, setterUppers, command);
 				options.Add(HelpCommand.Prototype, "show this message and exit", a => showHelp = true);

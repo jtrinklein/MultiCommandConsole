@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using log4net;
 using log4net.Appender;
 using log4net.Core;
 using log4net.Layout;
@@ -22,9 +21,9 @@ namespace MultiCommandConsole.Example
 					{Level.Info.Name, Level.Info},
 					{Level.Debug.Name, Level.Debug},
 				};
-		private static Hierarchy _hierarchy = (Hierarchy)LogManager.GetRepository();
-		private static Logger _rootLogger = _hierarchy.Root;
-		private static Level _origRootLogLevel = _rootLogger.Level;
+		private static readonly Hierarchy Hierarchy = (Hierarchy)log4net.LogManager.GetRepository();
+		private static readonly Logger RootLogger = Hierarchy.Root;
+		private static readonly Level OrigRootLogLevel = RootLogger.Level;
 		private Level _verbosity = Level.Info;
 		private AppenderSkeleton _consoleAppender;
 
@@ -73,18 +72,18 @@ namespace MultiCommandConsole.Example
 				_verbosity = Level.All;
 			}
 			_consoleAppender.Threshold = _verbosity;
-			if (_rootLogger.Level == null || _verbosity < _rootLogger.Level)
+			if (RootLogger.Level == null || _verbosity < RootLogger.Level)
 			{
-				_rootLogger.Level = _verbosity;
+				RootLogger.Level = _verbosity;
 			}
 
-			_hierarchy.Configured = true;
+			Hierarchy.Configured = true;
 		}
 
 		public void Cleanup()
 		{
-			_rootLogger.Level = _origRootLogLevel;
-			_hierarchy.Configured = true;
+			RootLogger.Level = OrigRootLogLevel;
+			Hierarchy.Configured = true;
 		}
 
 		private void EnsureConsoleAppender()
@@ -95,17 +94,17 @@ namespace MultiCommandConsole.Example
 			}
 
 			var consoleAppenderName = "ConsoleAppender";
-			_consoleAppender = (AppenderSkeleton)_rootLogger.GetAppender(consoleAppenderName);
+			_consoleAppender = (AppenderSkeleton)RootLogger.GetAppender(consoleAppenderName);
 			if (_consoleAppender == null)
 			{
 				_consoleAppender = GetConfiguredAppender(consoleAppenderName) ?? CreateAppender(consoleAppenderName);
-				_rootLogger.AddAppender(_consoleAppender);
+				RootLogger.AddAppender(_consoleAppender);
 			}
 		}
 
 		private static AppenderSkeleton GetConfiguredAppender(string consoleAppenderName)
 		{
-			var appenders = _hierarchy.GetAppenders();
+			var appenders = Hierarchy.GetAppenders();
 			return (AppenderSkeleton)appenders.FirstOrDefault(
 				a => consoleAppenderName.Equals(a.Name, StringComparison.OrdinalIgnoreCase));
 		}

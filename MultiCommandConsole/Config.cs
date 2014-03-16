@@ -5,11 +5,6 @@ namespace MultiCommandConsole
 {
 	public static class Config
 	{
-		private static NullLogger _default;
-
-		/// <summary>Use this to inject your own logging framework.</summary>
-		public static Func<Type, ILogger> GetLoggerDelegate { get; set; }
-
 		/// <summary>
 		/// By default, commands and arg sets are created by Activator.  
 		/// Use this delegate to override the default behavior. 
@@ -52,7 +47,6 @@ namespace MultiCommandConsole
 
 		static Config()
 		{
-			GetLoggerDelegate = delegate { return _default ?? (_default = new NullLogger()); };
 			ConsoleFormatter = new ConsoleFormatter();
 			CommandPromptText = "$";
 			ShowVierArgsCommand = false;
