@@ -1,11 +1,23 @@
 using System;
+using MultiCommandConsole.Commands;
 using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole
 {
 	public static class Config
 	{
-		/// <summary>
+	    private static Type _defaultCommand = typeof(HelpCommand);
+
+	    /// <summary>
+        /// When not specified or set to null, the help command becomes the default command.
+        /// </summary>
+        public static Type DefaultCommand
+	    {
+	        get { return _defaultCommand; }
+	        set { _defaultCommand = value ?? typeof(HelpCommand); }
+	    }
+
+	    /// <summary>
 		/// By default, commands and arg sets are created by Activator.  
 		/// Use this delegate to override the default behavior. 
 		/// </summary>

@@ -20,8 +20,13 @@ namespace MultiCommandConsole
 		public int HistorySize { get; set; }
 
 		/// <summary>
+		/// <para>
 		/// A list of types the the Engine may have to resolve to run any of the commands 
 		/// from the assemblies and types given in the ctor.
+        /// </para>
+		/// <para>
+		/// Iterate through this list to wire up your IoC container.
+        /// </para>
 		/// </summary>
 		public IEnumerable<Type> TypesToResolve
 		{

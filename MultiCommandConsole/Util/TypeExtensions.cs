@@ -3,7 +3,7 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole.Util
 {
-	internal static class TypeExtensions
+    internal static class TypeExtensions
 	{
 		public static object Default(this Type type)
 		{

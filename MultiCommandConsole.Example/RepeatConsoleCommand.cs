@@ -13,7 +13,7 @@ namespace MultiCommandConsole.Example
 		[Arg("text|t", "the text to be repeated", Required = true)]
 		public string Text { get; set; }
 
-		[Arg("times|n", "the number of times to repeat the text.  between 1 and 100")]
+		[Arg("times|n", "the number of times to repeat the text.  between 1 and 100", Required = true)]
 		public int Times { get; set; }
 
 		public LogOptions LogOptions { get; set; }

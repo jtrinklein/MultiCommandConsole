@@ -13,6 +13,7 @@ namespace MultiCommandConsole.Example
 			Config.CommandPromptText = "console";
 			Config.ShowConsoleCommand = true;
 			Config.ShowVierArgsCommand = true;
+		    Config.DefaultCommand = typeof (RepeatConsoleCommand);
 
 		    LogManager.Adapter = new Log4NetFactoryAdapter();
 

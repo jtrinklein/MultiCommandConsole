@@ -14,7 +14,8 @@ namespace MultiCommandConsole
 	{
 		private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
 
-		private readonly Dictionary<string, ConsoleCommandInfo> _commandsByName;
+        private readonly Dictionary<string, ConsoleCommandInfo> _commandsByName;
+        private readonly Dictionary<Type, ConsoleCommandInfo> _commandsByType;
 		private readonly ConsoleFormatter _chunker = Config.ConsoleFormatter;
 		internal ConsoleCommand ConsoleCommand { get; set; }
 
@@ -42,8 +43,9 @@ namespace MultiCommandConsole
 		}
 
 		public ConsoleCommandRepository(Engine engine)
-		{
-			_commandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
+        {
+            _commandsByType = new Dictionary<Type, ConsoleCommandInfo>();
+            _commandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
 
 			//these commands should never be created by the ResolveTypeDelegate.  They're internal only
 			AddCommand(BuildCommandInfo(new HelpCommand()));
@@ -80,6 +82,7 @@ namespace MultiCommandConsole
 
 		private void AddCommand(ConsoleCommandInfo info)
 		{
+            _commandsByType.Add(info.CommandType, info);
 			foreach (var name in info.Attribute.Prototype.GetPrototypeArray())
 			{
 				_commandsByName.Add(name, info);
@@ -130,25 +133,48 @@ namespace MultiCommandConsole
 		}
 
 		public CommandRunData LoadCommand(string[] args)
-		{
+        {
+            var optionPrefixes = new[] { '/', '-' };
+			ConsoleCommandInfo info = null;
+
 			if(args.IsNullOrEmpty() || string.IsNullOrEmpty(args[0]))
-			{
-				return new CommandRunData {Command = HelpCommand.ForCommands(Commands)};
-			}
-			
-			var firstArg = args[0].Trim().TrimStart(new []{'/','-'});
+            {
+                _commandsByType.TryGetValue(Config.DefaultCommand, out info);
+                if (info != null)
+                {
+                    args = new[] {info.Attribute.Prototype.GetPrototypeArray().First()}.Union(args).ToArray();
+                }
+            }
+
+			var commandName = args[0].Trim();
+            if (optionPrefixes.Any(p => p == commandName[0]))
+            {
+                //did the user type /help first?
+                if (_commandsByName.TryGetValue(commandName.Substring(1), out info)
+                    && info == _commandsByType[typeof(HelpCommand)])
+                {
+                    commandName = commandName.TrimStart(optionPrefixes);
+                }
+                else
+                {
+                    _commandsByType.TryGetValue(Config.DefaultCommand, out info);
+                    if (info != null)
+                    {
+                        args = new[] { info.Attribute.Prototype.GetPrototypeArray().First() }.Union(args).ToArray();
+                    }
+                }
+            }
 
 			bool showHelp = false;
 			var options = new OptionSet();
 
-			ConsoleCommandInfo info;
-			if(_commandsByName.TryGetValue(firstArg, out info))
+            if (info != null || _commandsByName.TryGetValue(commandName, out info))
 			{
 				if (info.CommandType == typeof(HelpCommand))
 				{
 					if (args.Length > 1)
 					{
-						return LoadCommand(new[]{args[1], args[0]});
+						return LoadCommand(new[]{args[1], "/" + commandName});
 					}
 					return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 				}
@@ -201,7 +227,7 @@ namespace MultiCommandConsole
 
 			}
 
-			Console.Out.WriteLine("Unknown command: " + firstArg);
+			Console.Out.WriteLine("Unknown command: " + commandName);
 			return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 		}
 

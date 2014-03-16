@@ -75,6 +75,7 @@
     <Compile Include="NDesk\OptionSet.cs" />
     <Compile Include="NDesk\OptionValueCollection.cs" />
     <Compile Include="NDesk\OptionValueType.cs" />
+    <Compile Include="Util\CommandLineParser.cs" />
     <Compile Include="Util\DisposableAction.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
