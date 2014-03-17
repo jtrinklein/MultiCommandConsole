@@ -16,9 +16,6 @@ namespace MultiCommandConsole
 		/// <summary>The name of the application.  Will be used to store console history.</summary>
 		public string AppName { get; set; }
 
-		/// <summary>The number of entries to keep in history.</summary>
-		public int HistorySize { get; set; }
-
 		/// <summary>
 		/// <para>
 		/// A list of types the the Engine may have to resolve to run any of the commands 

@@ -40,7 +40,9 @@ namespace MultiCommandConsole.Commands
 
 		public void Run()
 		{
-			var le = new LineEditor(_engine.AppName, _engine.HistorySize == 0 ? 10 : _engine.HistorySize)
+		    var le = new LineEditor(
+                Config.ConsoleMode.AppName, 
+                Config.ConsoleMode.HistorySize.GetValueOrDefault(10))
 			         	{
 			         		AutoCompleteEvent = (text, pos) => GetEntries(text)
 			         	};
@@ -62,7 +64,7 @@ namespace MultiCommandConsole.Commands
 					string[] args;
 					do
 					{
-						args = le.Edit(Config.CommandPromptText +  "> ", string.Empty).SplitCmdLineArgs();
+						args = le.Edit(Config.ConsoleMode.CommandPromptText +  "> ", string.Empty).SplitCmdLineArgs();
 					} while (args.IsNullOrEmpty());
 
 					if (args[0].Equals("quit", StringComparison.OrdinalIgnoreCase))

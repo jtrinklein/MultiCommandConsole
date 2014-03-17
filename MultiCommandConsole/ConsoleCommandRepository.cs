@@ -44,7 +44,7 @@ namespace MultiCommandConsole
 
 			//these commands should never be created by the ResolveTypeDelegate.  They're internal only
 			AddCommand(BuildCommandInfo(new HelpCommand()));
-			if (Config.ShowConsoleCommand)
+			if (Config.ConsoleMode.Enabled)
 			{
 				AddCommand(BuildCommandInfo(ConsoleCommand = new ConsoleCommand(engine, this)));
 			}

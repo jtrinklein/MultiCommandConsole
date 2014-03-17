@@ -24,25 +24,41 @@ namespace MultiCommandConsole
 		public static Func<Type, object> ResolveTypeDelegate { get; set; }
 
 		/// <summary>
-		/// Indicates a command is about to run.  <hint>This is where you should refresh any DI Container lifecycles</hint>.
+		/// Indicates a command is about to run.  
+		/// <hint>This is where you should refresh any DI Container lifecycles</hint>.
 		/// </summary>
 		public static Action<string[], Action<string[]>> RunCommand { get; set; }
 
 		/// <summary>
-		/// Indicates a command has finished running.  <hint>This is where you should cleanup any DI Container lifecycles</hint>.
+		/// Indicates a command has finished running.  
+		/// <hint>This is where you should cleanup any DI Container lifecycles</hint>.
 		/// </summary>
 		public static Action EndRunCommand { get; set; }
 
-		/// <summary>The console formatter used to format messages for the console window.</summary>
+		/// <summary>The console formatter used to format messages for the console window</summary>
 		public static ConsoleFormatter ConsoleFormatter { get; set; }
 
-		/// <summary>The prompt text displayed before the prompt while in console mode.</summary>
-		public static string CommandPromptText { get; set; }
 
-		/// <summary>
-		/// If true, an additional command will be displayed to allow the user to enter interactive console mode
-		/// </summary>
-		public static bool ShowConsoleCommand { get; set; }
+        public static class ConsoleMode
+        {
+            /// <summary>
+            /// If true, an additional command will be displayed to allow the user to enter interactive console mode
+            /// </summary>
+            public static bool Enabled { get; set; }
+
+            /// <summary>
+            /// The prompt text displayed before the prompt
+            /// </summary>
+            public static string CommandPromptText { get; set; }
+
+            /// <summary>The name of the application.  Will be used to store console history.</summary>
+            public static string AppName { get; set; }
+
+            /// <summary>
+            /// The number of entries to keep in history
+            /// </summary>
+            public static int? HistorySize { get; set; }
+        }
 
 		/// <summary>
 		/// If true, an additional command will be displayed to allow the user to see how the text they 
@@ -60,9 +76,11 @@ namespace MultiCommandConsole
 		static Config()
 		{
 			ConsoleFormatter = new ConsoleFormatter();
-			CommandPromptText = "$";
 			ShowVierArgsCommand = false;
 		    ResolveTypeDelegate = Activator.CreateInstance;
+
+            ConsoleMode.CommandPromptText = "$";
+		    ConsoleMode.HistorySize = 50;
 		}
 	}
 }

@@ -9,19 +9,17 @@ namespace MultiCommandConsole.Example
 		static void Main(string[] args)
 		{
 			var assembly = typeof (Program).Assembly;
-			log4net.Config.XmlConfigurator.ConfigureAndWatch(GetLogFileInfo(assembly));
-			Config.CommandPromptText = "console";
-			Config.ShowConsoleCommand = true;
+            log4net.Config.XmlConfigurator.ConfigureAndWatch(GetLogFileInfo(assembly));
+            Config.ConsoleMode.Enabled = true;
+			Config.ConsoleMode.CommandPromptText = "console";
+		    Config.ConsoleMode.HistorySize = 5;
+		    Config.ConsoleMode.AppName = "example_console";
 			Config.ShowVierArgsCommand = true;
 		    Config.DefaultCommand = typeof (RepeatConsoleCommand);
 
 		    LogManager.Adapter = new Log4NetFactoryAdapter();
 
-			var engine = new Engine(new[] {assembly})
-			             	{
-			             		AppName="example_console",
-								HistorySize = 5
-			             	};
+			var engine = new Engine(new[] {assembly});
 			engine.Run(args);
 		}
 
