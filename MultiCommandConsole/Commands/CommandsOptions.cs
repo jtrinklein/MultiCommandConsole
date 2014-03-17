@@ -6,21 +6,29 @@ namespace MultiCommandConsole.Commands
     [ArgSet("commands", "provides all commands")]
     public class CommandsOptions
     {
-        internal Dictionary<string, ConsoleCommandInfo> CommandsByPrototype { private get; set; }
-        internal Dictionary<Type, ConsoleCommandInfo> CommandsByType { private get; set; }
+        internal ConsoleCommandRepository ConsoleCommandRepository { private get; set; }
+        internal ICommandRunner CommandRunner { private get; set; }
 
-        public IEnumerable<ConsoleCommandInfo> Commands { get; set; }
+        public IEnumerable<ConsoleCommandInfo> Commands { get { return ConsoleCommandRepository.Commands; } }
+
+        public void Run(string[] args)
+        {
+            CommandRunner.Run(args);
+        }
+
+        public IDisposable HideCommandOfType<T>() where T: IConsoleCommand
+        {
+            return ConsoleCommandRepository.HideCommandOfType<T>();
+        }
 
         public ConsoleCommandInfo GetByPrototype(string name)
         {
-            ConsoleCommandInfo info;
-            return CommandsByPrototype.TryGetValue(name, out info) ? info : null;
+            return ConsoleCommandRepository.GetByPrototype(name);
         }
 
         public ConsoleCommandInfo GetByType(Type type)
         {
-            ConsoleCommandInfo info;
-            return CommandsByType.TryGetValue(type, out info) ? info : null;
+            return ConsoleCommandRepository.GetByType(type);
         }
     }
 }

@@ -67,7 +67,12 @@ namespace MultiCommandConsole
 			}
 		}
 
-		private void RunImpl(string[] args)
+        public void Stop()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RunImpl(string[] args)
 		{
 			CommandRunData runData = null;
 			try

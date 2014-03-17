@@ -10,18 +10,11 @@ namespace MultiCommandConsole.Commands
 {
     [ConsoleCommand(CommandName, "enter into console mode where commands can be typed interactively without exiting the console app.")]
 	internal class ConsoleCommand : IConsoleCommand
-	{
-		readonly ICommandRunner _commandRunner;
-		readonly ConsoleCommandRepository _consoleCommandRepository;
-		static readonly char[] ArgPrefixes = new[] { '/', '-' };
+    {
+        public const string CommandName = "console";
+        static readonly char[] ArgPrefixes = new[] { '/', '-' };
 
-		public ConsoleCommand(ICommandRunner commandRunner, ConsoleCommandRepository consoleCommandRepository)
-		{
-			_commandRunner = commandRunner;
-			_consoleCommandRepository = consoleCommandRepository;
-		}
-
-		public const string CommandName = "console";
+        public CommandsOptions CommandsOptions { get; set; }
 		
 		public string GetDetailedHelp()
 		{
@@ -36,7 +29,7 @@ namespace MultiCommandConsole.Commands
 		}
 
 		private Dictionary<string, ConsoleCommandInfo> _commandCache;
-		private Dictionary<string, List<string>> _optionCache = new Dictionary<string, List<string>>();
+		private readonly Dictionary<string, List<string>> _optionCache = new Dictionary<string, List<string>>();
 
 		public void Run()
 		{
@@ -47,7 +40,7 @@ namespace MultiCommandConsole.Commands
 			         		AutoCompleteEvent = (text, pos) => GetEntries(text)
 			         	};
 
-			using (_consoleCommandRepository.HideConsoleCommand())
+			using (CommandsOptions.HideCommandOfType<ConsoleCommand>())
 			{
 				var chunker = Config.ConsoleFormatter;
 				chunker.ChunckStringTo(
@@ -95,13 +88,13 @@ namespace MultiCommandConsole.Commands
 						            {
 						                args = args.Take(args.Length - 2).ToArray();
 						                Console.SetOut(streamWriter);
-						                _commandRunner.Run(args);
+						                CommandsOptions.Run(args);
 						            }
 						        }
 						    }
 						    else
 						    {
-						        _commandRunner.Run(args);
+                                CommandsOptions.Run(args);
 						    }
 						}
 						catch
@@ -127,7 +120,7 @@ namespace MultiCommandConsole.Commands
 				if (_commandCache == null)
 				{
 					_commandCache = new Dictionary<string, ConsoleCommandInfo>();
-					foreach(var command in _consoleCommandRepository.Commands)
+					foreach(var command in CommandsOptions.Commands)
 					{
 						foreach(var name in command.Attribute.Prototype.GetPrototypeArray())
 						{
