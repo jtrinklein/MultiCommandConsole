@@ -26,17 +26,12 @@ namespace MultiCommandConsole
 			{
 				if (_commands == null)
 				{
-					var commands = from c in _commandsByName.Values
-					               group c by c.Attribute.Prototype
-					               into grouping
-					               select grouping.First();
-
-					_commands = from c in commands
-					            let isInternal = c.CommandType.Namespace == typeof (HelpCommand).Namespace
+					var commands = from c in _commandsByType.Values
+					            let isInternal = c.CommandType.Assembly == GetType().Assembly
 					            orderby isInternal descending , c.Attribute.Prototype
 					            select c;
 
-					_commands = _commands.ToList();
+					_commands = commands.ToList();
 				}
 				return _commands;
 			}
@@ -239,14 +234,14 @@ namespace MultiCommandConsole
 			{
 				var args = option.PropertyInfo.GetValue(obj, null) ?? option.PropertyInfo.PropertyType.Resolve();
 
-				if (args is IValidatable)
-				{
-					validators.Add(args as IValidatable);
-				}
-				if (args is ISetupAndCleanup)
-				{
-					setterUppers.Add(args as ISetupAndCleanup);
-				}
+			    args.As<CommandsOptions>(o =>
+			        {
+			            o.Commands = Commands;
+			            o.CommandsByPrototype = _commandsByName;
+			            o.CommandsByType = _commandsByType;
+			        });
+                args.As<IValidatable>(validators.Add);
+                args.As<ISetupAndCleanup>(setterUppers.Add);
 
 				//load all arguments in a set before assigning it to the host property.
 				//  this allows the host to act on the fully loaded set when it's assigned.

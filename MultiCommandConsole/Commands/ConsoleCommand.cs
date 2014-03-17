@@ -8,7 +8,7 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole.Commands
 {
-	[ConsoleCommand(CommandName, "enter into console mode where commands can be typed interactively without exiting the console app.")]
+    [ConsoleCommand(CommandName, "enter into console mode where commands can be typed interactively without exiting the console app.")]
 	internal class ConsoleCommand : IConsoleCommand
 	{
 		readonly Engine _engine;

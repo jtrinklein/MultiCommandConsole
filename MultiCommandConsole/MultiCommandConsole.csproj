@@ -59,6 +59,7 @@
     <Compile Include="ArgSetAttribute.cs" />
     <Compile Include="ArgsHelper.cs" />
     <Compile Include="CommandRunData.cs" />
+    <Compile Include="Commands\CommandsOptions.cs" />
     <Compile Include="Commands\ConsoleCommand.cs" />
     <Compile Include="ConsoleCommandAttribute.cs" />
     <Compile Include="ConsoleCommandInfo.cs" />
