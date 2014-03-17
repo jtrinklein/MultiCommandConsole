@@ -66,6 +66,7 @@
     <Compile Include="ConsoleCommandRepository.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="EnumParserOption.cs" />
+    <Compile Include="ICommandRunner.cs" />
     <Compile Include="ISetupAndCleanup.cs" />
     <Compile Include="IValidatable.cs" />
     <Compile Include="Mono\getline.cs" />

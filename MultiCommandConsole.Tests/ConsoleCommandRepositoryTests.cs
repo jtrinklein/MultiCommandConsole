@@ -14,7 +14,7 @@ namespace MultiCommandConsole.Tests
         public void SetUp()
         {
             var commands = new[] {typeof (TestCommand)};
-            _repo = new ConsoleCommandRepository(new Engine(commands));
+            _repo = new ConsoleCommandRepository(null);
             _repo.AddCommands(commands);
         }
 

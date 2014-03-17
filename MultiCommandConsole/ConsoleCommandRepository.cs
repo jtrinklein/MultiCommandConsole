@@ -37,7 +37,7 @@ namespace MultiCommandConsole
 			}
 		}
 
-		public ConsoleCommandRepository(Engine engine)
+		public ConsoleCommandRepository(ICommandRunner commandRunner)
         {
             _commandsByType = new Dictionary<Type, ConsoleCommandInfo>();
             _commandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
@@ -46,7 +46,7 @@ namespace MultiCommandConsole
 			AddCommand(BuildCommandInfo(new HelpCommand()));
 			if (Config.ConsoleMode.Enabled)
 			{
-				AddCommand(BuildCommandInfo(ConsoleCommand = new ConsoleCommand(engine, this)));
+				AddCommand(BuildCommandInfo(ConsoleCommand = new ConsoleCommand(commandRunner, this)));
 			}
 			if (Config.ShowVierArgsCommand)
 			{

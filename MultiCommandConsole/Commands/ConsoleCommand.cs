@@ -11,13 +11,13 @@ namespace MultiCommandConsole.Commands
     [ConsoleCommand(CommandName, "enter into console mode where commands can be typed interactively without exiting the console app.")]
 	internal class ConsoleCommand : IConsoleCommand
 	{
-		readonly Engine _engine;
+		readonly ICommandRunner _commandRunner;
 		readonly ConsoleCommandRepository _consoleCommandRepository;
 		static readonly char[] ArgPrefixes = new[] { '/', '-' };
 
-		public ConsoleCommand(Engine engine, ConsoleCommandRepository consoleCommandRepository)
+		public ConsoleCommand(ICommandRunner commandRunner, ConsoleCommandRepository consoleCommandRepository)
 		{
-			_engine = engine;
+			_commandRunner = commandRunner;
 			_consoleCommandRepository = consoleCommandRepository;
 		}
 
@@ -95,18 +95,18 @@ namespace MultiCommandConsole.Commands
 						            {
 						                args = args.Take(args.Length - 2).ToArray();
 						                Console.SetOut(streamWriter);
-						                _engine.Run(args);
+						                _commandRunner.Run(args);
 						            }
 						        }
 						    }
 						    else
 						    {
-						        _engine.Run(args);
+						        _commandRunner.Run(args);
 						    }
 						}
 						catch
 						{
-						    //Engine already printed to logs and console
+						    //CommandRunner already printed to logs and console
 						}
 						finally
 						{

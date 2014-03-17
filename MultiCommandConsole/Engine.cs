@@ -7,8 +7,8 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole
 {
-	public class Engine
-	{
+    public class Engine : ICommandRunner
+    {
 		private static readonly ILog Log = LogManager.GetLogger<Engine>();
 
 		private readonly ConsoleCommandRepository _commandRepository;
