@@ -17,7 +17,7 @@ namespace MultiCommandConsole.Util
 		{
 			try
 			{
-				return Console.BufferWidth;
+				return Environment.UserInteractive ? Console.BufferWidth : 0;
 			}
 			catch
 			{
