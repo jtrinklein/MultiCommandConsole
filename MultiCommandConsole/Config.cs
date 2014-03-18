@@ -5,40 +5,7 @@ using MultiCommandConsole.Util;
 namespace MultiCommandConsole
 {
 	public static class Config
-	{
-	    private static Type _defaultCommand = typeof(HelpCommand);
-
-	    /// <summary>
-        /// When not specified or set to null, the help command becomes the default command.
-        /// </summary>
-        public static Type DefaultCommand
-	    {
-	        get { return _defaultCommand; }
-	        set { _defaultCommand = value ?? typeof(HelpCommand); }
-	    }
-
-	    /// <summary>
-		/// By default, commands and arg sets are created by Activator.  
-		/// Use this delegate to override the default behavior. 
-		/// </summary>
-		public static Func<Type, object> ResolveTypeDelegate { get; set; }
-
-		/// <summary>
-		/// Indicates a command is about to run.  
-		/// <hint>This is where you should refresh any DI Container lifecycles</hint>.
-		/// </summary>
-		public static Action<string[], Action<string[]>> RunCommand { get; set; }
-
-		/// <summary>
-		/// Indicates a command has finished running.  
-		/// <hint>This is where you should cleanup any DI Container lifecycles</hint>.
-		/// </summary>
-		public static Action EndRunCommand { get; set; }
-
-		/// <summary>The console formatter used to format messages for the console window</summary>
-		public static ConsoleFormatter ConsoleFormatter { get; set; }
-
-
+    {
         public static class ConsoleMode
         {
             /// <summary>
@@ -58,7 +25,44 @@ namespace MultiCommandConsole
             /// The number of entries to keep in history
             /// </summary>
             public static int? HistorySize { get; set; }
+
+            /// <summary>
+            /// Hook to allow modifying arguments before they're processed
+            /// </summary>
+            public static Func<string[], string[]> ArgumentsInterceptor { get; set; }
+
+            /// <summary>
+            /// Indicates a command is about to be run.  
+            /// <hint>This is where you should setup any DI container lifecycles</hint>.
+            /// </summary>
+            public static Action OnBeginRunCommand { get; set; }
+
+            /// <summary>
+            /// Indicates a command has finished running.  
+            /// <hint>This is where you should cleanup any DI container lifecycles</hint>.
+            /// </summary>
+            public static Action OnEndRunCommand { get; set; }
         }
+
+	    private static Type _defaultCommand = typeof(HelpCommand);
+
+	    /// <summary>
+        /// When not specified or set to null, the help command becomes the default command.
+        /// </summary>
+        public static Type DefaultCommand
+	    {
+	        get { return _defaultCommand; }
+	        set { _defaultCommand = value ?? typeof(HelpCommand); }
+	    }
+
+	    /// <summary>
+		/// By default, commands and arg sets are created by Activator.  
+		/// Use this delegate to override the default behavior. 
+		/// </summary>
+		public static Func<Type, object> ResolveTypeDelegate { get; set; }
+
+		/// <summary>The console formatter used to format messages for the console window</summary>
+		public static ConsoleFormatter ConsoleFormatter { get; set; }
 
 		/// <summary>
 		/// If true, an additional command will be displayed to allow the user to see how the text they 

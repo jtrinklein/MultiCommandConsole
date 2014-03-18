@@ -7,13 +7,12 @@ namespace MultiCommandConsole.Commands
     public class CommandsOptions
     {
         internal ConsoleCommandRepository ConsoleCommandRepository { private get; set; }
-        internal ICommandRunner CommandRunner { private get; set; }
 
         public IEnumerable<ConsoleCommandInfo> Commands { get { return ConsoleCommandRepository.Commands; } }
 
-        public void Run(string[] args)
+        public ICommandRunner GetRunner()
         {
-            CommandRunner.Run(args);
+            return new CommandRunner(ConsoleCommandRepository);
         }
 
         public IDisposable HideCommandOfType<T>() where T: IConsoleCommand

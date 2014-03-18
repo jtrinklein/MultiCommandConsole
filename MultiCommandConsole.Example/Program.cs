@@ -19,8 +19,7 @@ namespace MultiCommandConsole.Example
 
 		    LogManager.Adapter = new Log4NetFactoryAdapter();
 
-			var engine = new Engine(new[] {assembly});
-			engine.Run(args);
+		    new Engine(new[] {assembly}).GetRunner().Run(args);
 		}
 
 		private static FileInfo GetLogFileInfo(Assembly assembly)

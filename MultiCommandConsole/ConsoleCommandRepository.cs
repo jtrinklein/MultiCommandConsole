@@ -12,12 +12,11 @@ namespace MultiCommandConsole
 {
 	internal class ConsoleCommandRepository
 	{
-	    private readonly ICommandRunner _commandRunner;
 	    private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
 
         internal readonly Dictionary<string, ConsoleCommandInfo> CommandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
         internal readonly Dictionary<Type, ConsoleCommandInfo> CommandsByType = new Dictionary<Type, ConsoleCommandInfo>();
-        internal readonly ConsoleFormatter Chunker = Config.ConsoleFormatter;
+        internal readonly IConsoleFormatter Chunker = Config.ConsoleFormatter;
 
 		internal ConsoleCommand ConsoleCommand { get; set; }
 
@@ -39,10 +38,8 @@ namespace MultiCommandConsole
 			}
 		}
 
-		public ConsoleCommandRepository(ICommandRunner commandRunner)
+		public ConsoleCommandRepository()
         {
-		    _commandRunner = commandRunner;
-
 		    //these commands should never be created by the ResolveTypeDelegate.  They're internal only
 			AddCommand(BuildCommandInfo(new HelpCommand()));
 			if (Config.ConsoleMode.Enabled)
@@ -262,7 +259,6 @@ namespace MultiCommandConsole
 			    args.As<CommandsOptions>(o =>
 			        {
 			            o.ConsoleCommandRepository = this;
-			            o.CommandRunner = _commandRunner;
 			        });
                 args.As<IValidatable>(validators.Add);
                 args.As<ISetupAndCleanup>(setterUppers.Add);

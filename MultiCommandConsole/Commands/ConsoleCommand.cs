@@ -88,13 +88,15 @@ namespace MultiCommandConsole.Commands
 						            {
 						                args = args.Take(args.Length - 2).ToArray();
 						                Console.SetOut(streamWriter);
-						                CommandsOptions.Run(args);
+						                var resetEvent = CommandsOptions.GetRunner().Run(args);
+						                resetEvent.WaitOne();
 						            }
 						        }
 						    }
 						    else
 						    {
-                                CommandsOptions.Run(args);
+                                var resetEvent = CommandsOptions.GetRunner().Run(args);
+						        resetEvent.WaitOne();
 						    }
 						}
 						catch

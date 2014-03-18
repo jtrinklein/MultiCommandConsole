@@ -59,6 +59,7 @@
     <Compile Include="ArgSetAttribute.cs" />
     <Compile Include="ArgsHelper.cs" />
     <Compile Include="CommandRunData.cs" />
+    <Compile Include="CommandRunner.cs" />
     <Compile Include="Commands\CommandsOptions.cs" />
     <Compile Include="Commands\ConsoleCommand.cs" />
     <Compile Include="ConsoleCommandAttribute.cs" />
@@ -66,6 +67,8 @@
     <Compile Include="ConsoleCommandRepository.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="EnumParserOption.cs" />
+    <Compile Include="ICanBeCancelled.cs" />
+    <Compile Include="ICanBePaused.cs" />
     <Compile Include="ICommandRunner.cs" />
     <Compile Include="ISetupAndCleanup.cs" />
     <Compile Include="IValidatable.cs" />
@@ -85,6 +88,7 @@
     <Compile Include="Util\Converter.cs" />
     <Compile Include="Util\EnumerableExtensions.cs" />
     <Compile Include="Util\ConsoleFormatter.cs" />
+    <Compile Include="Util\IConsoleFormatter.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\TypeExtensions.cs" />
     <Compile Include="Commands\ViewArgsCommand.cs" />

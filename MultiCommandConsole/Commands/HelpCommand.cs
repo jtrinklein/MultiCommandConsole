@@ -13,7 +13,7 @@ namespace MultiCommandConsole.Commands
 		private IEnumerable<ConsoleCommandInfo> _commands;
 		private ConsoleCommandInfo _command;
 		private IConsoleCommand _instance;
-		ConsoleFormatter _chunker = Config.ConsoleFormatter;
+		IConsoleFormatter _chunker = Config.ConsoleFormatter;
 
 		public static HelpCommand ForCommands(IEnumerable<ConsoleCommandInfo> commands)
 		{
