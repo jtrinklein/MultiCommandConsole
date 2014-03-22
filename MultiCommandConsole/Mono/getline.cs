@@ -79,9 +79,6 @@ namespace Mono.Terminal {
 		// If we are done editing, this breaks the interactive loop
 		bool done = false;
 
-		// The thread where the Editing started taking place
-		Thread edit_thread;
-
 		// Our object that tracks history
 		History history;
 
@@ -763,15 +760,6 @@ namespace Mono.Terminal {
 			ForceCursor (cursor);
 		}
 
-		void InterruptEdit (object sender, ConsoleCancelEventArgs a)
-		{
-			// Do not abort our program:
-			a.Cancel = true;
-
-			// Interrupt the editor
-			edit_thread.Abort();
-		}
-
 		void HandleChar (char c)
 		{
 			if (searching != 0)
@@ -864,11 +852,9 @@ namespace Mono.Terminal {
 		
 		public string Edit (string prompt, string initial)
 		{
-			edit_thread = Thread.CurrentThread;
 			searching = 0;
-			Console.CancelKeyPress += InterruptEdit;
-			
-			done = false;
+
+            done = false;
 			history.CursorToEnd ();
 			max_rendered = 0;
 			
@@ -877,20 +863,11 @@ namespace Mono.Terminal {
 			InitText (initial);
 			history.Append (initial);
 
-			do {
-				try {
-					EditLoop ();
-				} catch (ThreadAbortException){
-					searching = 0;
-					Thread.ResetAbort ();
-					Console.WriteLine ();
-					SetPrompt (prompt);
-					SetText ("");
-				}
-			} while (!done);
-			Console.WriteLine ();
-			
-			Console.CancelKeyPress -= InterruptEdit;
+		    do
+		    {
+		        EditLoop();
+		    } while (!done); 
+		    Console.WriteLine ();
 
 			if (text == null){
 				history.Close ();
