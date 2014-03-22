@@ -15,6 +15,7 @@ namespace MultiCommandConsole.Commands
         static readonly char[] ArgPrefixes = new[] { '/', '-' };
 
         public CommandsOptions CommandsOptions { get; set; }
+        public ConsoleRunOptions ConsoleRunOptions { get; set; }
 		
 		public string GetDetailedHelp()
 		{
@@ -63,10 +64,8 @@ namespace MultiCommandConsole.Commands
 					if (args[0].Equals("quit", StringComparison.OrdinalIgnoreCase))
 					{
 						le.SaveHistory();
-						return;
 					}
-
-					if (args[0].Equals("cls", StringComparison.OrdinalIgnoreCase))
+					else if (args[0].Equals("cls", StringComparison.OrdinalIgnoreCase))
 					{
 						Console.Clear();
 					}
@@ -76,44 +75,15 @@ namespace MultiCommandConsole.Commands
 					}
 					else
 					{
-						try
-						{
-						    if (args.Length > 2 && args[args.Length - 2] == ">")
-						    {
-						        var outputFile = args.Last();
-						        using (var streamWriter = File.CreateText(outputFile))
-						        {
-						            var origConsoleOut = Console.Out;
-						            using (new DisposableAction(() => Console.SetOut(origConsoleOut)))
-						            {
-						                args = args.Take(args.Length - 2).ToArray();
-						                Console.SetOut(streamWriter);
-						                var resetEvent = CommandsOptions.GetRunner().Run(args);
-						                resetEvent.WaitOne();
-						            }
-						        }
-						    }
-						    else
-						    {
-                                var resetEvent = CommandsOptions.GetRunner().Run(args);
-						        resetEvent.WaitOne();
-						    }
-						}
-						catch
-						{
-						    //CommandRunner already printed to logs and console
-						}
-						finally
-						{
-						    le.SaveHistory();
-						}
+                        le.SaveHistory();
+						RunCommand(args);
 					}
 
 				} while (true);
 			}
 		}
 
-		private LineEditor.Completion GetEntries(string text)
+        private LineEditor.Completion GetEntries(string text)
 		{
 			string commandName = null;
 			string[] parts = null;
@@ -173,6 +143,41 @@ namespace MultiCommandConsole.Commands
 				e.SetContext("parts", parts);
 				throw;
 			}
-		}
+        }
+
+        private void RunCommand(string[] args)
+        {
+            try
+            {
+                if (args.Length > 2 && args[args.Length - 2] == ">")
+                {
+                    using (RedirectConsoleToFile(args.Last()))
+                    {
+                        args = args.Take(args.Length - 2).ToArray();
+                        ConsoleRunOptions.Run(args);
+                    }
+                }
+                else
+                {
+                    ConsoleRunOptions.Run(args);
+                }
+            }
+            catch
+            {
+                //CommandRunner already printed to logs and console
+            }
+        }
+
+        private IDisposable RedirectConsoleToFile(string outputFile)
+        {
+            var origConsoleOut = Console.Out;
+            var streamWriter = File.CreateText(outputFile);
+            Console.SetOut(streamWriter);
+            return new DisposableAction(() =>
+            {
+                Console.SetOut(origConsoleOut);
+                streamWriter.Dispose();
+            });
+        }
 	}
 }
