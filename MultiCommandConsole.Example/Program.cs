@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System;
+using System.Diagnostics;
 using Common.Logging;
 
 namespace MultiCommandConsole.Example
@@ -8,8 +8,11 @@ namespace MultiCommandConsole.Example
 	{
 		static void Main(string[] args)
 		{
-			var assembly = typeof (Program).Assembly;
-            log4net.Config.XmlConfigurator.ConfigureAndWatch(GetLogFileInfo(assembly));
+            if (Array.Exists(args, s => s == "/debug") && Environment.UserInteractive)
+            {
+                Debugger.Break();
+            }
+
             Config.ConsoleMode.Enabled = true;
 			Config.ConsoleMode.CommandPromptText = "console";
 		    Config.ConsoleMode.HistorySize = 5;
@@ -17,24 +20,10 @@ namespace MultiCommandConsole.Example
 			Config.ShowVierArgsCommand = true;
 		    Config.DefaultCommand = typeof (RepeatConsoleCommand);
 
-		    LogManager.Adapter = new Log4NetFactoryAdapter();
+		    LogManager.Adapter = Log4NetFactoryAdapter.Load();
 
+            var assembly = typeof(Program).Assembly;
 		    new Engine(new[] {assembly}).GetRunner().Run(args);
-		}
-
-		private static FileInfo GetLogFileInfo(Assembly assembly)
-		{
-			if(File.Exists("log4net.config"))
-			{
-				return new FileInfo("log4net.config");
-			}
-
-			var appConfig = assembly.Location + ".config";
-			if (File.Exists(appConfig))
-			{
-				return new FileInfo(appConfig);
-			}
-			throw new FileNotFoundException("Unable to locate log4net configs at log4net.config or " + appConfig);
 		}
 	}
 }
