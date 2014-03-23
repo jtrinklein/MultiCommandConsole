@@ -62,6 +62,7 @@
     <Compile Include="CommandRunner.cs" />
     <Compile Include="Commands\CommandsOptions.cs" />
     <Compile Include="Commands\ConsoleCommand.cs" />
+    <Compile Include="Commands\ConsoleRunOptions.cs" />
     <Compile Include="ConsoleCommandAttribute.cs" />
     <Compile Include="ConsoleCommandInfo.cs" />
     <Compile Include="ConsoleCommandRepository.cs" />

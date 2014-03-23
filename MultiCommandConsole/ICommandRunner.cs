@@ -8,5 +8,7 @@ namespace MultiCommandConsole
         void Stop();
         void Pause();
         void Resume();
+        bool CanBeCancelled { get; }
+        bool CanBePaused { get; }
     }
 }

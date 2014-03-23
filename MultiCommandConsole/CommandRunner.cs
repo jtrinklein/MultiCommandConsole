@@ -13,6 +13,7 @@ namespace MultiCommandConsole
         private readonly ConsoleCommandRepository _consoleCommandRepository;
         private static readonly ILog Log = LogManager.GetLogger<CommandRunner>();
         private volatile CommandRunData _runData;
+        private ManualResetEvent _exit;
 
         public CommandRunner(ConsoleCommandRepository consoleCommandRepository)
         {
@@ -22,10 +23,14 @@ namespace MultiCommandConsole
 
         public ManualResetEvent Run(string[] args)
         {
-            var exit = new ManualResetEvent(false);
-            new Thread(() => Run(args, exit)).Start();
-            return exit;
+            _exit = new ManualResetEvent(false);
+            new Thread(() => Run(args, _exit)).Start();
+            return _exit;
         }
+
+        public bool CanBeCancelled { get { return _runData.Command is ICanBeCancelled; } }
+
+        public bool CanBePaused { get { return _runData.Command is ICanBePaused; } }
 
         public void Stop()
         {
@@ -33,6 +38,7 @@ namespace MultiCommandConsole
             if (cancellable != null)
             {
                 cancellable.Stop();
+                _exit.Set();
             }
             else
             {

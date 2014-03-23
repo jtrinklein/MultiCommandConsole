@@ -256,10 +256,8 @@ namespace MultiCommandConsole
 			{
 				var args = option.PropertyInfo.GetValue(obj, null) ?? option.PropertyInfo.PropertyType.Resolve();
 
-			    args.As<CommandsOptions>(o =>
-			        {
-			            o.ConsoleCommandRepository = this;
-			        });
+			    args.As<CommandsOptions>(o => { o.ConsoleCommandRepository = this; });
+                args.As<ConsoleRunOptions>(o => { o.CreateCommandRunner = () => new CommandRunner(this); });
                 args.As<IValidatable>(validators.Add);
                 args.As<ISetupAndCleanup>(setterUppers.Add);
 
