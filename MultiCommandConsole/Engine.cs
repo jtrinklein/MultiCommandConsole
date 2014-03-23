@@ -22,15 +22,14 @@ namespace MultiCommandConsole
 		{
 			get
 			{
-				var commands = _commandRepository.Commands;
-				foreach (var command in commands)
-				{
-					yield return command.CommandType;
-					foreach (var arg in ArgsHelper.GetOptions(command.CommandType).Where(a => a.ArgSetAttribute != null))
-					{
-						yield return arg.PropertyInfo.PropertyType;
-					}
-				}
+				var commands = _commandRepository.Commands.ToList();
+			    return commands
+			        .Select(c => c.CommandType)
+			        .Union(
+			            commands.SelectMany(c => ArgsHelper.GetOptions(c.CommandType))
+			                    .Where(a => a.ArgSetAttribute != null)
+			                    .Select(a => a.PropertyInfo.PropertyType)
+                                .Distinct());
 			}
 		}
 
