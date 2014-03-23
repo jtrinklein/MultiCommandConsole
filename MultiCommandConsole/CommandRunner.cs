@@ -74,7 +74,7 @@ namespace MultiCommandConsole
 
         public void Run(string[] args, ManualResetEvent exit)
         {
-            DateTime started = DateTime.Now;
+            DateTime started = Config.NowDelegate();
             var stopwatch = Stopwatch.StartNew();
 
             Log.InfoFormat("Running: {0}", string.Join(" ", args));
@@ -102,10 +102,10 @@ namespace MultiCommandConsole
                 Config.ConsoleMode.OnEndRunCommand();
             }
 
-            Log.InfoFormat("Command execution time:{0} started:{1} ended:{2}",
+            Log.InfoFormat("Command execution took:{0} started:{1} ended:{2}",
                            stopwatch.Elapsed,
                            started.ToString("hh:mm:ss"),
-                           DateTime.Now.ToString("hh:mm:ss"));
+                           Config.NowDelegate().ToString("hh:mm:ss"));
             exit.Set();
         }
 

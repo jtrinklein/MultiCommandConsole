@@ -45,6 +45,7 @@ namespace MultiCommandConsole
         }
 
 	    private static Type _defaultCommand = typeof(HelpCommand);
+	    private static Func<DateTime> _nowDelegate = () => DateTime.Now;
 
 	    /// <summary>
         /// When not specified or set to null, the help command becomes the default command.
@@ -77,7 +78,16 @@ namespace MultiCommandConsole
 		/// </summary>
 		public static bool EscapeIsAltKey { get; set; }
 
-		static Config()
+        /// <summary>
+        /// Delegate used to determine the current datetime. Defaults to DateTime.Now and setting to null resets to DateTime.Now
+        /// </summary>
+        public static Func<DateTime> NowDelegate
+        {
+            get { return _nowDelegate; }
+            set { _nowDelegate = value ?? (() => DateTime.Now); }
+        }
+
+	    static Config()
 		{
 			ConsoleFormatter = new ConsoleFormatter();
 			ShowVierArgsCommand = false;
