@@ -12,11 +12,12 @@ namespace MultiCommandConsole
 {
 	internal class ConsoleCommandRepository
 	{
-		private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
+	    private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
 
-        private readonly Dictionary<string, ConsoleCommandInfo> _commandsByName;
-        private readonly Dictionary<Type, ConsoleCommandInfo> _commandsByType;
-		private readonly ConsoleFormatter _chunker = Config.ConsoleFormatter;
+        internal readonly Dictionary<string, ConsoleCommandInfo> CommandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
+        internal readonly Dictionary<Type, ConsoleCommandInfo> CommandsByType = new Dictionary<Type, ConsoleCommandInfo>();
+        internal readonly IConsoleFormatter Chunker = Config.ConsoleFormatter;
+
 		internal ConsoleCommand ConsoleCommand { get; set; }
 
 		private IEnumerable<ConsoleCommandInfo> _commands;
@@ -26,32 +27,24 @@ namespace MultiCommandConsole
 			{
 				if (_commands == null)
 				{
-					var commands = from c in _commandsByName.Values
-					               group c by c.Attribute.Prototype
-					               into grouping
-					               select grouping.First();
-
-					_commands = from c in commands
-					            let isInternal = c.CommandType.Namespace == typeof (HelpCommand).Namespace
+					var commands = from c in CommandsByType.Values
+					            let isInternal = c.CommandType.Assembly == GetType().Assembly
 					            orderby isInternal descending , c.Attribute.Prototype
 					            select c;
 
-					_commands = _commands.ToList();
+					_commands = commands.ToList();
 				}
 				return _commands;
 			}
 		}
 
-		public ConsoleCommandRepository(Engine engine)
+		public ConsoleCommandRepository()
         {
-            _commandsByType = new Dictionary<Type, ConsoleCommandInfo>();
-            _commandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
-
-			//these commands should never be created by the ResolveTypeDelegate.  They're internal only
+		    //these commands should never be created by the ResolveTypeDelegate.  They're internal only
 			AddCommand(BuildCommandInfo(new HelpCommand()));
-			if (Config.ShowConsoleCommand)
+			if (Config.ConsoleMode.Enabled)
 			{
-				AddCommand(BuildCommandInfo(ConsoleCommand = new ConsoleCommand(engine, this)));
+				AddCommand(BuildCommandInfo(ConsoleCommand = new ConsoleCommand()));
 			}
 			if (Config.ShowVierArgsCommand)
 			{
@@ -82,10 +75,10 @@ namespace MultiCommandConsole
 
 		private void AddCommand(ConsoleCommandInfo info)
 		{
-            _commandsByType.Add(info.CommandType, info);
+            CommandsByType.Add(info.CommandType, info);
 			foreach (var name in info.Attribute.Prototype.GetPrototypeArray())
 			{
-				_commandsByName.Add(name, info);
+				CommandsByName.Add(name, info);
 			}
 		}
 
@@ -116,15 +109,39 @@ namespace MultiCommandConsole
 			       	};
 		}
 
-		internal DisposableAction HideConsoleCommand()
-		{
-			ConsoleCommandInfo info;
-			if(_commandsByName.TryGetValue(ConsoleCommand.CommandName, out info) 
-				&& _commandsByName.Remove(ConsoleCommand.CommandName))
-			{
-				return new DisposableAction(() => _commandsByName.Add(ConsoleCommand.CommandName, info));
-			}
-			return new DisposableAction(delegate { /* noop */ });
+	    public ConsoleCommandInfo GetByPrototype(string name)
+        {
+            ConsoleCommandInfo info;
+            return CommandsByName.TryGetValue(name, out info) ? info : null;
+	    }
+
+	    public ConsoleCommandInfo GetByType(Type type)
+        {
+            ConsoleCommandInfo info;
+            return CommandsByType.TryGetValue(type, out info) ? info : null;
+	    }
+
+        internal DisposableAction HideCommandOfType<T>() where T : IConsoleCommand
+        {
+            var commandType = typeof(T);
+
+            var restoreActions = new List<Action>();
+
+            ConsoleCommandInfo commandInfo;
+            if (CommandsByType.TryGetValue(commandType, out commandInfo))
+            {
+                ConsoleCommandInfo info = commandInfo;  //access to modified closure
+
+                CommandsByType.Remove(commandType);
+                restoreActions.Add(() => CommandsByType.Add(commandType, info));
+
+                restoreActions.AddRange(commandInfo.Attribute.Prototype
+                                                   .GetPrototypeArray()
+                                                   .Where(n => CommandsByName.Remove(n))
+                                                   .Select(name => (Action) (() => CommandsByName.Add(name, info))));
+            }
+
+            return new DisposableAction(() => restoreActions.ForEach(action => action()));
 		}
 
 		public IEnumerable<ConsoleCommandAttribute> GetCommandList()
@@ -139,7 +156,7 @@ namespace MultiCommandConsole
 
 			if(args.IsNullOrEmpty() || string.IsNullOrEmpty(args[0]))
             {
-                _commandsByType.TryGetValue(Config.DefaultCommand, out info);
+                CommandsByType.TryGetValue(Config.DefaultCommand, out info);
                 if (info != null)
                 {
                     args = new[] {info.Attribute.Prototype.GetPrototypeArray().First()}.Union(args).ToArray();
@@ -150,14 +167,14 @@ namespace MultiCommandConsole
             if (optionPrefixes.Any(p => p == commandName[0]))
             {
                 //did the user type /help first?
-                if (_commandsByName.TryGetValue(commandName.Substring(1), out info)
-                    && info == _commandsByType[typeof(HelpCommand)])
+                if (CommandsByName.TryGetValue(commandName.Substring(1), out info)
+                    && info == CommandsByType[typeof(HelpCommand)])
                 {
                     commandName = commandName.TrimStart(optionPrefixes);
                 }
                 else
                 {
-                    _commandsByType.TryGetValue(Config.DefaultCommand, out info);
+                    CommandsByType.TryGetValue(Config.DefaultCommand, out info);
                     if (info != null)
                     {
                         args = new[] { info.Attribute.Prototype.GetPrototypeArray().First() }.Union(args).ToArray();
@@ -168,7 +185,7 @@ namespace MultiCommandConsole
 			bool showHelp = false;
 			var options = new OptionSet();
 
-            if (info != null || _commandsByName.TryGetValue(commandName, out info))
+            if (info != null || CommandsByName.TryGetValue(commandName, out info))
 			{
 				if (info.CommandType == typeof(HelpCommand))
 				{
@@ -213,7 +230,7 @@ namespace MultiCommandConsole
 						foreach (var error in errors)
 						{
 							Console.Out.Write("!!! ");
-							_chunker.ChunckStringTo(error, Console.Out);
+							Chunker.ChunckStringTo(error, Console.Out);
 						}
 						return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
 					}
@@ -239,14 +256,10 @@ namespace MultiCommandConsole
 			{
 				var args = option.PropertyInfo.GetValue(obj, null) ?? option.PropertyInfo.PropertyType.Resolve();
 
-				if (args is IValidatable)
-				{
-					validators.Add(args as IValidatable);
-				}
-				if (args is ISetupAndCleanup)
-				{
-					setterUppers.Add(args as ISetupAndCleanup);
-				}
+			    args.As<CommandsOptions>(o => { o.ConsoleCommandRepository = this; });
+                args.As<ConsoleRunOptions>(o => { o.CreateCommandRunner = () => new CommandRunner(this); });
+                args.As<IValidatable>(validators.Add);
+                args.As<ISetupAndCleanup>(setterUppers.Add);
 
 				//load all arguments in a set before assigning it to the host property.
 				//  this allows the host to act on the fully loaded set when it's assigned.

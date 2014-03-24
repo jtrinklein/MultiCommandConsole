@@ -5,8 +5,8 @@ using Common.Logging;
 
 namespace MultiCommandConsole.Util
 {
-	public class ConsoleFormatter
-	{
+    public class ConsoleFormatter : IConsoleFormatter
+    {
 		private static readonly ILog Log = LogManager.GetLogger<ConsoleFormatter>();
 
 		public int OverriddenBufferWidth { get; set; }
@@ -17,7 +17,7 @@ namespace MultiCommandConsole.Util
 		{
 			try
 			{
-				return Console.BufferWidth;
+				return Environment.UserInteractive ? Console.BufferWidth : 0;
 			}
 			catch
 			{

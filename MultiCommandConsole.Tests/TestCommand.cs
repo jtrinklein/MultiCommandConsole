@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MultiCommandConsole.Commands;
 
 namespace MultiCommandConsole.Tests
 {
@@ -11,6 +12,8 @@ namespace MultiCommandConsole.Tests
 
         [Arg("message|m", "this message will be output to the console")]
         public string Message { get; set; }
+
+        public CommandsOptions CommandsOptions { get; set; }
 
         public TestCommand()
         {

@@ -14,7 +14,7 @@ namespace MultiCommandConsole.Tests
         public void SetUp()
         {
             var commands = new[] {typeof (TestCommand)};
-            _repo = new ConsoleCommandRepository(new Engine(commands));
+            _repo = new ConsoleCommandRepository();
             _repo.AddCommands(commands);
         }
 
@@ -62,7 +62,6 @@ namespace MultiCommandConsole.Tests
             var runData = _repo.LoadCommand("/help test".SplitCmdLineArgs());
 
             runData.Command.Should().BeOfType<HelpCommand>();
-            var helpCommand = (HelpCommand)runData.Command;
         }
 
         [Test]
@@ -71,6 +70,14 @@ namespace MultiCommandConsole.Tests
             var runData = _repo.LoadCommand("help test".SplitCmdLineArgs());
 
             runData.Command.Should().BeOfType<HelpCommand>();
+        }
+
+        [Test]
+        public void Should_populate_commands_on_CommandOptions()
+        {
+            var command = (TestCommand)_repo.LoadCommand("test".SplitCmdLineArgs()).Command;
+            command.CommandsOptions.Commands.Should().NotBeEmpty();
+            command.CommandsOptions.Commands.Should().BeEquivalentTo(_repo.Commands);
         }
     }
 }
