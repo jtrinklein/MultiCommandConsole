@@ -1,6 +1,6 @@
 namespace MultiCommandConsole
 {
-    public interface ICanBeCancelled
+    public interface ICanBeStopped
     {
         void Stop();
     }

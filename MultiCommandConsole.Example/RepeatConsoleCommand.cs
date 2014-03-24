@@ -7,7 +7,7 @@ using Common.Logging;
 namespace MultiCommandConsole.Example
 {
 	[ConsoleCommand("repeat", "repeats the entered phrase the specified number of times")]
-	public class RepeatConsoleCommand : IConsoleCommand, ICanBeCancelled, ICanBePaused
+	public class RepeatConsoleCommand : IConsoleCommand, ICanBeStopped, ICanBePaused
 	{
 		private static readonly ILog Log = LogManager.GetLogger(typeof (RepeatConsoleCommand));
 

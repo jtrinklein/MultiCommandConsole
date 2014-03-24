@@ -1,6 +1,5 @@
 using System;
 using Common.Logging;
-using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Commands
 {
@@ -15,7 +14,7 @@ namespace MultiCommandConsole.Commands
 
         /// <summary>
         /// Synchronous run method that will run the command for the given args in a new thread.
-        /// If the command implements ICanBeCancelled
+        /// If the command implements ICanBeStopped
         /// </summary>
         /// <param name="args"></param>
         public void Run(string[] args)
@@ -26,8 +25,7 @@ namespace MultiCommandConsole.Commands
             _runner = CreateCommandRunner();
             try
             {
-                var stoplight = _runner.Run(args);
-                ConsoleReader.Watch(Stop, Pause, Resume, until: () => stoplight.IsRed);
+                _runner.Run(args);
             }
             finally
             {
@@ -39,38 +37,13 @@ namespace MultiCommandConsole.Commands
 
         private void Stop()
         {
-            if (!_runner.CanBeCancelled)
+            if (!_runner.CanBeStopped)
             {
                 Console.Out.WriteLine("the command cannot be cancelled");
                 return;
             }
 
-            Console.Out.WriteLine("stopping");
             _runner.Stop();
-        }
-
-        private void Pause()
-        {
-            if (!_runner.CanBePaused)
-            {
-                Console.Out.WriteLine("the command cannot be paused");
-                return;
-            }
-
-            Console.Out.WriteLine("pausing");
-            _runner.Pause();
-        }
-
-        private void Resume()
-        {
-            if (!_runner.CanBePaused)
-            {
-                Console.Out.WriteLine("the command cannot be paused, therefore it cannot be resumed");
-                return;
-            }
-
-            Console.Out.WriteLine("resuming");
-            _runner.Resume();
         }
 
         private void OnUnhandledException(object sender, UnhandledExceptionEventArgs eventArgs)
@@ -88,7 +61,6 @@ namespace MultiCommandConsole.Commands
 
         private void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {
-            Log.Info("ConsoleRunOptions.OnCancelKeyPress");
             e.Cancel = true;
             Stop();
         }

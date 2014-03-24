@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Common.Logging;
+using MultiCommandConsole.Util;
 using ObjectPrinter;
 
 namespace MultiCommandConsole
@@ -15,6 +16,7 @@ namespace MultiCommandConsole
         private readonly ConsoleCommandRepository _consoleCommandRepository;
         private volatile CommandRunData _runData;
         private Stoplight _stoplight;
+        private EventWaitHandle _commandLoaded;
 
         public CommandRunner(ConsoleCommandRepository consoleCommandRepository)
         {
@@ -22,28 +24,41 @@ namespace MultiCommandConsole
             _consoleCommandRepository = consoleCommandRepository;
         }
 
-        public Stoplight Run(string[] args)
+        public void Run(string[] args)
         {
+            _commandLoaded = new ManualResetEvent(false);
             _stoplight = new Stoplight();
             new Thread(() => Run(args, _stoplight)).Start();
-            return _stoplight;
+            _commandLoaded.WaitOne();
+            if (Environment.UserInteractive)
+            {
+                ConsoleReader.Watch(
+                    _stoplight,
+                    CanBeStopped, CanBePaused,
+                    Stop, Pause, Resume);
+            }
+            else
+            {
+                _stoplight.Token.WaitHandle.WaitOne();
+            }
         }
 
-        public bool CanBeCancelled { get { return _runData.Command is ICanBeCancelled; } }
+        public bool CanBeStopped { get { return _runData.Command is ICanBeStopped; } }
 
         public bool CanBePaused { get { return _runData.Command is ICanBePaused; } }
 
         public void Stop()
         {
-            var cancellable = _runData.Command as ICanBeCancelled;
-            if (cancellable != null)
+            var stoppable = _runData.Command as ICanBeStopped;
+            if (stoppable != null)
             {
-                cancellable.Stop();
+                Console.Out.WriteLine("stopping");
+                stoppable.Stop();
                 _stoplight.Stop();
             }
             else
             {
-                Log.InfoFormat("{0} does not implement {1}", _runData.Command.GetType(), typeof(ICanBeCancelled));
+                Log.InfoFormat("{0} does not implement {1}", _runData.Command.GetType(), typeof(ICanBeStopped));
             }
         }
 
@@ -52,6 +67,7 @@ namespace MultiCommandConsole
             var pausable = _runData.Command as ICanBePaused;
             if (pausable != null)
             {
+                Console.Out.WriteLine("pausing");
                 pausable.Pause();
             }
             else
@@ -65,6 +81,7 @@ namespace MultiCommandConsole
             var pausable = _runData.Command as ICanBePaused;
             if (pausable != null)
             {
+                Console.Out.WriteLine("resuming");
                 pausable.Resume();
             }
             else
@@ -96,6 +113,7 @@ namespace MultiCommandConsole
 
             //load command after OnBeginRunCommand to let DI containers be configured
             _runData = _consoleCommandRepository.LoadCommand(args);
+            _commandLoaded.Set();
             RunSafely(_runData);
 
             if (Config.ConsoleMode.OnEndRunCommand != null)

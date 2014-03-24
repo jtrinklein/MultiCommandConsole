@@ -1,18 +1,24 @@
 using System;
+using System.Text;
 using System.Threading;
 
 namespace MultiCommandConsole.Util
 {
     public static class ConsoleReader
     {
-        public static void Watch(Action onStop, Action onPause, Action onResume, Func<bool> until, int checkEveryNMilliSeconds = 100)
+        public static void Watch(Stoplight stoplight, bool canBeStopped, bool canBePaused, Action onStop, Action onPause, Action onResume, int checkEveryNMilliSeconds = 100)
         {
             //all this because Ctrl+C is broken in .net 4.0
 
-            ShowConsoleOptions();
+            if (!Environment.UserInteractive)
+            {
+                throw new InvalidOperationException("expected UserInteractive mode");
+            }
+
+            ShowConsoleOptions(canBeStopped, canBePaused);
             bool isPaused = false;
 
-            while (!until())
+            while (stoplight.IsGreen)
             {
                 if (Console.KeyAvailable)
                 {
@@ -23,7 +29,7 @@ namespace MultiCommandConsole.Util
                         {
                             onResume();
                             isPaused = false;
-                            ShowConsoleOptions();
+                            ShowConsoleOptions(canBeStopped, canBePaused);
                         }
                     }
                     else
@@ -36,7 +42,7 @@ namespace MultiCommandConsole.Util
                         {
                             isPaused = true;
                             onPause();
-                            ShowConsoleOptions(isPaused: true);
+                            ShowConsoleOptions(canBeStopped, canBePaused, isPaused: true);
                         }
                     }
                 }
@@ -47,12 +53,24 @@ namespace MultiCommandConsole.Util
             }
         }
 
-        public static void ShowConsoleOptions(bool isPaused = false)
+        public static void ShowConsoleOptions(bool canBeStopped, bool canBePaused, bool isPaused = false)
         {
+            var sb = new StringBuilder();
+            if (canBeStopped)
+            {
+                sb.Append("(s)top ");
+            }
+            if (canBePaused)
+            {
+                sb.Append(isPaused ? "(r)esume" : "(p)ause");
+            }
+            if (sb.Length > 0)
+            {
+                return;
+            }
             Console.WriteLine();
-            Console.WriteLine(isPaused 
-                ? "options: (s)top (r)esume" 
-                : "options: (s)top (p)ause");
+            Console.Write("options: ");
+            Console.WriteLine(sb);
             Console.WriteLine();
         }
     }

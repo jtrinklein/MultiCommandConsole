@@ -71,7 +71,7 @@
     <Compile Include="ConsoleCommandRepository.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="EnumParserOption.cs" />
-    <Compile Include="ICanBeCancelled.cs" />
+    <Compile Include="ICanBeStopped.cs" />
     <Compile Include="ICanBePaused.cs" />
     <Compile Include="ICommandRunner.cs" />
     <Compile Include="ISetupAndCleanup.cs" />
