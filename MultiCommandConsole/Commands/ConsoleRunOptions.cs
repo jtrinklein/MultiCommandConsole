@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using Common.Logging;
 using MultiCommandConsole.Util;
 
@@ -50,7 +49,6 @@ namespace MultiCommandConsole.Commands
             _runner.Stop();
         }
 
-        //TODO: add Pause hook to console
         private void Pause()
         {
             if (!_runner.CanBePaused)
@@ -63,7 +61,6 @@ namespace MultiCommandConsole.Commands
             _runner.Pause();
         }
 
-        //TODO: add Resume hook to console
         private void Resume()
         {
             if (!_runner.CanBePaused)
