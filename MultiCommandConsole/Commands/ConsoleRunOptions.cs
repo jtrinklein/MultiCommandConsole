@@ -10,8 +10,6 @@ namespace MultiCommandConsole.Commands
     {
         private static readonly ILog Log = LogManager.GetLogger<ConsoleRunOptions>();
 
-        public static string PressCtrlCMessage = "press ctrl+q to exit";
-
         private volatile ICommandRunner _runner;
 
         internal Func<ICommandRunner> CreateCommandRunner { private get; set; }
@@ -30,11 +28,7 @@ namespace MultiCommandConsole.Commands
             try
             {
                 var stoplight = _runner.Run(args);
-                Console.Out.WriteLine(PressCtrlCMessage);
-                if (ConsoleReader.WatchForCancel(until: () => stoplight.IsRed))
-                {
-                    Stop();
-                }
+                ConsoleReader.Watch(Stop, Pause, Resume, until: () => stoplight.IsRed);
             }
             finally
             {
