@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Common.Logging;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Commands
 {
@@ -9,9 +10,8 @@ namespace MultiCommandConsole.Commands
     {
         private static readonly ILog Log = LogManager.GetLogger<ConsoleRunOptions>();
 
-        public static string PressCtrlCMessage = "press ctrl+c to exit";
+        public static string PressCtrlCMessage = "press ctrl+q to exit";
 
-        private volatile ManualResetEvent _exit;
         private volatile ICommandRunner _runner;
 
         internal Func<ICommandRunner> CreateCommandRunner { private get; set; }
@@ -27,18 +27,18 @@ namespace MultiCommandConsole.Commands
             Console.CancelKeyPress += OnCancelKeyPress;
 
             _runner = CreateCommandRunner();
-
             try
             {
-                using (_exit = _runner.Run(args))
+                var stoplight = _runner.Run(args);
+                Console.Out.WriteLine(PressCtrlCMessage);
+                if (ConsoleReader.WatchForCancel(until: () => stoplight.IsRed))
                 {
-                    Console.Out.WriteLine(PressCtrlCMessage);
-                    _exit.WaitOne();
+                    Stop();
                 }
-                _exit = null;
             }
             finally
             {
+                _runner = null;
                 Console.CancelKeyPress -= OnCancelKeyPress;
                 AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
             }

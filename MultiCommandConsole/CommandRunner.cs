@@ -10,10 +10,11 @@ namespace MultiCommandConsole
 {
     internal class CommandRunner : ICommandRunner
     {
-        private readonly ConsoleCommandRepository _consoleCommandRepository;
         private static readonly ILog Log = LogManager.GetLogger<CommandRunner>();
+
+        private readonly ConsoleCommandRepository _consoleCommandRepository;
         private volatile CommandRunData _runData;
-        private ManualResetEvent _exit;
+        private Stoplight _stoplight;
 
         public CommandRunner(ConsoleCommandRepository consoleCommandRepository)
         {
@@ -21,11 +22,11 @@ namespace MultiCommandConsole
             _consoleCommandRepository = consoleCommandRepository;
         }
 
-        public ManualResetEvent Run(string[] args)
+        public Stoplight Run(string[] args)
         {
-            _exit = new ManualResetEvent(false);
-            new Thread(() => Run(args, _exit)).Start();
-            return _exit;
+            _stoplight = new Stoplight();
+            new Thread(() => Run(args, _stoplight)).Start();
+            return _stoplight;
         }
 
         public bool CanBeCancelled { get { return _runData.Command is ICanBeCancelled; } }
@@ -38,7 +39,7 @@ namespace MultiCommandConsole
             if (cancellable != null)
             {
                 cancellable.Stop();
-                _exit.Set();
+                _stoplight.Stop();
             }
             else
             {
@@ -72,7 +73,7 @@ namespace MultiCommandConsole
             }
         }
 
-        public void Run(string[] args, ManualResetEvent exit)
+        public void Run(string[] args, Stoplight stoplight)
         {
             DateTime started = Config.NowDelegate();
             var stopwatch = Stopwatch.StartNew();
@@ -106,7 +107,8 @@ namespace MultiCommandConsole
                            stopwatch.Elapsed,
                            started.ToString("hh:mm:ss"),
                            Config.NowDelegate().ToString("hh:mm:ss"));
-            exit.Set();
+
+            stoplight.Stop();
         }
 
         private void RunSafely(CommandRunData runData)

@@ -63,6 +63,9 @@
     <Compile Include="Commands\CommandsOptions.cs" />
     <Compile Include="Commands\ConsoleCommand.cs" />
     <Compile Include="Commands\ConsoleRunOptions.cs" />
+    <Compile Include="IStoplight.cs" />
+    <Compile Include="Stoplight.cs" />
+    <Compile Include="Util\ConsoleReader.cs" />
     <Compile Include="ConsoleCommandAttribute.cs" />
     <Compile Include="ConsoleCommandInfo.cs" />
     <Compile Include="ConsoleCommandRepository.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="Util\ConsoleFormatter.cs" />
     <Compile Include="Util\IConsoleFormatter.cs" />
     <Compile Include="Util\StringExtensions.cs" />
+    <Compile Include="Util\TemporaryThread.cs" />
     <Compile Include="Util\TypeExtensions.cs" />
     <Compile Include="Commands\ViewArgsCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
