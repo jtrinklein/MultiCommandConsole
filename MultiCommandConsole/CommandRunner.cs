@@ -29,6 +29,7 @@ namespace MultiCommandConsole
             _commandLoaded = new ManualResetEvent(false);
             _stoplight = new Stoplight();
             new Thread(() => Run(args, _stoplight)).Start();
+
             _commandLoaded.WaitOne();
             if (Environment.UserInteractive)
             {
@@ -114,7 +115,21 @@ namespace MultiCommandConsole
             //load command after OnBeginRunCommand to let DI containers be configured
             _runData = _consoleCommandRepository.LoadCommand(args);
             _commandLoaded.Set();
+
+            //TODO: exclude console command
+            if (CanBeStopped)
+            {
+                AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+                Console.CancelKeyPress += OnCancelKeyPress;
+            }
+
             RunSafely(_runData);
+
+            if (CanBeStopped)
+            {
+                Console.CancelKeyPress -= OnCancelKeyPress;
+                AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
+            }
 
             if (Config.ConsoleMode.OnEndRunCommand != null)
             {
@@ -174,6 +189,27 @@ namespace MultiCommandConsole
                 var error = e.DumpToString();
                 Log.Error(error);
             }
+        }
+
+
+
+        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs eventArgs)
+        {
+            if (eventArgs.IsTerminating)
+            {
+                Log.Fatal("unhandled exception. stopping service.", (Exception)eventArgs.ExceptionObject);
+                Stop();
+            }
+            else
+            {
+                Log.Error("unhandled exception", (Exception)eventArgs.ExceptionObject);
+            }
+        }
+
+        private void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            e.Cancel = true;
+            Stop();
         }
     }
 }
