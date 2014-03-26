@@ -114,6 +114,16 @@ namespace MultiCommandConsole
 
             //load command after OnBeginRunCommand to let DI containers be configured
             _runData = _consoleCommandRepository.LoadCommand(args);
+            if (_runData.Errors.Any())
+            {
+                foreach (var error in _runData.Errors)
+                {
+                    Console.Out.WriteLine();
+                    Console.Out.Write("!!! ");
+                    Config.ConsoleFormatter.ChunckStringTo(error, Console.Out);
+                    Console.Out.WriteLine();
+                }
+            }
             _commandLoaded.Set();
 
             //TODO: exclude console command

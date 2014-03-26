@@ -16,7 +16,6 @@ namespace MultiCommandConsole
 
         internal readonly Dictionary<string, ConsoleCommandInfo> CommandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
         internal readonly Dictionary<Type, ConsoleCommandInfo> CommandsByType = new Dictionary<Type, ConsoleCommandInfo>();
-        internal readonly IConsoleFormatter Chunker = Config.ConsoleFormatter;
 
 		internal ConsoleCommand ConsoleCommand { get; set; }
 
@@ -216,6 +215,8 @@ namespace MultiCommandConsole
 				}
 				LoadArgs(options, validators, setterUppers, command);
 				options.Add(HelpCommand.Prototype, "show this message and exit", a => showHelp = true);
+
+                List<string> errors;
 				try
 				{
 					command.ExtraArgs = options.Parse(args.Skip(1));
@@ -224,21 +225,21 @@ namespace MultiCommandConsole
 						return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
 					}
 
-					var errors = validators.OrderBy(v => v is IConsoleCommand).SelectMany(v => v.GetArgValidationErrors()).ToList();
-					if (errors.Count > 0)
-					{
-						foreach (var error in errors)
-						{
-							Console.Out.Write("!!! ");
-							Chunker.ChunckStringTo(error, Console.Out);
-						}
-						return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
-					}
+				    errors = validators.OrderBy(v => v is IConsoleCommand).SelectMany(v => v.GetArgValidationErrors()).ToList();
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
-					return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
+				    errors = new List<string> {e.Message};
 				}
+
+                if (errors.Count > 0)
+                {
+                    return new CommandRunData
+                    {
+                        Command = HelpCommand.ForCommand(info, command),
+                        Errors = errors
+                    };
+                }
 
 				return new CommandRunData { Command = command, SetterUppers = setterUppers};
 

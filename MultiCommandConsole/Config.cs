@@ -63,7 +63,7 @@ namespace MultiCommandConsole
 		public static Func<Type, object> ResolveTypeDelegate { get; set; }
 
 		/// <summary>The console formatter used to format messages for the console window</summary>
-		public static ConsoleFormatter ConsoleFormatter { get; set; }
+		public static IConsoleFormatter ConsoleFormatter { get; set; }
 
 		/// <summary>
 		/// If true, an additional command will be displayed to allow the user to see how the text they 
