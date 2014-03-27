@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole
 {
@@ -15,5 +17,8 @@ namespace MultiCommandConsole
 		public bool Required { get; set; }
 		public string AppSettingsKey { get; set; }
 		public string ConnectionStringKey { get; set; }
+
+        public string[] PrototypeArray { get { return Prototype.GetPrototypeArray(); } }
+        public string FirstPrototype { get { return PrototypeArray.First(); } }
 	}
 }

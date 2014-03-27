@@ -8,17 +8,13 @@ namespace MultiCommandConsole.Tests
     [ConsoleCommand("test|t", "test console command")]
     public class TestCommand : IConsoleCommand
     {
-        public static string DefaultMessage = "TestCommand.Run";
-
-        [Arg("message|m", "this message will be output to the console")]
+        [Arg("message|m", "this message will be output to the console", Required = true)]
         public string Message { get; set; }
 
-        public CommandsOptions CommandsOptions { get; set; }
+        [Arg("someswitch|ss", "some switch to test switches")]
+        public bool Switch { get; set; } 
 
-        public TestCommand()
-        {
-            Message = DefaultMessage;
-        }
+        public CommandsOptions CommandsOptions { get; set; }
 
         public string GetDetailedHelp()
         {

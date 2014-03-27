@@ -209,6 +209,9 @@ namespace MultiCommandConsole
 					throw;
 				}
 
+
+                var errors = new List<string>();
+                var commandArgs = new Dictionary<Arg,object>();
 				var validators = new List<IValidatable> { command };
 				var setterUppers = new List<ISetupAndCleanup>();
 			    var setterUpper = command as ISetupAndCleanup;
@@ -216,10 +219,9 @@ namespace MultiCommandConsole
 				{
 					setterUppers.Add(setterUpper);
 				}
-				LoadArgs(options, validators, setterUppers, command);
+				LoadArgs(options, validators, setterUppers, command, commandArgs);
 				options.Add(HelpCommand.Prototype, "show this message and exit", a => showHelp = true);
 
-                List<string> errors;
 				try
 				{
 					command.ExtraArgs = options.Parse(args.Skip(1));
@@ -228,7 +230,14 @@ namespace MultiCommandConsole
 						return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
 					}
 
-				    errors = validators.OrderBy(v => v is IConsoleCommand).SelectMany(v => v.GetArgValidationErrors()).ToList();
+				    errors.AddRange(validators.OrderBy(v => v is IConsoleCommand)
+				                              .SelectMany(v => v.GetArgValidationErrors()));
+
+				    errors.AddRange(from arg in commandArgs
+                                    where arg.Key.ArgAttribute.Required
+                                    let value = arg.Key.PropertyInfo.GetValue(arg.Value, null) 
+                                    where value == null 
+                                    select arg.Key.ArgAttribute.FirstPrototype + " is required");
 				}
 				catch (Exception e)
 				{
@@ -252,23 +261,23 @@ namespace MultiCommandConsole
 			return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 		}
 
-		private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, List<ISetupAndCleanup> setterUppers, object obj)
+		private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, List<ISetupAndCleanup> setterUppers, object obj, Dictionary<Arg, object> commandArgs)
 		{
 			var options = ArgsHelper.GetOptions(obj.GetType()).ToList();
 
 			foreach (var option in options.Where(p => p.ArgSetAttribute != null))
 			{
-				var args = option.PropertyInfo.GetValue(obj, null) ?? option.PropertyInfo.PropertyType.Resolve();
+				var argSet = option.PropertyInfo.GetValue(obj, null) ?? option.PropertyInfo.PropertyType.Resolve();
 
-			    args.As<CommandsOptions>(o => { o.ConsoleCommandRepository = this; });
-                args.As<ConsoleRunOptions>(o => { o.CreateCommandRunner = () => new CommandRunner(this); });
-                args.As<IValidatable>(validators.Add);
-                args.As<ISetupAndCleanup>(setterUppers.Add);
+			    argSet.As<CommandsOptions>(o => { o.ConsoleCommandRepository = this; });
+                argSet.As<ConsoleRunOptions>(o => { o.CreateCommandRunner = () => new CommandRunner(this); });
+                argSet.As<IValidatable>(validators.Add);
+                argSet.As<ISetupAndCleanup>(setterUppers.Add);
 
 				//load all arguments in a set before assigning it to the host property.
 				//  this allows the host to act on the fully loaded set when it's assigned.
-				LoadArgs(optionSet, validators, setterUppers, args);
-				option.PropertyInfo.SetValue(obj, args, null);
+				LoadArgs(optionSet, validators, setterUppers, argSet, commandArgs);
+				option.PropertyInfo.SetValue(obj, argSet, null);
 			}
 		
 			foreach (var option in options.Where(p => p.ArgAttribute != null))
@@ -287,11 +296,15 @@ namespace MultiCommandConsole
 				            s =>
 				            	{
 				            		var type = localProperty.PropertyInfo.PropertyType;
-				            		var value = type == typeof (bool)
-				            		            	? true
+                                    //specifying a switch without value is same as setting it to true
+
+				            		var value = type == typeof (bool) && s == null
+				            		            	? true 
 				            		            	: Converter.ChangeType(type, s);
 									localProperty.PropertyInfo.SetValue(obj, value, null);
 				            	});
+
+                commandArgs.Add(option, obj);
 			}
 		}
 	}
