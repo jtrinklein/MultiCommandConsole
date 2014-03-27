@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration.Install;
 using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.ServiceProcess;
-using System.Text.RegularExpressions;
 using Common.Logging;
 
 namespace MultiCommandConsole.Services
@@ -20,6 +18,14 @@ namespace MultiCommandConsole.Services
             return ServiceController.GetServices().Any(s => s.ServiceName.Equals(serviceName, StringComparison.OrdinalIgnoreCase));
         }
 
+        public Service GetCurrent()
+        {
+            //http://stackoverflow.com/questions/1841790/how-can-a-windows-service-determine-its-servicename
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            String query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
+            return new ManagementObjectSearcher(query).Get().Cast<ManagementObject>().Select(Map).First();
+        }
+
         public IEnumerable<Service> All()
         {
             //using ServiceController only returns Name & DisplayName
@@ -27,12 +33,17 @@ namespace MultiCommandConsole.Services
             return mc.GetInstances()
                      .Cast<ManagementObject>()
                      .Where(IsThisExecutable)
-                     .Select(mo => new Service
-                         {
-                             ServiceName = mo.GetPropertyValue("Name").ToString(),
-                             DisplayName = mo.GetPropertyValue("DisplayName").ToString(),
-                             Description = mo.GetPropertyValue("Description").ToString(),
-                         });
+                     .Select(Map);
+        }
+
+        private static Service Map(ManagementObject mo)
+        {
+            return new Service
+                {
+                    ServiceName = mo.GetPropertyValue("Name").ToString(),
+                    DisplayName = mo.GetPropertyValue("DisplayName").ToString(),
+                    Description = mo.GetPropertyValue("Description").ToString(),
+                };
         }
 
         private static bool IsThisExecutable(ManagementObject mo)

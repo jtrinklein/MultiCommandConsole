@@ -8,5 +8,6 @@ namespace MultiCommandConsole.Services
         void Save(Service options);
         void Add(Service options);
         void Delete(string serviceName);
+        Service GetCurrent();
     }
 }
