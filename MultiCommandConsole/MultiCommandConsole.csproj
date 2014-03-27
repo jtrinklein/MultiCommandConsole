@@ -65,6 +65,7 @@
     <Compile Include="Commands\CommandsOptions.cs" />
     <Compile Include="Commands\ConsoleCommand.cs" />
     <Compile Include="Commands\ConsoleRunOptions.cs" />
+    <Compile Include="Commands\UserInteractiveOptions.cs" />
     <Compile Include="IConsoleCommandRepository.cs" />
     <Compile Include="IStoplight.cs" />
     <Compile Include="Stoplight.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="NDesk\OptionValueCollection.cs" />
     <Compile Include="NDesk\OptionValueType.cs" />
     <Compile Include="Util\CommandLineParser.cs" />
+    <Compile Include="Util\ConsoleWriter.cs" />
     <Compile Include="Util\DisposableAction.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="Util\EnumerableExtensions.cs" />
     <Compile Include="Util\ConsoleFormatter.cs" />
     <Compile Include="Util\IConsoleFormatter.cs" />
+    <Compile Include="Util\IConsoleWriter.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\TemporaryThread.cs" />
     <Compile Include="Util\TypeExtensions.cs" />

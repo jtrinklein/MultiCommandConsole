@@ -28,6 +28,7 @@ namespace MultiCommandConsole
         {
             _commandLoaded = new ManualResetEvent(false);
             _stoplight = new Stoplight();
+
             new Thread(() => Run(args, _stoplight)).Start();
 
             _commandLoaded.WaitOne();
@@ -53,6 +54,7 @@ namespace MultiCommandConsole
             var stoppable = _runData.Command as ICanBeStopped;
             if (stoppable != null)
             {
+                Log.Info("stopping");
                 Console.Out.WriteLine("stopping");
                 stoppable.Stop();
                 _stoplight.Stop();
@@ -68,6 +70,7 @@ namespace MultiCommandConsole
             var pausable = _runData.Command as ICanBePaused;
             if (pausable != null)
             {
+                Log.Info("pausing");
                 Console.Out.WriteLine("pausing");
                 pausable.Pause();
             }
@@ -82,6 +85,7 @@ namespace MultiCommandConsole
             var pausable = _runData.Command as ICanBePaused;
             if (pausable != null)
             {
+                Log.Info("resuming");
                 Console.Out.WriteLine("resuming");
                 pausable.Resume();
             }

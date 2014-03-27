@@ -81,15 +81,5 @@ namespace MultiCommandConsole.Util
 				textWriter.WriteLine(chunkPrefix + chunk);
 			}
 		}
-
-		public void ChunckStringTo(string text, Action<string> action, string chunkPrefix = null)
-		{
-			chunkPrefix = chunkPrefix ?? string.Empty;
-
-			foreach (var chunk in ChunkString(text, chunkPrefix.Length))
-			{
-				action(chunkPrefix + chunk);
-			}
-		}
 	}
 }

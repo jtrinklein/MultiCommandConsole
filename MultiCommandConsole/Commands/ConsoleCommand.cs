@@ -16,6 +16,7 @@ namespace MultiCommandConsole.Commands
 
         public CommandsOptions CommandsOptions { get; set; }
         public ConsoleRunOptions ConsoleRunOptions { get; set; }
+        public UserInteractiveOptions UserInteractiveOptions { get; set; } 
 		
 		public string GetDetailedHelp()
 		{
@@ -26,10 +27,6 @@ namespace MultiCommandConsole.Commands
 
 		public IEnumerable<string> GetArgValidationErrors()
 		{
-            if (!Environment.UserInteractive)
-            {
-                return new[] {"console command is only available when the app is run in the console"};
-            }
 			return Enumerable.Empty<String>();
 		}
 
@@ -47,15 +44,11 @@ namespace MultiCommandConsole.Commands
 
 			using (CommandsOptions.HideCommandOfType<ConsoleCommand>())
 			{
-				var chunker = Config.ConsoleFormatter;
-				chunker.ChunckStringTo(
-					"Type \"quit\" to exit."
-					+ Environment.NewLine
-					+ "Type \"cls\" to clear the console window."
-					+ Environment.NewLine
-					+ "Type \"> filename\" to redirect output to a file."
-					+ Environment.NewLine,
-					Console.Out);
+                UserInteractiveOptions.Writer
+                    .WriteLines(
+                    "Type \"quit\" to exit.",
+                    "Type \"cls\" to clear the console window.",
+                    "Type \"> filename\" to redirect output to a file.");
 				
 				do
 				{

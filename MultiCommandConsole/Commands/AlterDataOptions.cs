@@ -2,7 +2,7 @@ using System;
 
 namespace MultiCommandConsole.Commands
 {
-    [ArgSet("AlterData", "Options for commands that can alter data")]
+    [ArgSet("alter-data", "Options for commands that can alter data")]
     public class AlterDataOptions
     {
         [Arg("noPrompt", "Prevents the command from prompting the user for confirmation.")]

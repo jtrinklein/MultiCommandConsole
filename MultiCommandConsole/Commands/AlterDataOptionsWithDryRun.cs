@@ -2,7 +2,7 @@ using System;
 
 namespace MultiCommandConsole.Commands
 {
-    [ArgSet("AlterData", "Options for commands that can alter data")]
+    [ArgSet("alter-data", "Options for commands that can alter data")]
     public class AlterDataOptionsWithDryRun
     {
         [Arg("dryrun", "Log results without applying them.")]
