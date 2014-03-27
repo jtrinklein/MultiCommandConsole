@@ -17,7 +17,6 @@ namespace MultiCommandConsole.Services
 
             static Defaults()
             {
-                CommandLine = "ping /s=google.com /i=1";
                 Account = ServiceAccount.LocalService;
                 StartMode = ServiceStartMode.Automatic;
             }

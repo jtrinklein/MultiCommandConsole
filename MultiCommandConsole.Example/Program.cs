@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
 using Common.Logging;
 using MultiCommandConsole.Services;
 using ObjectPrinter;
@@ -22,6 +21,8 @@ namespace MultiCommandConsole.Example
 		    Config.ConsoleMode.AppName = "example_console";
 			Config.ShowVierArgsCommand = true;
 		    Config.DefaultCommand = typeof (RepeatConsoleCommand);
+
+            Services.Config.Defaults.CommandLine = "ping /s=google.com /i=1";
 
 		    LogManager.Adapter = Log4NetFactoryAdapter.Load();
 

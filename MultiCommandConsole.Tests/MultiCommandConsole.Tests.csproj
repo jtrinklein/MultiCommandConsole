@@ -75,6 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringExtensionTests_SplitCmdLineArgs.cs" />
     <Compile Include="TestCommand.cs" />
+    <Compile Include="TestServiceCommand.cs" />
     <Compile Include="UncFileCommand.cs" />
     <Compile Include="ConsoleCommandRepositoryTests.cs" />
   </ItemGroup>

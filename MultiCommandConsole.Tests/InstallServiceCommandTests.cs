@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.ServiceProcess;
 using FluentAssertions;
 using Moq;
@@ -21,8 +22,12 @@ namespace MultiCommandConsole.Tests
             _cmdRepo = new Mock<IConsoleCommandRepository>();
             _svcRepo = new Mock<IServicesRepository>();
 
+            _cmdRepo.Setup(r => r.LoadCommand(It.IsAny<string[]>()))
+                    .Returns(new CommandRunData { Command = new TestServiceCommand() });
+
             _cmd = new InstallServiceCommand(_svcRepo.Object)
             {
+                ExtraArgs = new List<string>(),
                 CommandsOptions = new CommandsOptions { ConsoleCommandRepository = _cmdRepo.Object },
             };
         }
