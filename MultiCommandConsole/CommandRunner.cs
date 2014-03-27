@@ -187,6 +187,7 @@ namespace MultiCommandConsole
                 {
                     e.SetContext("command", runData.Command);
                 }
+                Console.Out.WriteLine(e.Message + " see logs for details");
                 var error = (e.InnerException ?? e).DumpToString();
                 Log.Error(error);
             }
@@ -196,6 +197,7 @@ namespace MultiCommandConsole
                 {
                     e.SetContext("command", runData.Command);
                 }
+                Console.Out.WriteLine(e.Message + " see logs for details");
                 var error = e.DumpToString();
                 Log.Error(error);
             }

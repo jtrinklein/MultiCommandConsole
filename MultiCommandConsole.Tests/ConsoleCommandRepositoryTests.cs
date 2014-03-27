@@ -66,8 +66,8 @@ namespace MultiCommandConsole.Tests
         public void Should_populate_commands_on_CommandOptions()
         {
             var command = (TestCommand)_repo.LoadCommand("test /m=msg-is-required".SplitCmdLineArgs()).Command;
-            command.CommandsOptions.Commands.Should().NotBeEmpty();
-            command.CommandsOptions.Commands.Should().BeEquivalentTo(_repo.Commands);
+            command.CommandsOptions.GetCommands().Should().NotBeEmpty();
+            command.CommandsOptions.GetCommands().Should().BeEquivalentTo(_repo.Commands);
         }
 
         [Test]

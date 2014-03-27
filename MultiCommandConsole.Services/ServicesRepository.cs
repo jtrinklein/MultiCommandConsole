@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration.Install;
 using System.Linq;
@@ -30,13 +31,14 @@ namespace MultiCommandConsole.Services
                          {
                              ServiceName = mo.GetPropertyValue("Name").ToString(),
                              DisplayName = mo.GetPropertyValue("DisplayName").ToString(),
-                             Description = mo.GetPropertyValue("Description").ToString()
+                             Description = mo.GetPropertyValue("Description").ToString(),
                          });
         }
 
         private static bool IsThisExecutable(ManagementObject mo)
         {
-            return mo.GetPropertyValue("PathName").ToString().StartsWith(AppDomain.CurrentDomain.BaseDirectory, StringComparison.OrdinalIgnoreCase);
+            var path = mo.GetPropertyValue("PathName").ToString();
+            return path.Contains(Assembly.GetEntryAssembly().Location);
         }
 
         public void Save(Service options)
@@ -56,15 +58,16 @@ namespace MultiCommandConsole.Services
                 throw new InvalidOperationException("service already exists with the name '" + options.ServiceName + "'");
             }
 
-            CustomInstaller.Service = options;
-            ManagedInstallerClass.InstallHelper(new[] { Assembly.GetExecutingAssembly().Location });
+            new CustomInstaller(options).Install(new Hashtable());
+            
+            //ManagedInstallerClass.InstallHelper(new[] { Assembly.GetEntryAssembly().Location });
             Log.InfoFormat("installed {0}", options.ServiceName);
         }
 
         public void Delete(string serviceName)
         {
-            CustomInstaller.Service = new Service{ServiceName = serviceName};
-            ManagedInstallerClass.InstallHelper(new[] { "/u", Assembly.GetExecutingAssembly().Location });
+            new CustomInstaller(new Service{ServiceName = serviceName}).Uninstall(null);
+            //ManagedInstallerClass.InstallHelper(new[] { "/u", Assembly.GetExecutingAssembly().Location });
             Log.InfoFormat("deleted {0}", serviceName);
         }
     }

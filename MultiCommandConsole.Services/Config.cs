@@ -14,6 +14,13 @@ namespace MultiCommandConsole.Services
             public static string Username { get; set; }
             public static string Password { get; set; }
             public static ServiceStartMode StartMode { get; set; }
+
+            static Defaults()
+            {
+                CommandLine = "ping /s=google.com /i=1";
+                Account = ServiceAccount.LocalService;
+                StartMode = ServiceStartMode.Automatic;
+            }
         }
 
     }

@@ -96,7 +96,7 @@ namespace MultiCommandConsole.Commands
 				if (_commandCache == null)
 				{
 					_commandCache = new Dictionary<string, ConsoleCommandInfo>();
-					foreach(var command in CommandsOptions.Commands)
+					foreach(var command in CommandsOptions.GetCommands())
 					{
 						foreach(var name in command.Attribute.PrototypeArray)
 						{

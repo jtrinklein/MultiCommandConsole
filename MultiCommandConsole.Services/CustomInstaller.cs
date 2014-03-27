@@ -1,5 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Configuration.Install;
+using System.IO;
+using System.Reflection;
 using System.ServiceProcess;
 
 namespace MultiCommandConsole.Services
@@ -7,33 +10,58 @@ namespace MultiCommandConsole.Services
     [RunInstaller(true)]
     public class CustomInstaller : Installer
     {
-        public static Service Service { get; set; }
+        private readonly Service _service;
 
-        public CustomInstaller()
+        public CustomInstaller(Service service)
         {
+            _service = service;
+            Installers.Add(GetServiceInstaller());
             Installers.Add(GetServiceProcessInstaller());
-            Installers.Add(
-                new ServiceInstaller
+            var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+            Context = new InstallContext(
+                null, 
+                new[]
                     {
-                        ServiceName = Service.ServiceName, //must be the same as what was set in Program's constructor
-                        DisplayName = Service.DisplayName,
-                        Description = Service.Description,
-                        StartType = Service.StartMode,
+                        "/LogToConsole=true", 
+                        "/InstallStateDir=" + Path.Combine(baseDir, "service-install.state"),
+                        "/LogFile=" + Path.Combine(baseDir, "service-install.log")
                     });
+
+            foreach (string key in Context.Parameters.Keys)
+            {
+                Console.Out.WriteLine("{0}={1}", key, Context.Parameters[key]);
+            }
         }
 
-        private static ServiceProcessInstaller GetServiceProcessInstaller()
+        protected override void OnBeforeInstall(System.Collections.IDictionary savedState)
         {
-            return Service.Account == ServiceAccount.User
+            base.OnBeforeInstall(savedState);
+            Context.Parameters["assemblypath"] = "\"" + Assembly.GetEntryAssembly().Location + "\"";
+        }
+
+        private ServiceInstaller GetServiceInstaller()
+        {
+            return new ServiceInstaller
+                {
+                    ServiceName = _service.ServiceName,
+                    DisplayName = _service.DisplayName,
+                    Description = _service.Description,
+                    StartType = _service.StartMode,
+                };
+        }
+
+        private ServiceProcessInstaller GetServiceProcessInstaller()
+        {
+            return _service.Account == ServiceAccount.User
                        ? new ServiceProcessInstaller
                            {
-                               Account = Service.Account,
-                               Username = Service.Username,
-                               Password = Service.Password
+                               Account = _service.Account,
+                               Username = _service.Username,
+                               Password = _service.Password
                            }
                        : new ServiceProcessInstaller
                            {
-                               Account = Service.Account
+                               Account = _service.Account
                            };
         }
     }

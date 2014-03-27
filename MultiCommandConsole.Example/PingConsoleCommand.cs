@@ -39,7 +39,7 @@ namespace MultiCommandConsole.Example
         public IEnumerable<string> GetArgValidationErrors()
         {
             var errors = new List<string>();
-            if (Sites.Length == 0)
+            if (Sites == null || Sites.Length == 0)
             {
                 errors.Add("at least one site must be specified");
             }

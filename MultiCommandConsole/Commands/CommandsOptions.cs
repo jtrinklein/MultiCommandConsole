@@ -9,7 +9,10 @@ namespace MultiCommandConsole.Commands
     {
         internal IConsoleCommandRepository ConsoleCommandRepository { private get; set; }
 
-        public IEnumerable<ConsoleCommandInfo> Commands { get { return ConsoleCommandRepository.Commands; } }
+        public IEnumerable<ConsoleCommandInfo> GetCommands()
+        {
+            return ConsoleCommandRepository.Commands;
+        }
 
         public ICommandRunner GetRunner()
         {

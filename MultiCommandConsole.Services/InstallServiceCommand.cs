@@ -14,6 +14,7 @@ namespace MultiCommandConsole.Services
         private ICanRunAsService _serviceCommand;
 
         public CommandsOptions CommandsOptions { get; set; }
+        public AlterDataOptions AlterDataOptions { get; set; }
 
         [Arg("list", "list the commands that can be installed as services")]
         public bool List { get; set; }
@@ -90,16 +91,27 @@ namespace MultiCommandConsole.Services
                 {
                     CommandLine = CommandLine.TrimEnd() + " " + string.Join(" ", ExtraArgs);
                     ExtraArgs.Clear();
+                }
 
-                    _commandRunData = CommandsOptions.Load(CommandLine);
+                _commandRunData = CommandsOptions.Load(CommandLine);
+
+                if (_commandRunData.Errors.Count > 0)
+                {
+                    errors.Add("errors with arguments for /command");
+                    errors.AddRange(_commandRunData.Errors);
+                }
+                else
+                {
                     _serviceCommand = _commandRunData.Command as ICanRunAsService;
                     if (_serviceCommand == null)
                     {
                         errors.Add(_commandRunData.Command.GetType().Name + " does not implement ICanRunAsService");
                     }
-                    if (_commandRunData.Errors.Count > 0)
+                    else
                     {
-                        errors.AddRange(_commandRunData.Errors);
+                        ServiceName = _serviceCommand.ServiceName;
+                        DisplayName = _serviceCommand.DisplayName;
+                        Description = _serviceCommand.Description;
                     }
                 }
             }
@@ -122,18 +134,28 @@ namespace MultiCommandConsole.Services
                 ListCommandsThatCanBeRunAsService();
                 return;
             }
-
+            
             var service = new Service
                 {
-                    ServiceName = ServiceName ?? _serviceCommand.ServiceName,
-                    DisplayName = DisplayName ?? _serviceCommand.DisplayName,
-                    Description = Description ?? _serviceCommand.Description,
+                    ServiceName = ServiceName,
+                    DisplayName = DisplayName,
+                    Description = Description,
                     Account = Account,
                     Username = Username,
                     Password = Password,
                     StartMode = StartMode,
                     CommandLine = CommandLine
                 };
+
+            Console.Out.WriteLine("You are about to install this service:");
+            Console.Out.WriteLine("  service name: " + service.ServiceName);
+            Console.Out.WriteLine("  display name: " + service.DisplayName);
+            Console.Out.WriteLine("  description : " + service.Description);
+           
+            if (!AlterDataOptions.Continue("Would you like to continue?"))
+            {
+                return;
+            }
 
             if (ForceReinstall)
             {
@@ -147,7 +169,7 @@ namespace MultiCommandConsole.Services
 
         private void ListCommandsThatCanBeRunAsService()
         {
-            var commands = CommandsOptions.Commands
+            var commands = CommandsOptions.GetCommands()
                                           .Where(c => typeof (ICanRunAsService).IsAssignableFrom(c.CommandType))
                                           .ToList();
 

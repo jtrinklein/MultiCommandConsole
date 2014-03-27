@@ -241,6 +241,7 @@ namespace MultiCommandConsole
 				}
 				catch (Exception e)
 				{
+                    Log.Error(e.Dump());
 				    errors = new List<string> {e.Message};
 				}
 
@@ -295,17 +296,28 @@ namespace MultiCommandConsole
 				optionSet.Add(prototype, description,
 				            s =>
 				            	{
-				            		var type = localProperty.PropertyInfo.PropertyType;
-                                    //specifying a switch without value is same as setting it to true
-
-				            		var value = type == typeof (bool) && s == null
-				            		            	? true 
-				            		            	: Converter.ChangeType(type, s);
+				            	    var value = GetValue(localProperty.PropertyInfo.PropertyType, s);
 									localProperty.PropertyInfo.SetValue(obj, value, null);
 				            	});
 
                 commandArgs.Add(option, obj);
 			}
 		}
-	}
+
+        private static object GetValue(Type type, string s)
+        {
+            if (type == typeof (bool) && s == null)
+            {
+                //specifying a switch without value is same as setting it to true
+                return true;
+            }
+
+            if (type == typeof (string[]))
+            {
+                return s.Split(',');
+            }
+
+            return Converter.ChangeType(type, s);
+        }
+    }
 }
