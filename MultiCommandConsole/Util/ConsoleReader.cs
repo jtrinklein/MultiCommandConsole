@@ -64,7 +64,7 @@ namespace MultiCommandConsole.Util
             {
                 sb.Append(isPaused ? "(r)esume" : "(p)ause");
             }
-            if (sb.Length > 0)
+            if (sb.Length == 0)
             {
                 return;
             }

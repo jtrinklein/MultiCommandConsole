@@ -13,12 +13,12 @@ namespace MultiCommandConsole
     {
         private static readonly ILog Log = LogManager.GetLogger<CommandRunner>();
 
-        private readonly ConsoleCommandRepository _consoleCommandRepository;
+        private readonly IConsoleCommandRepository _consoleCommandRepository;
         private volatile CommandRunData _runData;
         private Stoplight _stoplight;
         private EventWaitHandle _commandLoaded;
 
-        public CommandRunner(ConsoleCommandRepository consoleCommandRepository)
+        public CommandRunner(IConsoleCommandRepository consoleCommandRepository)
         {
             if (consoleCommandRepository == null) throw new ArgumentNullException("consoleCommandRepository");
             _consoleCommandRepository = consoleCommandRepository;

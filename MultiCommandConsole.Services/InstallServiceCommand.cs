@@ -1,22 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceProcess;
 using MultiCommandConsole.Commands;
 
 namespace MultiCommandConsole.Services
 {
-    [ConsoleCommand("install", "installs the current exe as a service targetting the specified command")]
+    [ConsoleCommand("install-service", "installs the current exe as a service targetting the specified command")]
     public class InstallServiceCommand : IConsoleCommand
     {
+        private readonly IServicesRepository _servicesRepository;
+        private CommandRunData _commandRunData;
+        private ICanRunAsService _serviceCommand;
+
         public CommandsOptions CommandsOptions { get; set; }
 
-        [Arg("servicename|sn", "service name")]
+        [Arg("list", "list the commands that can be installed as services")]
+        public bool List { get; set; }
+
+        [Arg("servicename|sn", "overrides the service name")]
         public string ServiceName { get; set; }
 
-        [Arg("displayname|dn", "display name")]
+        [Arg("displayname|dn", "overrides the display name")]
         public string DisplayName { get; set; }
 
-        [Arg("description|d", "description for the service")]
+        [Arg("description|d", "overrides the description for the service")]
         public string Description { get; set; }
 
         [Arg("account|a", "the account the service will run as. options:LocalService,NetworkService,LocalSystem,User")]
@@ -34,12 +42,19 @@ namespace MultiCommandConsole.Services
         [Arg("force|f", "uninstalls the service if it's already installed")]
         public bool ForceReinstall { get; set; }
 
-        public InstallServiceCommand()
+        [Arg("command|c", "the command and arguments to run.  should be the last argument provided")]
+        public string CommandLine { get; set; }
+
+        public InstallServiceCommand() 
+            : this(new ServicesRepository())
         {
-            //TODO: load from CommandLine
-            //ServiceName = Service.Default.ServiceName;
-            //DisplayName = Service.Default.DisplayName;
-            //Description = Service.Default.Description;
+        }
+
+        public InstallServiceCommand(IServicesRepository servicesRepository)
+        {
+            _servicesRepository = servicesRepository;
+
+            CommandLine = Config.Defaults.CommandLine;
 
             Account = Config.Defaults.Account;
             Username = Config.Defaults.Username;
@@ -50,21 +65,9 @@ namespace MultiCommandConsole.Services
         public IEnumerable<string> GetArgValidationErrors()
         {
             var errors = new List<string>();
-            if (!Enum.IsDefined(typeof(ServiceAccount), Account))
+            if (List)
             {
-                errors.Add("invalid account");
-            }
-            if (!Enum.IsDefined(typeof(ServiceStartMode), StartMode))
-            {
-                errors.Add("invalid startmode");
-            }
-            if (string.IsNullOrWhiteSpace(ServiceName))
-            {
-                errors.Add("servicename is required");
-            }
-            if (string.IsNullOrWhiteSpace(DisplayName))
-            {
-                errors.Add("displayname is required");
+                return errors;
             }
             if (Account == ServiceAccount.User)
             {
@@ -75,6 +78,29 @@ namespace MultiCommandConsole.Services
                 if (string.IsNullOrWhiteSpace(Password))
                 {
                     errors.Add("pwd is required when account=User");
+                }
+            }
+            if (string.IsNullOrWhiteSpace(CommandLine))
+            {
+                errors.Add("command is required");
+            }
+            else
+            {
+                if (ExtraArgs.Count > 0)
+                {
+                    CommandLine = CommandLine.TrimEnd() + " " + string.Join(" ", ExtraArgs);
+                    ExtraArgs.Clear();
+
+                    _commandRunData = CommandsOptions.Load(CommandLine);
+                    _serviceCommand = _commandRunData.Command as ICanRunAsService;
+                    if (_serviceCommand == null)
+                    {
+                        errors.Add(_commandRunData.Command.GetType().Name + " does not implement ICanRunAsService");
+                    }
+                    if (_commandRunData.Errors.Count > 0)
+                    {
+                        errors.AddRange(_commandRunData.Errors);
+                    }
                 }
             }
             return errors;
@@ -91,31 +117,50 @@ namespace MultiCommandConsole.Services
 
         public void Run()
         {
-            var repo = new ServicesRepository();
+            if (List)
+            {
+                ListCommandsThatCanBeRunAsService();
+                return;
+            }
+
             var service = new Service
                 {
-                    ServiceName = ServiceName,
-                    DisplayName = DisplayName,
-                    Description = Description,
+                    ServiceName = ServiceName ?? _serviceCommand.ServiceName,
+                    DisplayName = DisplayName ?? _serviceCommand.DisplayName,
+                    Description = Description ?? _serviceCommand.Description,
                     Account = Account,
                     Username = Username,
                     Password = Password,
-                    StartMode = StartMode
+                    StartMode = StartMode,
+                    CommandLine = CommandLine
                 };
-
-            //TODO:
-            // - list commands available to install
-            // - load command from args
-            // - validate no errors
-            // - add command line from extra args
 
             if (ForceReinstall)
             {
-                repo.Save(service);
+                _servicesRepository.Save(service);
             }
             else
             {
-                repo.Add(service);
+                _servicesRepository.Add(service);
+            }
+        }
+
+        private void ListCommandsThatCanBeRunAsService()
+        {
+            var commands = CommandsOptions.Commands
+                                          .Where(c => typeof (ICanRunAsService).IsAssignableFrom(c.CommandType))
+                                          .ToList();
+
+            if (commands.Count == 0)
+            {
+                Console.Out.WriteLine("no commands implement ICanRunAsService");
+            }
+            else
+            {
+                foreach (var command in commands)
+                {
+                    Console.Out.WriteLine(command.Attribute.FirstPrototype);
+                }
             }
         }
     }

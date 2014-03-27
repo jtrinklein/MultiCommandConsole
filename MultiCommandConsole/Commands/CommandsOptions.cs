@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Commands
 {
     [ArgSet("commands", "provides all commands")]
     public class CommandsOptions
     {
-        internal ConsoleCommandRepository ConsoleCommandRepository { private get; set; }
+        internal IConsoleCommandRepository ConsoleCommandRepository { private get; set; }
 
         public IEnumerable<ConsoleCommandInfo> Commands { get { return ConsoleCommandRepository.Commands; } }
 
@@ -28,6 +29,11 @@ namespace MultiCommandConsole.Commands
         public ConsoleCommandInfo GetByType(Type type)
         {
             return ConsoleCommandRepository.GetByType(type);
+        }
+
+        public CommandRunData Load(string commandLine)
+        {
+            return ConsoleCommandRepository.LoadCommand(commandLine.SplitCmdLineArgs());
         }
     }
 }

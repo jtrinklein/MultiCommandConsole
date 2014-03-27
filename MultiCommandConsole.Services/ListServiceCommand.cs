@@ -1,25 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MultiCommandConsole.Services
 {
-    [ConsoleCommand("install", "installs the current exe as a service targetting the specified command")]
+    [ConsoleCommand("list-service", "lists the services matching the provided service name regex")]
     public class ListServiceCommand : IConsoleCommand
     {
-        [Arg("servicename|sn", "service name")]
-        public string ServiceName { get; set; }
+        private readonly IServicesRepository _servicesRepository;
 
-        public ListServiceCommand()
+        public ListServiceCommand() 
+            : this(new ServicesRepository())
         {
-            ServiceName = Config.Defaults.ServiceNamePrefix;
+        }
+        public ListServiceCommand(IServicesRepository servicesRepository)
+        {
+            _servicesRepository = servicesRepository;
         }
 
         public IEnumerable<string> GetArgValidationErrors()
         {
-            if (string.IsNullOrWhiteSpace(ServiceName))
-            {
-                return new[] { "servicename is required" };
-            }
             return Enumerable.Empty<string>();
         }
 
@@ -32,9 +32,12 @@ namespace MultiCommandConsole.Services
 
         public void Run()
         {
-            var serviceControllers = new ServicesRepository().List(ServiceName);
+            var services = _servicesRepository.All().ToList();
+            foreach (var service in services.OrderBy(s => s.DisplayName))
+            {
+                Console.Out.WriteLine(service.DisplayName);
+            }
             //TODO:
-            // - list services alphabetically
             // - validate their command line settings are still valid (add arg to let user decide if we validate or not)
         }
     }

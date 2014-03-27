@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole
 {
@@ -12,5 +14,8 @@ namespace MultiCommandConsole
 
 		public string Prototype { get; private set; }
 		public string Descripion { get; private set; }
+
+        public string[] PrototypeArray { get { return Prototype.GetPrototypeArray(); } }
+        public string FirstPrototype { get { return PrototypeArray.First(); } }
 	}
 }

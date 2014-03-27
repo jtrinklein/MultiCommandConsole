@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace MultiCommandConsole.Services
 {
-    [ConsoleCommand("install", "installs the current exe as a service targetting the specified command")]
+    [ConsoleCommand("uninstall-service", "uninstalls the specified service")]
     public class UninstallServiceCommand : IConsoleCommand
     {
         [Arg("servicename|sn", "service name")]

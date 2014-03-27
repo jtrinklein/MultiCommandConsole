@@ -11,7 +11,6 @@ namespace MultiCommandConsole.Services
         public string Username { get; set; }
         public string Password { get; set; }
         public ServiceStartMode StartMode { get; set; }
-
         public string CommandLine { get; set; }
     }
 }

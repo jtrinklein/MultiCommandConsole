@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration.Install;
 using System.Linq;
+using System.Management;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Text.RegularExpressions;
@@ -15,13 +16,27 @@ namespace MultiCommandConsole.Services
 
         private static bool Exists(string serviceName)
         {
-            return ServiceController.GetServices().Any(s => s.ServiceName == serviceName);
+            return ServiceController.GetServices().Any(s => s.ServiceName.Equals(serviceName, StringComparison.OrdinalIgnoreCase));
         }
 
-        public IEnumerable<ServiceController> List(string serviceName)
+        public IEnumerable<Service> All()
         {
-            var regex = new Regex(serviceName, RegexOptions.IgnoreCase);
-            return ServiceController.GetServices().Where(s => regex.IsMatch(s.ServiceName));
+            //using ServiceController only returns Name & DisplayName
+            var mc = new ManagementClass("Win32_Service");
+            return mc.GetInstances()
+                     .Cast<ManagementObject>()
+                     .Where(IsThisExecutable)
+                     .Select(mo => new Service
+                         {
+                             ServiceName = mo.GetPropertyValue("Name").ToString(),
+                             DisplayName = mo.GetPropertyValue("DisplayName").ToString(),
+                             Description = mo.GetPropertyValue("Description").ToString()
+                         });
+        }
+
+        private static bool IsThisExecutable(ManagementObject mo)
+        {
+            return mo.GetPropertyValue("PathName").ToString().StartsWith(AppDomain.CurrentDomain.BaseDirectory, StringComparison.OrdinalIgnoreCase);
         }
 
         public void Save(Service options)

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Reflection;
 using Common.Logging;
+using MultiCommandConsole.Services;
+using ObjectPrinter;
 
 namespace MultiCommandConsole.Example
 {
@@ -22,8 +25,18 @@ namespace MultiCommandConsole.Example
 
 		    LogManager.Adapter = Log4NetFactoryAdapter.Load();
 
-            var assembly = typeof(Program).Assembly;
-		    new Engine(new[] {assembly}).GetRunner().Run(args);
+		    try
+		    {
+		        new Engine(new[]
+		            {
+		                typeof(Program).Assembly, 
+		                typeof(InstallServiceCommand).Assembly
+		            }).GetRunner().Run(args);
+		    }
+		    catch (Exception e)
+		    {
+		        Console.Out.WriteLine(e.Dump());
+		    }
 		}
 	}
 }

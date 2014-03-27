@@ -36,6 +36,9 @@
     <Reference Include="FluentAssertions">
       <HintPath>..\packages\FluentAssertions.1.7.1.1\lib\net40\FluentAssertions.dll</HintPath>
     </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1402.2112\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.5.10.11092\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -47,6 +50,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -56,6 +60,7 @@
   <ItemGroup>
     <Compile Include="ConsoleFormatterTests.cs" />
     <Compile Include="ImitateConsole.cs" />
+    <Compile Include="InstallServiceCommandTests.cs" />
     <Compile Include="NDesk\DefaultOption.cs" />
     <Compile Include="NDesk\Foo.cs" />
     <Compile Include="NDesk\FooConverter.cs" />
@@ -73,6 +78,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MultiCommandConsole.Services\MultiCommandConsole.Services.csproj">
+      <Project>{e8a8dd54-9e8f-41cc-9d01-9a39c761b666}</Project>
+      <Name>MultiCommandConsole.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MultiCommandConsole\MultiCommandConsole.csproj">
       <Project>{C8A4A5F7-C8CE-4F59-8583-5701EBCA2D68}</Project>
       <Name>MultiCommandConsole</Name>

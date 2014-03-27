@@ -10,8 +10,8 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole
 {
-	internal class ConsoleCommandRepository
-	{
+    internal class ConsoleCommandRepository : IConsoleCommandRepository
+    {
 	    private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
 
         internal readonly Dictionary<string, ConsoleCommandInfo> CommandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
@@ -75,9 +75,17 @@ namespace MultiCommandConsole
 		private void AddCommand(ConsoleCommandInfo info)
 		{
             CommandsByType.Add(info.CommandType, info);
-			foreach (var name in info.Attribute.Prototype.GetPrototypeArray())
+			foreach (var name in info.Attribute.PrototypeArray)
 			{
-				CommandsByName.Add(name, info);
+			    try
+			    {
+			        CommandsByName.Add(name, info);
+			    }
+			    catch (Exception e)
+			    {
+                    e.SetContext("name", name);
+			        throw;
+			    }
 			}
 		}
 
@@ -120,7 +128,7 @@ namespace MultiCommandConsole
             return CommandsByType.TryGetValue(type, out info) ? info : null;
 	    }
 
-        internal DisposableAction HideCommandOfType<T>() where T : IConsoleCommand
+        public IDisposable HideCommandOfType<T>() where T : IConsoleCommand
         {
             var commandType = typeof(T);
 
@@ -143,11 +151,6 @@ namespace MultiCommandConsole
             return new DisposableAction(() => restoreActions.ForEach(action => action()));
 		}
 
-		public IEnumerable<ConsoleCommandAttribute> GetCommandList()
-		{
-			return Commands.Select(v => v.Attribute);
-		}
-
 		public CommandRunData LoadCommand(string[] args)
         {
             var optionPrefixes = new[] { '/', '-' };
@@ -158,7 +161,7 @@ namespace MultiCommandConsole
                 CommandsByType.TryGetValue(Config.DefaultCommand, out info);
                 if (info != null)
                 {
-                    args = new[] {info.Attribute.Prototype.GetPrototypeArray().First()}.Union(args).ToArray();
+                    args = new[] {info.Attribute.FirstPrototype}.Union(args).ToArray();
                 }
             }
 
@@ -176,7 +179,7 @@ namespace MultiCommandConsole
                     CommandsByType.TryGetValue(Config.DefaultCommand, out info);
                     if (info != null)
                     {
-                        args = new[] { info.Attribute.Prototype.GetPrototypeArray().First() }.Union(args).ToArray();
+                        args = new[] { info.Attribute.FirstPrototype }.Union(args).ToArray();
                     }
                 }
             }
