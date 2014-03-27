@@ -30,46 +30,7 @@ namespace MultiCommandConsole.Util
 
 		public IEnumerable<string> ChunkString(string text, int decreaseChunkBy = 0)
 		{
-			var chunkSize = BufferWidth - decreaseChunkBy;
-
-			if (chunkSize > text.Length)
-			{
-				foreach (var chunk in text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
-				{
-					yield return chunk;
-				}
-			}
-			else
-			{
-				var startIndex = 0;
-				while (startIndex < text.Length)
-				{
-					var effectiveChunkSize = chunkSize;
-					var chunk = text.Substring(startIndex, Math.Min(chunkSize, text.Length - startIndex));
-					var newlineIndex = chunk.IndexOf(Environment.NewLine, StringComparison.Ordinal);
-					if (newlineIndex != -1)
-					{
-						effectiveChunkSize = newlineIndex + Environment.NewLine.Length;
-						chunk = chunk.Substring(0, effectiveChunkSize).Trim(Environment.NewLine.ToCharArray());
-					}
-					else if (chunk.Length == chunkSize)
-					{
-						for (int i = chunk.Length - 1; i >= 0; i--)
-						{
-							var c = chunk[i];
-
-							if (char.IsWhiteSpace(c) || c == '-')
-							{
-								effectiveChunkSize = i + 1;
-								chunk = chunk.Substring(0, effectiveChunkSize).Trim();
-								break;
-							}
-						}
-					}
-					yield return chunk;
-					startIndex += effectiveChunkSize;
-				}
-			}
+		    return text.Chunk(BufferWidth - decreaseChunkBy);
 		}
 
 		public void ChunckStringTo(string text, TextWriter textWriter, string chunkPrefix = null)

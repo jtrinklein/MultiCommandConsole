@@ -15,6 +15,8 @@ namespace MultiCommandConsole.Commands
 		private IConsoleCommand _instance;
 		IConsoleFormatter _chunker = Config.ConsoleFormatter;
 
+        public UserInteractiveOptions UserInteractiveOptions { get; set; }
+
 		public static HelpCommand ForCommands(IEnumerable<ConsoleCommandInfo> commands)
 		{
 			if (commands == null) throw new ArgumentNullException("commands");
@@ -87,8 +89,10 @@ namespace MultiCommandConsole.Commands
 		void PrintOptions(int indentLength, Type type, object instance, Section section)
 		{
 			var options = ArgsHelper.GetOptions(type).ToList();
-			
-			var descr = new StringBuilder();
+
+		    var writer = UserInteractiveOptions.Writer;
+
+		    var descr = new StringBuilder();
 			var rows = new List<SectionRow>(options.Count);
 			foreach (var option in options.Where(o => o.ArgAttribute != null))
 			{

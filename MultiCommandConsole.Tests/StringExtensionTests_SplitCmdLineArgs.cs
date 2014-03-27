@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace MultiCommandConsole.Tests
 {
-	[TestFixture]
+    [TestFixture]
 	public class StringExtensionTests_SplitCmdLineArgs
 	{
 		[Test]
