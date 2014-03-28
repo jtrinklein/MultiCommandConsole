@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using ObjectPrinter;
 
 namespace MultiCommandConsole.Util
@@ -13,6 +14,11 @@ namespace MultiCommandConsole.Util
 			}
 			return null;
 		}
+
+        public static object GetOrResolve(this PropertyInfo property, object instance)
+        {
+            return property.GetValue(instance, null) ?? property.PropertyType.Resolve();
+        }
 
 		public static object Resolve(this Type type)
 		{

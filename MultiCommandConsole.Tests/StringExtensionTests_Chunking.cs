@@ -55,23 +55,23 @@ namespace MultiCommandConsole.Tests
             cells.PivotChunks(" - ", new[] { cells[0].Length, cells[1].Length })
                  .Should().Equal(new []
                      {
-                         "install-services - installs the specified command as a service"
+                         " install-services - installs the specified command as a service"
                      });
 
             cells.PivotChunks(": ", new[] {10, 20})
                  .Should().Equal(new[]
                      {
-                         "install-  : installs the        ",
-                         "services  : specified command as",
-                         "          : a service           "
+                         " install-  : installs the        ",
+                         " services  : specified command as",
+                         "           : a service           "
                      });
 
             cells.PivotChunks(": ", "  ", new[] {cells[0].Length, 20})
                  .Should().Equal(new[]
                      {
-                         "install-services: installs the        ",
-                         "                  specified command as",
-                         "                  a service           "
+                         " install-services: installs the        ",
+                         "                   specified command as",
+                         "                   a service           "
                      });
         }
 
@@ -84,7 +84,7 @@ namespace MultiCommandConsole.Tests
         [Test]
         public void GetChunk_should_handle_empty()
         {
-            string.Empty.GetChunks(10).Should().BeEmpty();
+            string.Empty.GetChunks(10).Should().Equal(new []{string.Empty});
         }
 
         [Test]

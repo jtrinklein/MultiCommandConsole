@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using MultiCommandConsole.Util;
 
@@ -13,9 +14,10 @@ namespace MultiCommandConsole.Commands
 		private IEnumerable<ConsoleCommandInfo> _commands;
 		private ConsoleCommandInfo _command;
 		private IConsoleCommand _instance;
-		IConsoleFormatter _chunker = Config.ConsoleFormatter;
 
-        public UserInteractiveOptions UserInteractiveOptions { get; set; }
+	    private readonly TableFormat _tableFormat = new TableFormat {Widths = new[] {-1, -1}};
+
+	    public UserInteractiveOptions UserInteractiveOptions { get; set; }
 
 		public static HelpCommand ForCommands(IEnumerable<ConsoleCommandInfo> commands)
 		{
@@ -30,7 +32,12 @@ namespace MultiCommandConsole.Commands
 			return new HelpCommand { _command = command, _instance = instance };
 		}
 
-		public string GetDetailedHelp()
+	    public HelpCommand()
+	    {
+            UserInteractiveOptions = new UserInteractiveOptions();
+	    }
+
+	    public string GetDetailedHelp()
 		{
 			return "\"help\" will display the list of commands available in this console application. " 
 				+ Environment.NewLine
@@ -52,155 +59,120 @@ namespace MultiCommandConsole.Commands
 			}
 			else
 			{
-				var sectionRows = _commands.Select(c => new SectionRow
-				{
-				    Cells = new[] 
-				                {
-				                    BuildDisplayName(string.Empty, c.Attribute.Prototype),
-				                    c.Attribute.Descripion
-				                }
-				});
-
-				var section = new Section
-				              	{
-				              		Header = new[]
-				              		         	{
-				              		         		" - type '{command} --help' to see the help for a given command",
-				              		         		"Commands:"
-				              		         	},
-									Rows = sectionRows
-				              	};
-
-				var indentLength = 0;
-
-				PrintSection(indentLength, section);
+			    PrintHelp4CommandList();
 			}
 		}
+
+	    private void PrintHelp4CommandList()
+        {
+            var writer = UserInteractiveOptions.Writer;
+
+	        writer.WriteLines(
+	            " - type '{command} --help' to see the help for a given command",
+	            "Commands:",
+                ""
+	            );
+
+	        writer.WriteTable(
+	            null,
+	            _commands.OrderBy(c => c.Attribute.FirstPrototype).Select(ToTableRow),
+	            _tableFormat);
+        }
 
 	    private void PrintHelp4SingleCommand()
         {
             var writer = UserInteractiveOptions.Writer;
 
-	        var section = new Section
-	            {
-	                Header = new[]
-	                    {
-	                        BuildDisplayName(string.Empty, _command.Attribute.Prototype),
-	                        _instance.GetDetailedHelp() ?? string.Empty
-	                    }
-	            };
+	        writer.WriteLines(
+	           _command.Attribute.FirstPrototype + " " + FormatShortNames(_command.Attribute.PrototypeArray.Skip(1)),
+	            _instance.GetDetailedHelp() ?? string.Empty);
 
-	        PrintOptions(0, _command.CommandType, _instance, section);
+	        writer.WriteTable(
+	            null,
+	            ToArgHelpInfo(_command.CommandType, _instance).Distinct().Select(ToTableRow),
+	            _tableFormat);
+        }
+
+        private static string[] ToTableRow(ConsoleCommandInfo c)
+        {
+            return new[]
+	            {
+	                c.Attribute.FirstPrototype,
+	                c.Attribute.PrototypeArray.Length > 1
+	                    ? FormatShortNames(c.Attribute.PrototypeArray) + c.Attribute.Descripion
+	                    : c.Attribute.Descripion
+	            };
+        }
+
+        private string[] ToTableRow(ArgHelpInfo arg)
+        {
+            var sb = new StringBuilder();
+            if (!arg.OtherPrototypes.IsNullOrEmpty())
+            {
+                sb.Append(FormatShortNames(arg.OtherPrototypes));
+            }
+            if (!arg.Description.IsNullOrEmpty())
+            {
+                sb.AppendLine(arg.Description);
+            }
+            sb.Append("default=");
+            sb.AppendLine(arg.DefaultValue == null ? "{null}" : arg.DefaultValue.ToString());
+
+            return new[]
+                {
+                    arg.IsRequired ? arg.FirstPrototype + "*" : arg.FirstPrototype,
+                    sb.ToString()
+                };
+        }
+
+	    private static string FormatShortNames(IEnumerable<string> otherPrototypes)
+	    {
+	        var names = otherPrototypes.ToArray();
+            if (names.IsNullOrEmpty())
+            {
+                return null;
+            }
+	        return "(" + string.Join(",", names) + ") ";
 	    }
 
-	    void PrintOptions(int indentLength, Type type, object instance, Section section)
+	    private class ArgHelpInfo : IComparable<ArgHelpInfo>
+        {
+            public string FirstPrototype { get; set; }
+            public IEnumerable<string> OtherPrototypes { get; set; }
+            public bool IsRequired { get; set; }
+            public string Description { get; set; }
+            public object DefaultValue { get; set; }
+
+            public int CompareTo(ArgHelpInfo other)
+            {
+                return String.Compare(FirstPrototype, other.FirstPrototype, StringComparison.Ordinal);
+            }
+        }
+
+	    private IEnumerable<ArgHelpInfo> ToArgHelpInfo(Type type, object instance)
 		{
 			var options = ArgsHelper.GetOptions(type).ToList();
-
-		    var writer = UserInteractiveOptions.Writer;
-
-		    var descr = new StringBuilder();
-			var rows = new List<SectionRow>(options.Count);
-			foreach (var option in options.Where(o => o.ArgAttribute != null))
-			{
-				var defaultValue = option.PropertyInfo.GetValue(instance, null);
-				bool isRequired = option.ArgAttribute.Required && defaultValue == option.PropertyInfo.PropertyType.Default();
-				
-				string name = BuildDisplayName("/", option.ArgAttribute.Prototype);
-				if (isRequired)
-				{
-					name = name + " *";
-				}
-
-				descr.Length = 0;
-				descr.AppendLine(option.ArgAttribute.Description);
-				descr.Append("default=");
-				descr.AppendLine((defaultValue ?? "{NULL}").ToString());
-
-				if (!string.IsNullOrEmpty(option.ArgAttribute.AppSettingsKey))
-				{
-					descr.Append("AppSettings key=");
-					descr.AppendLine(option.ArgAttribute.AppSettingsKey);
-				}
-				if (!string.IsNullOrEmpty(option.ArgAttribute.ConnectionStringKey))
-				{
-					descr.Append("ConnectionString key=");
-					descr.AppendLine(option.ArgAttribute.ConnectionStringKey);
-				}
-
-				rows.Add(new SectionRow { Cells = new[] { name, descr.ToString() } });
-			}
-
-			section.Rows = rows;
-			PrintSection(indentLength, section);
-
-			foreach (var option in options.Where(p => p.ArgSetAttribute != null))
-			{
-				var optionSetInstance = option.PropertyInfo.PropertyType.Resolve();
-				PrintOptions(indentLength, option.PropertyInfo.PropertyType, optionSetInstance, new Section());
-			}
+	        var args = options.Where(o => o.ArgAttribute != null);
+	        var argSets = options.Where(p => p.ArgSetAttribute != null);
+	        return args.Select(o => ToArgHelpInfo(o, instance))
+	                   .Union(argSets.SelectMany(o => ParseArgSet(o.PropertyInfo, instance)));
 		}
 
-		private void PrintSection(int indentLength, Section section)
-		{
-			Console.Out.WriteLine(string.Empty);
-			var indent = new string(' ', indentLength);
-			if (section.Header != null)
-			{
-				foreach (var header in section.Header)
-				{
-					_chunker.ChunckStringTo(header, Console.Out, indent);
-					Console.Out.WriteLine(string.Empty);
-				}
-			}
+	    private IEnumerable<ArgHelpInfo> ParseArgSet(PropertyInfo property, object instance)
+	    {
+	        return ToArgHelpInfo(property.PropertyType, property.GetOrResolve(instance));
+	    }
 
-			if (section.Rows.IsNullOrEmpty())
-			{
-				return;
-			}
-
-			indentLength += 2;
-			indent = new string(' ', indentLength);
-			var spacer = " : ";
-			var maxCell1Length = section.Rows.Max(c => c.Cells[0].Length);
-			var cell2StartIndex = indent.Length + maxCell1Length + spacer.Length;
-
-			foreach (var row in section.Rows)
-			{
-				Console.Out.Write(indent);
-				Console.Out.Write(row.Cells[0].PadRight(maxCell1Length));
-				Console.Out.Write(spacer);
-
-				var padding = 2 + cell2StartIndex;
-				bool firstChunk = true;
-				foreach (var chunk in _chunker.ChunkString(row.Cells[1], padding))
-				{
-					if (!firstChunk)
-					{
-						Console.Out.Write(new string(' ', cell2StartIndex));
-					}
-					Console.Out.WriteLine(chunk);
-					firstChunk = false;
-				}
-				Console.Out.WriteLine(string.Empty);
-			}
-		}
-
-		private class Section
-		{
-			public IEnumerable<string> Header { get; set; }
-			public IEnumerable<SectionRow> Rows { get; set; }
-			
-		}
-
-		private class SectionRow
-		{
-			public string[] Cells { get; set; } 
-		}
-
-		private static string BuildDisplayName(string prefix, string prototype)
-		{
-			return prefix + string.Join(", " + prefix, prototype.GetPrototypeArray());
-		}
+	    private static ArgHelpInfo ToArgHelpInfo(Arg option, object instance)
+	    {
+	        return new ArgHelpInfo
+	            {
+	                FirstPrototype = option.ArgAttribute.FirstPrototype,
+	                OtherPrototypes = option.ArgAttribute.PrototypeArray.Skip(1),
+	                Description = option.ArgAttribute.Description,
+	                IsRequired = option.ArgAttribute.Required && option.PropertyInfo.GetValue(instance, null) == option.PropertyInfo.PropertyType.Default(),
+	                DefaultValue = option.PropertyInfo.GetValue(instance, null)
+	            };
+	    }
 	}
 }

@@ -18,20 +18,30 @@ namespace MultiCommandConsole.Util
 		    return new CommandLineParser().Parse(consoleInput);
 		}
 
-	    public static IEnumerable<string> PivotChunks(this string[] cells, string spacer, int[] widths)
-	    {
-	        return PivotChunks(cells, spacer, spacer, widths);
-	    }
+        public static IEnumerable<string> PivotChunks(this string[] cells, string spacer, int[] widths)
+        {
+            return PivotChunks(cells, spacer, spacer, widths);
+        }
 
-	    public static IEnumerable<string> PivotChunks(this string[] cells, string spacerFirstLine, string spacerOtherLines, int[] widths)
+        public static IEnumerable<string> PivotChunks(this string[] cells, string spacer4FirstRow, string spacer4OtherRows, int[] widths)
+        {
+            return PivotChunks(cells, new TableFormat
+                {
+                    Spacer4FirstRow = spacer4FirstRow,
+                    Spacer4OtherRows = spacer4OtherRows,
+                    Widths = widths
+                });
+        }
+
+	    public static IEnumerable<string> PivotChunks(this string[] cells, TableFormat tableFormat)
         {
             if (cells.IsNullOrEmpty())
             {
                 yield break;
             }
 
-            var line = new StringBuilder();
-            string spacer = spacerFirstLine;
+	        var widths = tableFormat.Widths;
+            var spacer = tableFormat.Spacer4FirstRow;
 
             //break cells into lines
 	        var cellsWithLines = new List<string>[cells.Length];
@@ -45,8 +55,10 @@ namespace MultiCommandConsole.Util
             }
 
             //construct each line
+            var line = new StringBuilder();
 	        for (int l = 0; l < maxLineCount; l++)
 	        {
+	            line.Append(tableFormat.Indent);
 	            for (int c = 0; c < cellsWithLines.Length; c++)
                 {
                     var cell = cellsWithLines[c];
@@ -62,14 +74,19 @@ namespace MultiCommandConsole.Util
                 }
 	            yield return line.ToString();
                 line.Length = 0;
-                spacer = spacerOtherLines;
+                spacer = tableFormat.Spacer4OtherRows;
 	        }
         }
 
 	    public static IEnumerable<string> GetChunks(this string text, int chunkSize)
         {
-            if (string.IsNullOrEmpty(text))
+            if (text == null)
             {
+                yield break;
+            }
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                yield return text;
                 yield break;
             }
 
@@ -186,22 +203,5 @@ namespace MultiCommandConsole.Util
                 throw;
             }
         }
-
-        ///<summary>walk backwards on the string to find the first place to break the line</summary>
-	    private static string SplitOnWholeWord(string chunk)
-	    {
-	        for (int i = chunk.Length - 1; i >= 0; i--)
-	        {
-	            var c = chunk[i];
-
-	            //find place to split the line
-	            if (char.IsWhiteSpace(c) || c == '-')
-	            {
-                    chunk = chunk.Substring(0, i + 1).Trim();
-	                break;
-	            }
-	        }
-	        return chunk;
-	    }
 	}
 }

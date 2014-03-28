@@ -214,11 +214,8 @@ namespace MultiCommandConsole
                 var commandArgs = new Dictionary<Arg,object>();
 				var validators = new List<IValidatable> { command };
 				var setterUppers = new List<ISetupAndCleanup>();
-			    var setterUpper = command as ISetupAndCleanup;
-				if (setterUpper != null)
-				{
-					setterUppers.Add(setterUpper);
-				}
+
+			    command.As<ISetupAndCleanup>(setterUppers.Add);
 				LoadArgs(options, validators, setterUppers, command, commandArgs);
 				options.Add(HelpCommand.Prototype, "show this message and exit", a => showHelp = true);
 
@@ -268,7 +265,7 @@ namespace MultiCommandConsole
 
 			foreach (var option in options.Where(p => p.ArgSetAttribute != null))
 			{
-				var argSet = option.PropertyInfo.GetValue(obj, null) ?? option.PropertyInfo.PropertyType.Resolve();
+				var argSet = option.PropertyInfo.GetOrResolve(obj);
 
 			    argSet.As<CommandsOptions>(o => { o.ConsoleCommandRepository = this; });
                 argSet.As<ConsoleRunOptions>(o => { o.CreateCommandRunner = () => new CommandRunner(this); });

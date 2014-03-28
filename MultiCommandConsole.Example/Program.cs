@@ -20,7 +20,7 @@ namespace MultiCommandConsole.Example
 		    Config.ConsoleMode.HistorySize = 5;
 		    Config.ConsoleMode.AppName = "example_console";
 			Config.ShowVierArgsCommand = true;
-		    Config.DefaultCommand = typeof (RepeatConsoleCommand);
+		    //Config.DefaultCommand = typeof (RepeatConsoleCommand);
 
             Services.Config.Defaults.CommandLine = "ping /s=google.com /i=1";
 
