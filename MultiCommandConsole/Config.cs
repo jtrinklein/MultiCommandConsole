@@ -1,5 +1,6 @@
 using System;
 using MultiCommandConsole.Commands;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole
 {
@@ -55,6 +56,12 @@ namespace MultiCommandConsole
 	        set { _defaultCommand = value ?? typeof(HelpCommand); }
 	    }
 
+        /// <summary>
+        /// The console writer used to write messages for the console window 
+        /// (or to the logger when in running as a service)
+        /// </summary>
+        public static IConsoleWriter ConsoleWriter { get; set; }
+
 	    /// <summary>
 		/// By default, commands and arg sets are created by Activator.  
 		/// Use this delegate to override the default behavior. 
@@ -83,6 +90,7 @@ namespace MultiCommandConsole
             set { _nowDelegate = value ?? (() => DateTime.Now); }
         }
 
+
 	    static Config()
 		{
 			ShowVierArgsCommand = false;
@@ -90,6 +98,10 @@ namespace MultiCommandConsole
 
             ConsoleMode.CommandPromptText = "$";
 		    ConsoleMode.HistorySize = 50;
+
+	        ConsoleWriter = Environment.UserInteractive 
+                ? (IConsoleWriter) new ConsoleWriter() 
+                : new LoggingConsoleWriter();
 		}
 	}
 }

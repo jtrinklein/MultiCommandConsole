@@ -123,12 +123,7 @@ namespace MultiCommandConsole
                 var writer = new ConsoleWriter();
                 foreach (var error in _runData.Errors)
                 {
-                    writer.WriteLines(
-                        "",
-                        "!!!",
-                        error,
-                        ""
-                        );
+                    writer.WriteLines("", "!!!", error, "");
                 }
             }
             _commandLoaded.Set();

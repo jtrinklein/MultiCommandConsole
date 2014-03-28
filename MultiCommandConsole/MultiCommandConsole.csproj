@@ -97,6 +97,7 @@
     <Compile Include="Util\Converter.cs" />
     <Compile Include="Util\EnumerableExtensions.cs" />
     <Compile Include="Util\IConsoleWriter.cs" />
+    <Compile Include="Util\LoggingConsoleWriter.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\TableFormat.cs" />
     <Compile Include="Util\TemporaryThread.cs" />
