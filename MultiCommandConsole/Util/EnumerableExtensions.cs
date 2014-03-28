@@ -25,6 +25,11 @@ namespace MultiCommandConsole.Util
 			return enumerable;
 		}
 
+        public static T SafeFromIndex<T>(this IList<T> items, int index)
+        {
+            return items.Count > index ? items[index] : default(T);
+        }
+
         public static T SafeFromIndex<T>(this T[] items, int index)
         {
             return items.Length > index ? items[index] : default(T);

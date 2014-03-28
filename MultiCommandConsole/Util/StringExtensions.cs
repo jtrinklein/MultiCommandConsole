@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using ObjectPrinter;
 
 namespace MultiCommandConsole.Util
 {
@@ -23,94 +25,183 @@ namespace MultiCommandConsole.Util
 
 	    public static IEnumerable<string> PivotChunks(this string[] cells, string spacerFirstLine, string spacerOtherLines, int[] widths)
         {
+            if (cells.IsNullOrEmpty())
+            {
+                yield break;
+            }
+
             var line = new StringBuilder();
-            int chunkIndex = 0;
             string spacer = spacerFirstLine;
 
-            while(true)
+            //break cells into lines
+	        var cellsWithLines = new List<string>[cells.Length];
+	        var maxLineCount = 0;
+	        for (int i = 0; i < cells.Length; i++)
             {
-                bool hasText = false;
-                line.Length = 0;
+                var width = widths.SafeFromIndex(i);
+                var lines = cells[i].GetChunks(width).ToList();
+                cellsWithLines[i] = lines;
+                maxLineCount = Math.Max(maxLineCount, lines.Count);
+            }
 
-                for (int i = 0; i < cells.Length; i++)
+            //construct each line
+	        for (int l = 0; l < maxLineCount; l++)
+	        {
+	            for (int c = 0; c < cellsWithLines.Length; c++)
                 {
-                    var width = widths.SafeFromIndex(i);
-                    var chunk = cells[i].GetChunk(width, chunkIndex);
-                    if (i > 0)
+                    var cell = cellsWithLines[c];
+                    var cellLine = cell.SafeFromIndex(l);
+                    var width = widths.SafeFromIndex(c);
+                    if (c > 0)
                     {
                         line.Append(spacer);
                     }
-                    if (!chunk.IsNullOrEmpty())
-                    {
-                        line.Append(chunk.PadRight(width));
-                        hasText = true;
-                    }
-                    else
-                    {
-                        line.Append("".PadRight(width));
-                    }
+                    line.Append(cellLine == null 
+                        ? "".PadRight(width) 
+                        : cellLine.PadRight(width));
                 }
-                if (!hasText)
-                {
-                    yield break;
-                }
-
-                yield return line.ToString();
-                chunkIndex++;
+	            yield return line.ToString();
+                line.Length = 0;
                 spacer = spacerOtherLines;
-            }
+	        }
         }
 
-        public static string GetChunk(this string text, int chunkSize, int chunkIndex)
+	    public static IEnumerable<string> GetChunks(this string text, int chunkSize)
         {
-            var startIndex = chunkSize*chunkIndex;
-            if (startIndex > text.Length)
+            if (string.IsNullOrEmpty(text))
             {
-                return null;
+                yield break;
             }
-            return text.Substring(startIndex, Math.Min(chunkSize, text.Length - startIndex));
+
+	        var lines = text.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+
+	        foreach (var line in lines)
+	        {
+	            if (string.IsNullOrEmpty(line))
+	            {
+	                yield return string.Empty;
+	            }
+                else if (chunkSize > line.Length)
+                {
+                    yield return line.Trim();
+                }
+                else
+                {
+                    var startIndex = 0;
+                    while (startIndex < line.Length)
+                    {
+                        //add one to chunksize to include viable line breaks when splitting words
+                        var chunk = line.WholeWordSubstring(startIndex, chunkSize, out startIndex);
+                        yield return chunk.Trim();
+                        startIndex++;
+                    }
+                }
+	        }
         }
 
-	    public static IEnumerable<string> Chunk(this string text, int chunkSize)
+        internal static string WholeWordSubstring(this string text, int startIndex, int length, out int endIndex)
         {
-            if (chunkSize > text.Length)
-            {
-                foreach (var chunk in text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    yield return chunk;
-                }
-            }
-            else
-            {
-                var startIndex = 0;
-                while (startIndex < text.Length)
-                {
-                    var effectiveChunkSize = chunkSize;
-                    var chunk = text.Substring(startIndex, Math.Min(chunkSize, text.Length - startIndex));
-                    var newlineIndex = chunk.IndexOf(Environment.NewLine, StringComparison.Ordinal);
-                    if (newlineIndex != -1)
-                    {
-                        effectiveChunkSize = newlineIndex + Environment.NewLine.Length;
-                        chunk = chunk.Substring(0, effectiveChunkSize).Trim(Environment.NewLine.ToCharArray());
-                    }
-                    else if (chunk.Length == chunkSize)
-                    {
-                        for (int i = chunk.Length - 1; i >= 0; i--)
-                        {
-                            var c = chunk[i];
+            int start = startIndex;
+            char currentChar = '\0';
+            var nextChar = '\0';
+            var currentIndex = start;
+            var lastLineBreak = 0;
+            var lastPunctuation = 0;
+            var endOfString = false;
 
-                            if (char.IsWhiteSpace(c) || c == '-')
-                            {
-                                effectiveChunkSize = i + 1;
-                                chunk = chunk.Substring(0, effectiveChunkSize).Trim();
-                                break;
-                            }
-                        }
-                    }
-                    yield return chunk;
-                    startIndex += effectiveChunkSize;
+            try
+            {
+                while (start < text.Length && char.IsWhiteSpace(text[start]))
+                {
+                    start++;
                 }
+                if (start == text.Length)
+                {
+                    //remaining string is all whitepaces
+                    endIndex = text.Length - 1;
+                    return null;
+                }
+
+                while (true)
+                {
+                    currentChar = text[currentIndex];
+
+                    if (char.IsWhiteSpace(currentChar))
+                    {
+                        lastLineBreak = currentIndex;
+                    }
+                    else if (char.IsPunctuation(currentChar))
+                    {
+                        lastPunctuation = currentIndex;
+                    }
+
+                    if (currentIndex == text.Length - 1)
+                    {
+                        endOfString = true;
+                        break;
+                    }
+
+                    if ((currentIndex - start) == length - 1)
+                    {
+                        nextChar = text[currentIndex + 1];
+                        break;
+                    }
+
+                    currentIndex++;
+                }
+
+                if (endOfString 
+                    || currentIndex == lastLineBreak || currentIndex == lastPunctuation 
+                    || char.IsWhiteSpace(nextChar) || char.IsPunctuation(nextChar))
+                {
+                    endIndex = currentIndex;
+                    return text.Substring(start, endIndex - start + 1);
+                }
+
+                var lastBreak = Math.Max(lastLineBreak, lastPunctuation);
+                if (lastBreak > 0 && lastBreak == lastLineBreak)
+                {
+                    endIndex = lastBreak;
+                    return text.Substring(start, endIndex - start);
+                }
+                if (lastBreak > 0 && lastBreak == lastPunctuation)
+                {
+                    endIndex = lastPunctuation;
+                    return text.Substring(start, endIndex - start + 1);
+                }
+
+                endIndex = currentIndex;
+                return text.Substring(start, endIndex - start + 1);
+            }
+            catch (Exception e)
+            {
+                e.SetContext("text", text);
+                e.SetContext("startIndex", startIndex);
+                e.SetContext("start", start);
+                e.SetContext("currentIndex", currentIndex);
+                e.SetContext("currentChar", currentChar);
+                e.SetContext("nextChar", nextChar);
+                e.SetContext("lastLineBreak", lastLineBreak);
+                e.SetContext("lastPunctuation", lastPunctuation);
+                throw;
             }
         }
+
+        ///<summary>walk backwards on the string to find the first place to break the line</summary>
+	    private static string SplitOnWholeWord(string chunk)
+	    {
+	        for (int i = chunk.Length - 1; i >= 0; i--)
+	        {
+	            var c = chunk[i];
+
+	            //find place to split the line
+	            if (char.IsWhiteSpace(c) || c == '-')
+	            {
+                    chunk = chunk.Substring(0, i + 1).Trim();
+	                break;
+	            }
+	        }
+	        return chunk;
+	    }
 	}
 }

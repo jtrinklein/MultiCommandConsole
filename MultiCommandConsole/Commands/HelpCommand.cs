@@ -48,16 +48,7 @@ namespace MultiCommandConsole.Commands
 		{
 			if (_command != null)
 			{
-				var section = new Section
-				{
-					Header = new[]
-				              	{
-				              		BuildDisplayName(string.Empty, _command.Attribute.Prototype),
-									_instance.GetDetailedHelp() ?? string.Empty
-				              	}
-				};
-
-				PrintOptions(0, _command.CommandType, _instance, section);
+			    PrintHelp4SingleCommand();
 			}
 			else
 			{
@@ -86,7 +77,23 @@ namespace MultiCommandConsole.Commands
 			}
 		}
 
-		void PrintOptions(int indentLength, Type type, object instance, Section section)
+	    private void PrintHelp4SingleCommand()
+        {
+            var writer = UserInteractiveOptions.Writer;
+
+	        var section = new Section
+	            {
+	                Header = new[]
+	                    {
+	                        BuildDisplayName(string.Empty, _command.Attribute.Prototype),
+	                        _instance.GetDetailedHelp() ?? string.Empty
+	                    }
+	            };
+
+	        PrintOptions(0, _command.CommandType, _instance, section);
+	    }
+
+	    void PrintOptions(int indentLength, Type type, object instance, Section section)
 		{
 			var options = ArgsHelper.GetOptions(type).ToList();
 

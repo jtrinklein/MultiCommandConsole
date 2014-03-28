@@ -30,7 +30,7 @@ namespace MultiCommandConsole.Util
 
 		public IEnumerable<string> ChunkString(string text, int decreaseChunkBy = 0)
 		{
-		    return text.Chunk(BufferWidth - decreaseChunkBy);
+		    return text.GetChunks(BufferWidth - decreaseChunkBy);
 		}
 
 		public void ChunckStringTo(string text, TextWriter textWriter, string chunkPrefix = null)

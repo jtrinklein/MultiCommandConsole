@@ -24,15 +24,16 @@ namespace MultiCommandConsole.Util
             _getScreenWidth = getScreenWidth;
         }
 
-        public void Write(string format, params object[] args)
-        {
-            _writer.Write(format, args);
-        }
         public void WriteLine(string format, params object[] args)
         {
-            Write(format, args);
-            _writer.WriteLine();
+            var text = args == null ? format : string.Format(format, args);
+            var chunks = text.GetChunks(_getScreenWidth());
+            foreach (var chunk in chunks)
+            {
+                _writer.WriteLine(chunk);
+            }
         }
+
         public void WriteLines(params string[] lines)
         {
             if (lines.IsNullOrEmpty())
@@ -42,7 +43,7 @@ namespace MultiCommandConsole.Util
 
             foreach (var line in lines)
             {
-                _writer.WriteLine(line);
+                WriteLine(line);
             }
         }
 

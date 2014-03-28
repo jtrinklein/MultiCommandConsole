@@ -1,3 +1,4 @@
+using System.Linq;
 using FluentAssertions;
 using MultiCommandConsole.Util;
 using NUnit.Framework;
@@ -8,20 +9,36 @@ namespace MultiCommandConsole.Tests
     public class StringExtensionTests_Chunking
     {
         [Test]
-        public void GetChunk_should_return_correct_chunks()
+        public void WholeWordSubstring_should_break_on_whitepace_and_punctuation()
         {
-            //                    1         2
-            //          01234567890123456789012345678
-            var text = "this is a string of some size";
-            text.GetChunk(10, 0).Should().Be("this is a ");
-            text.GetChunk(10, 1).Should().Be("string of ");
-            text.GetChunk(10, 2).Should().Be("some size");
-            text.GetChunk(10, 3).Should().Be(null);
+            //                   1         2         3         4
+            //          123456789012345678901234567890123456789012
+            var text = "installs the specified command-as a service";
 
-            text.GetChunk(30, 0).Should().Be(text);
-            text.GetChunk(30, 1).Should().Be(null);
+            int endIndex;
+            text.WholeWordSubstring(0, 21, out endIndex).Should().Be("installs the");
+            text.WholeWordSubstring(0, 22, out endIndex).Should().Be("installs the specified");
+            text.WholeWordSubstring(0, 30, out endIndex).Should().Be("installs the specified command");
+            text.WholeWordSubstring(0, 33, out endIndex).Should().Be("installs the specified command-as");
+        }
 
-            text.GetChunk(0, 0).Should().Be(string.Empty);
+        [Test]
+        public void WholeWordSubstring_should_trim_starting_whitepace()
+        {
+            //                        1         2         3         4
+            //               123456789012345678901234567890123456789012
+            var text = " \t\ninstalls stuff";
+            int endIndex;
+            text.WholeWordSubstring(0, 8, out endIndex).Should().Be("installs");
+            text.WholeWordSubstring(0, 14, out endIndex).Should().Be("installs stuff");
+        }
+
+        [Test]
+        public void WholeWordSubstring_should_return_entire_text_when_length_permits()
+        {
+            var text = "install-services";
+            int endIndex;
+            text.WholeWordSubstring(0, 16, out endIndex).Should().Be(text);
         }
 
         [Test]
@@ -44,18 +61,70 @@ namespace MultiCommandConsole.Tests
             cells.PivotChunks(": ", new[] {10, 20})
                  .Should().Equal(new[]
                      {
-                         "install-se: installs the specifi",
-                         "rvices    : ed command as a serv",
-                         "          : ice                 "
+                         "install-  : installs the        ",
+                         "services  : specified command as",
+                         "          : a service           "
                      });
 
             cells.PivotChunks(": ", "  ", new[] {cells[0].Length, 20})
                  .Should().Equal(new[]
                      {
-                         "install-services: installs the specifi",
-                         "                  ed command as a serv",
-                         "                  ice                 "
+                         "install-services: installs the        ",
+                         "                  specified command as",
+                         "                  a service           "
                      });
+        }
+
+        [Test]
+        public void GetChunk_should_handle_null()
+        {
+            ((string) null).GetChunks(10).Should().BeEmpty();
+        }
+
+        [Test]
+        public void GetChunk_should_handle_empty()
+        {
+            string.Empty.GetChunks(10).Should().BeEmpty();
+        }
+
+        [Test]
+        public void GetChunks_should_pad_right()
+        {
+            //         1         2         3         4
+            //123456789012345678901234567890123456789012
+            "installs the specified command as a service"
+                .GetChunks(20).Should().Equal(new object[]
+                    {
+                        "installs the",
+                        "specified command as",
+                        "a service"
+                    });
+        }
+
+        [Test]
+        public void GetChunk_should_handle_text_shorter_than_chunksize()
+        {
+            var text = "short text";
+            text.GetChunks(10).Should().Equal(new []{text});
+            text.GetChunks(9).Should().Equal(new[] { "short", "text" });
+        }
+
+        [Test]
+        public void GetChunk_should_account_for_newlines()
+        {
+            //             012345678901234567890
+            var chunks1 = "this textdoes not".GetChunks(13).ToList();
+            var chunks2 = "this text\nwraps".GetChunks(13).ToList();
+            chunks1.Should().Equal(new []
+                {
+                    "this textdoes",
+                    "not"
+                });
+            chunks2.Should().Equal(new[]
+                {
+                    "this text",
+                    "wraps"
+                });
         }
     }
 }
