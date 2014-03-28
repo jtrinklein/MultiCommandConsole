@@ -62,7 +62,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleFormatterTests.cs" />
     <Compile Include="ImitateConsole.cs" />
     <Compile Include="InstallServiceCommandTests.cs" />
     <Compile Include="NDesk\DefaultOption.cs" />

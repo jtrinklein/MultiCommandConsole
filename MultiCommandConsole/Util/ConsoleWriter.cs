@@ -7,8 +7,6 @@ namespace MultiCommandConsole.Util
 {
     public class ConsoleWriter : IConsoleWriter
     {
-        //TODO: use Chunker to chunck string to best fit the current console window
-
         private readonly TextWriter _writer;
         private readonly Func<int> _getScreenWidth;
 

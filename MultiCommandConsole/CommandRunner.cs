@@ -120,12 +120,15 @@ namespace MultiCommandConsole
             _runData = _consoleCommandRepository.LoadCommand(args);
             if (_runData.Errors.Any())
             {
+                var writer = new ConsoleWriter();
                 foreach (var error in _runData.Errors)
                 {
-                    Console.Out.WriteLine();
-                    Console.Out.Write("!!! ");
-                    Config.ConsoleFormatter.ChunckStringTo(error, Console.Out);
-                    Console.Out.WriteLine();
+                    writer.WriteLines(
+                        "",
+                        "!!!",
+                        error,
+                        ""
+                        );
                 }
             }
             _commandLoaded.Set();

@@ -1,6 +1,5 @@
 using System;
 using MultiCommandConsole.Commands;
-using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole
 {
@@ -62,9 +61,6 @@ namespace MultiCommandConsole
 		/// </summary>
 		public static Func<Type, object> ResolveTypeDelegate { get; set; }
 
-		/// <summary>The console formatter used to format messages for the console window</summary>
-		public static IConsoleFormatter ConsoleFormatter { get; set; }
-
 		/// <summary>
 		/// If true, an additional command will be displayed to allow the user to see how the text they 
 		/// enter is converted into arguments.  Useful when arguments need to escape quotes.
@@ -89,7 +85,6 @@ namespace MultiCommandConsole
 
 	    static Config()
 		{
-			ConsoleFormatter = new ConsoleFormatter();
 			ShowVierArgsCommand = false;
 		    ResolveTypeDelegate = Activator.CreateInstance;
 

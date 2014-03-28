@@ -96,8 +96,6 @@
     <Compile Include="IConsoleCommand.cs" />
     <Compile Include="Util\Converter.cs" />
     <Compile Include="Util\EnumerableExtensions.cs" />
-    <Compile Include="Util\ConsoleFormatter.cs" />
-    <Compile Include="Util\IConsoleFormatter.cs" />
     <Compile Include="Util\IConsoleWriter.cs" />
     <Compile Include="Util\StringExtensions.cs" />
     <Compile Include="Util\TableFormat.cs" />

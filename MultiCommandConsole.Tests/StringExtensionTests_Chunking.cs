@@ -126,5 +126,13 @@ namespace MultiCommandConsole.Tests
                     "wraps"
                 });
         }
+
+        [Test]
+        public void WholeWordSubstring_should_handle_no_breaks()
+        {
+            "0123456789".GetChunks(5).Should().Equal(new[] { "01234", "56789" });
+            "123456789".GetChunks(3).Should().Equal(new[] { "123", "456", "789" });
+            "1234567890".GetChunks(4).Should().Equal(new[] { "1234", "5678", "90" });
+        }
     }
 }
