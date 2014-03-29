@@ -6,7 +6,7 @@ namespace MultiCommandConsole.Util
 {
     public static class ConsoleReader
     {
-        public static void Watch(Stoplight stoplight, bool canBeStopped, bool canBePaused, Action onStop, Action onPause, Action onResume, int checkEveryNMilliSeconds = 100)
+        public static void Watch(IStoplight stoplight, bool canBeStopped, bool canBePaused, Action onStop, Action onPause, Action onResume, int checkEveryNMilliSeconds = 100)
         {
             //all this because Ctrl+C is broken in .net 4.0
 

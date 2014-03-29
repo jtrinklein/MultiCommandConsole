@@ -7,19 +7,36 @@ namespace MultiCommandConsole.Util
 {
     public class ConsoleWriter : IConsoleWriter
     {
+        private readonly TextWriter _errorWriter;
         private readonly TextWriter _writer;
         private readonly Func<int> _getScreenWidth;
 
         public ConsoleWriter()
-            : this(Console.Out, () => Math.Min(Console.BufferWidth, Console.WindowWidth))
+            : this(Console.Out, Console.Error, () => Math.Min(Console.BufferWidth, Console.WindowWidth))
         {
         }
 
-        public ConsoleWriter(TextWriter writer, Func<int> getScreenWidth)
+        public ConsoleWriter(TextWriter writer, TextWriter errorWriter, Func<int> getScreenWidth)
         {
             if (writer == null) throw new ArgumentNullException("writer");
+            if (errorWriter == null) throw new ArgumentNullException("errorWriter");
             _writer = writer;
+            _errorWriter = errorWriter;
             _getScreenWidth = getScreenWidth;
+        }
+
+        public void WriteErrorLine(object obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+            WriteErrorLine(obj.ToString());
+        }
+
+        public void WriteErrorLine(string format, params object[] args)
+        {
+            WriteLine(_errorWriter, format, args);
         }
 
         public void WriteLine(object obj)
@@ -33,11 +50,16 @@ namespace MultiCommandConsole.Util
 
         public void WriteLine(string format, params object[] args)
         {
+            WriteLine(_writer, format, args);
+        }
+
+        private void WriteLine(TextWriter writer, string format, object[] args)
+        {
             var text = args.IsNullOrEmpty() ? format : string.Format(format, args);
             var chunks = text.GetChunks(_getScreenWidth());
             foreach (var chunk in chunks)
             {
-                _writer.WriteLine(chunk);
+                writer.WriteLine(chunk);
             }
         }
 

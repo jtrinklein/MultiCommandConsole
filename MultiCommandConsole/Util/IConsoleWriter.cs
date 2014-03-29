@@ -4,6 +4,8 @@ namespace MultiCommandConsole.Util
 {
     public interface IConsoleWriter
     {
+        void WriteErrorLine(object obj);
+        void WriteErrorLine(string format, params object[] args);
         void WriteLine(object obj);
         void WriteLine(string format, params object[] args);
         void WriteLines(params string[] lines);

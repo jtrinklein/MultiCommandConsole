@@ -9,6 +9,16 @@ namespace MultiCommandConsole.Util
     {
         private static readonly ILog Log = LogManager.GetLogger<LoggingConsoleWriter>();
 
+        public void WriteErrorLine(object obj)
+        {
+            Log.Error(obj);
+        }
+
+        public void WriteErrorLine(string format, params object[] args)
+        {
+            Log.ErrorFormat(format, args);
+        }
+
         public void WriteLine(object obj)
         {
             Log.Info(obj);
@@ -26,7 +36,17 @@ namespace MultiCommandConsole.Util
 
         public void WriteTable(string[] headers, IEnumerable<string[]> rows, TableFormat tableFormat = null)
         {
-            Log.Info(headers.Union(rows.Select(cells => string.Join(" - ", cells))).Dump());
+            var lines = Enumerable.Empty<string>();
+            if (headers != null)
+            {
+                lines = lines.Union(headers);
+            }
+            if (rows != null)
+            {
+                lines = lines.Union(rows.Select(cells => string.Join(" - ", cells)));
+            }
+
+            Log.Info(lines.Dump());
         }
     }
 }

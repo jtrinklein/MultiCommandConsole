@@ -4,6 +4,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using Common.Logging;
 using MultiCommandConsole.Services;
+using MultiCommandConsole.Util;
 using ObjectPrinter;
 using Timer = System.Timers.Timer;
 
@@ -13,6 +14,9 @@ namespace MultiCommandConsole.Example
     public class PingConsoleCommand : IConsoleCommand, ICanRunAsService, ICanBePaused
     {
         private static readonly ILog Log = LogManager.GetLogger<PingConsoleCommand>();
+
+        private IStoplight _stoplight;
+        private IConsoleWriter _writer;
 
         public string ServiceName { get { return "SimplePingService"; } }
         public string DisplayName { get { return "Simple Ping Service"; } }
@@ -30,7 +34,7 @@ namespace MultiCommandConsole.Example
         [Arg("sites|s", "comma delimited list of sites")]
         public string[] Sites { get; set; }
 
-        [Arg("interval|i", "interval in minutes")]
+        [Arg("interval|i", "interval in seconds")]
         public int Interval { get; set; }
 
         [Arg("timeout|to", "time to wait for ping to succeed per site")]
@@ -64,9 +68,12 @@ namespace MultiCommandConsole.Example
 
         public void Run()
         {
-            _timer = new Timer(Interval);
+            _timer = new Timer(TimeSpan.FromSeconds(Interval).TotalMilliseconds);
             _timer.Elapsed += (sender, args) => PingSites();
+            _timer.AutoReset = true;
             _timer.Start();
+
+            _stoplight.Token.WaitHandle.WaitOne();
         }
 
         public void Stop()
@@ -100,17 +107,17 @@ namespace MultiCommandConsole.Example
 
                     if (reply != null && reply.Status == IPStatus.Success)
                     {
-                        Log.InfoFormat("successful ping: {0} ({1}) took {2}", site, reply.Address,
+                        _writer.WriteLine("successful ping: {0} ({1}) took {2}", site, reply.Address,
                                        TimeSpan.FromMilliseconds(reply.RoundtripTime));
                     }
                     else
                     {
-                        Log.ErrorFormat("failed ping: {0} \n {1}", site, reply.DumpToString());
+                        _writer.WriteErrorLine("failed ping: {0} \n {1}", site, reply.DumpToString());
                     }
                 }
                 catch (Exception e)
                 {
-                    Log.ErrorFormat("failed ping: {0} \n {1}", site, e.DumpToString());
+                    _writer.WriteErrorLine("failed ping: {0} \n {1}", site, e.DumpToString());
                 }
 
                 if (_shouldStop)

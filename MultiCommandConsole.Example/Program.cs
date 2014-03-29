@@ -22,7 +22,7 @@ namespace MultiCommandConsole.Example
 			Config.ShowVierArgsCommand = true;
 		    //Config.DefaultCommand = typeof (RepeatConsoleCommand);
 
-            Services.Config.Defaults.CommandLine = "ping /s=google.com /i=1";
+            Services.Config.Defaults.CommandLine = "ping /s=google.com /i=10";
 
 		    LogManager.Adapter = Log4NetFactoryAdapter.Load();
 

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using ObjectPrinter;
 
@@ -51,6 +52,35 @@ namespace MultiCommandConsole.Util
                 return true;
             }
             return false;
+        }
+
+
+        public static void SetPropertyOrFieldValue<T>(this object host, T value) where T: class 
+        {
+            var writerProp = host.GetType()
+                                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                 .FirstOrDefault(p => p.CanWrite && typeof(T).IsAssignableFrom(p.PropertyType));
+
+            if (writerProp != null)
+            {
+                if (writerProp.GetValue(host, null) == null)
+                {
+                    writerProp.SetValue(host, value, null);
+                }
+                return;
+            }
+
+            var writerField = host.GetType()
+                                 .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                 .FirstOrDefault(f => typeof(T).IsAssignableFrom(f.FieldType));
+
+            if (writerField != null)
+            {
+                if (writerField.GetValue(host) == null)
+                {
+                    writerField.SetValue(host, value);
+                }
+            }
         }
 	}
 }

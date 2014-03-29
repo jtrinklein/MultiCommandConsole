@@ -127,6 +127,9 @@ namespace MultiCommandConsole
                     writer.WriteLines("", "!!!", error, "");
                 }
             }
+
+            _runData.Command.SetPropertyOrFieldValue((IStoplight)stoplight);
+
             _commandLoaded.Set();
 
             //TODO: exclude console command
