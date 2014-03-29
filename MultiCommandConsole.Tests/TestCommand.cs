@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MultiCommandConsole.Commands;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Tests
 {
@@ -12,7 +13,11 @@ namespace MultiCommandConsole.Tests
         public string Message { get; set; }
 
         [Arg("someswitch|ss", "some switch to test switches")]
-        public bool Switch { get; set; } 
+        public bool Switch { get; set; }
+
+        private IConsoleWriter _writer;
+
+        public IConsoleWriter Writer { get { return _writer; } }
 
         public CommandsOptions CommandsOptions { get; set; }
 

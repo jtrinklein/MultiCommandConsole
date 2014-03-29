@@ -1,9 +1,7 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using MultiCommandConsole.Commands;
 using MultiCommandConsole.Util;
 using NUnit.Framework;
-using ObjectPrinter;
 
 namespace MultiCommandConsole.Tests
 {

@@ -259,8 +259,9 @@ namespace MultiCommandConsole
 			return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 		}
 
-		private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, List<ISetupAndCleanup> setterUppers, object obj, Dictionary<Arg, object> commandArgs)
+        private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, List<ISetupAndCleanup> setterUppers, object obj, Dictionary<Arg, object> commandArgs)
 		{
+            SetConsoleWriter(obj);
 			var options = ArgsHelper.GetOptions(obj.GetType()).ToList();
 
 			foreach (var option in options.Where(p => p.ArgSetAttribute != null))
@@ -315,6 +316,35 @@ namespace MultiCommandConsole
             }
 
             return Converter.ChangeType(type, s);
+        }
+
+
+        private static void SetConsoleWriter(object instance)
+        {
+            var writerProp = instance.GetType()
+                                 .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                 .FirstOrDefault(p => p.CanWrite && typeof(IConsoleWriter).IsAssignableFrom(p.PropertyType));
+
+            if (writerProp != null)
+            {
+                if (writerProp.GetValue(instance, null) == null)
+                {
+                    writerProp.SetValue(instance, Config.ConsoleWriter, null);
+                }
+                return;
+            }
+
+            var writerField = instance.GetType()
+                                 .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                                 .FirstOrDefault(f => typeof(IConsoleWriter).IsAssignableFrom(f.FieldType));
+
+            if (writerField != null)
+            {
+                if (writerField.GetValue(instance) == null)
+                {
+                    writerField.SetValue(instance, Config.ConsoleWriter);
+                }
+            }
         }
     }
 }

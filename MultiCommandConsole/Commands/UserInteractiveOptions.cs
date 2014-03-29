@@ -8,9 +8,15 @@ namespace MultiCommandConsole.Commands
     [ArgSet("user-interactive", "options for outputting text to console, and ensuring app is in UserInteractive mode")]
     public class UserInteractiveOptions : IValidatable
     {
-        private readonly IConsoleWriter _writer = new ConsoleWriter();
+        public IConsoleWriter Writer { get; private set; }
 
-        public IConsoleWriter Writer { get { return _writer; } }
+        public UserInteractiveOptions() : this(Config.ConsoleWriter)
+        {
+        }
+        public UserInteractiveOptions(IConsoleWriter writer)
+        {
+            Writer = writer;
+        }
 
         public IEnumerable<string> GetArgValidationErrors()
         {
