@@ -9,6 +9,11 @@ namespace MultiCommandConsole.Util
     {
         private static readonly ILog Log = LogManager.GetLogger<LoggingConsoleWriter>();
 
+        public void WriteLine(object obj)
+        {
+            Log.Info(obj);
+        }
+
         public void WriteLine(string format, params object[] args)
         {
             Log.InfoFormat(format, args);

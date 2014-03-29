@@ -35,7 +35,7 @@ namespace MultiCommandConsole.Tests
 
         public void Run()
         {
-            Console.Out.WriteLine(Message);
+            _writer.WriteLine(Message);
         }
     }
 }

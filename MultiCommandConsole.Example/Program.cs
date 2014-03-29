@@ -36,7 +36,7 @@ namespace MultiCommandConsole.Example
 		    }
 		    catch (Exception e)
 		    {
-		        Console.Out.WriteLine(e.Dump());
+		        Config.ConsoleWriter.WriteLine(e.Dump());
 		    }
 		}
 	}

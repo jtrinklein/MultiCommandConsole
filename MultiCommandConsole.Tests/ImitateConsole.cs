@@ -9,9 +9,9 @@ namespace MultiCommandConsole.Tests
 	{
 		private void Run(string consoleInput)
 		{
-			Console.Out.WriteLine("*********************************************");
-			Console.Out.WriteLine("***** Running: " + consoleInput);
-			Console.Out.WriteLine("*********************************************");
+			Config.ConsoleWriter.WriteLine("*********************************************");
+            Config.ConsoleWriter.WriteLine("***** Running: " + consoleInput);
+            Config.ConsoleWriter.WriteLine("*********************************************");
 			new Engine(new []{typeof(TestCommand),typeof(UncFileCommand)}).GetRunner().Run(consoleInput.SplitCmdLineArgs());
 		}
 		

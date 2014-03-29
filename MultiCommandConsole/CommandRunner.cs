@@ -17,6 +17,7 @@ namespace MultiCommandConsole
         private volatile CommandRunData _runData;
         private Stoplight _stoplight;
         private EventWaitHandle _commandLoaded;
+        private IConsoleWriter _writer = Config.ConsoleWriter;
 
         public CommandRunner(IConsoleCommandRepository consoleCommandRepository)
         {
@@ -55,7 +56,7 @@ namespace MultiCommandConsole
             if (stoppable != null)
             {
                 Log.Info("stopping");
-                Console.Out.WriteLine("stopping");
+                _writer.WriteLine("stopping");
                 stoppable.Stop();
                 _stoplight.Stop();
             }
@@ -71,7 +72,7 @@ namespace MultiCommandConsole
             if (pausable != null)
             {
                 Log.Info("pausing");
-                Console.Out.WriteLine("pausing");
+                _writer.WriteLine("pausing");
                 pausable.Pause();
             }
             else
@@ -86,7 +87,7 @@ namespace MultiCommandConsole
             if (pausable != null)
             {
                 Log.Info("resuming");
-                Console.Out.WriteLine("resuming");
+                _writer.WriteLine("resuming");
                 pausable.Resume();
             }
             else
@@ -189,7 +190,7 @@ namespace MultiCommandConsole
                 {
                     e.SetContext("command", runData.Command);
                 }
-                Console.Out.WriteLine(e.Message + " see logs for details");
+                _writer.WriteLine(e.Message + " see logs for details");
                 var error = (e.InnerException ?? e).DumpToString();
                 Log.Error(error);
             }
@@ -199,7 +200,7 @@ namespace MultiCommandConsole
                 {
                     e.SetContext("command", runData.Command);
                 }
-                Console.Out.WriteLine(e.Message + " see logs for details");
+                _writer.WriteLine(e.Message + " see logs for details");
                 var error = e.DumpToString();
                 Log.Error(error);
             }

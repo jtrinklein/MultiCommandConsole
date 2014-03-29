@@ -28,7 +28,7 @@ namespace MultiCommandConsole.Tests
 
         public void Run()
         {
-            Console.Out.WriteLine(File);
+            Config.ConsoleWriter.WriteLine(File);
         }
     }
 }

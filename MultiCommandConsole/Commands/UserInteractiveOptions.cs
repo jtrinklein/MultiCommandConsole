@@ -26,5 +26,16 @@ namespace MultiCommandConsole.Commands
             }
             return Enumerable.Empty<String>();
         }
+
+        public string Prompt(string prompt)
+        {
+            if (string.IsNullOrWhiteSpace(prompt))
+            {
+                throw new ArgumentNullException("prompt");
+            }
+
+            Writer.WriteLine(prompt);
+            return Console.ReadLine();
+        }
     }
 }

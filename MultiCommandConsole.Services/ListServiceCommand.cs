@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Services
 {
@@ -8,6 +8,7 @@ namespace MultiCommandConsole.Services
     public class ListServiceCommand : IConsoleCommand
     {
         private readonly IServicesRepository _servicesRepository;
+        private IConsoleWriter _writer;
 
         public ListServiceCommand() 
             : this(new ServicesRepository())
@@ -35,7 +36,7 @@ namespace MultiCommandConsole.Services
             var services = _servicesRepository.All().ToList();
             foreach (var service in services.OrderBy(s => s.DisplayName))
             {
-                Console.Out.WriteLine(service.DisplayName);
+                _writer.WriteLine(service.DisplayName);
             }
             //TODO:
             // - validate their command line settings are still valid (add arg to let user decide if we validate or not)

@@ -11,6 +11,8 @@ namespace MultiCommandConsole.Commands
         [Arg("noPrompt", "Prevents the command from prompting the user for confirmation.")]
         public bool NoPrompt { get; set; }
 
+        public UserInteractiveOptions UserInteractiveOptions { get; set; }
+
         public bool ContinueFor(int count, string objectType)
         {
             return Continue("You are about to alter data for " + count + " " + objectType + ".  Would you like to continue?");
@@ -23,8 +25,7 @@ namespace MultiCommandConsole.Commands
                 return true;
             }
 
-            Console.WriteLine(prompt + " type 'y' or 'yes' to continue");
-            var response = Console.ReadLine();
+            var response = UserInteractiveOptions.Prompt(prompt + " type 'y' or 'yes' to continue");
             return response != null
                    && (
                           response.Equals("y", StringComparison.OrdinalIgnoreCase)

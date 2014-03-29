@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using MultiCommandConsole.Commands;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Services
 {
@@ -12,6 +12,7 @@ namespace MultiCommandConsole.Services
         private readonly IServicesRepository _servicesRepository;
         private CommandRunData _commandRunData;
         private ICanRunAsService _serviceCommand;
+        private IConsoleWriter _writer;
 
         public CommandsOptions CommandsOptions { get; set; }
         public AlterDataOptions AlterDataOptions { get; set; }
@@ -147,10 +148,10 @@ namespace MultiCommandConsole.Services
                     CommandLine = CommandLine
                 };
 
-            Console.Out.WriteLine("You are about to install this service:");
-            Console.Out.WriteLine("  service name: " + service.ServiceName);
-            Console.Out.WriteLine("  display name: " + service.DisplayName);
-            Console.Out.WriteLine("  description : " + service.Description);
+            _writer.WriteLine("You are about to install this service:");
+            _writer.WriteLine("  service name: " + service.ServiceName);
+            _writer.WriteLine("  display name: " + service.DisplayName);
+            _writer.WriteLine("  description : " + service.Description);
            
             if (!AlterDataOptions.Continue("Would you like to continue?"))
             {
@@ -175,13 +176,13 @@ namespace MultiCommandConsole.Services
 
             if (commands.Count == 0)
             {
-                Console.Out.WriteLine("no commands implement ICanRunAsService");
+                _writer.WriteLine("no commands implement ICanRunAsService");
             }
             else
             {
                 foreach (var command in commands)
                 {
-                    Console.Out.WriteLine(command.Attribute.FirstPrototype);
+                    _writer.WriteLine(command.Attribute.FirstPrototype);
                 }
             }
         }

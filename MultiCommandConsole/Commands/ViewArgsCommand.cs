@@ -29,7 +29,7 @@ namespace MultiCommandConsole.Commands
 		{
 			foreach (var arg in ExtraArgs)
 			{
-				Console.Out.WriteLine(arg);
+				Config.ConsoleWriter.WriteLine(arg);
 			}
 		}
 	}

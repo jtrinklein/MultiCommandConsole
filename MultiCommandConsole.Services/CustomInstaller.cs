@@ -29,7 +29,7 @@ namespace MultiCommandConsole.Services
 
             foreach (string key in Context.Parameters.Keys)
             {
-                Console.Out.WriteLine("{0}={1}", key, Context.Parameters[key]);
+                MultiCommandConsole.Config.ConsoleWriter.WriteLine("{0}={1}", key, Context.Parameters[key]);
             }
         }
 

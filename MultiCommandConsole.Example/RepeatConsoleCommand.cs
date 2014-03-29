@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
+using MultiCommandConsole.Util;
 using ObjectPrinter;
 using Common.Logging;
 
@@ -10,6 +10,7 @@ namespace MultiCommandConsole.Example
 	public class RepeatConsoleCommand : IConsoleCommand, ICanBeStopped, ICanBePaused
 	{
 		private static readonly ILog Log = LogManager.GetLogger<RepeatConsoleCommand>();
+        private IConsoleWriter _writer;
 
 		[Arg("text|t", "the text to be repeated", Required = true)]
 		public string Text { get; set; }
@@ -62,7 +63,7 @@ namespace MultiCommandConsole.Example
                     Thread.Sleep(1000);
                 }
 
-				Console.Out.WriteLine(Text);
+                _writer.WriteLine(Text);
                 if (Sleep > 0)
                 {
                     Thread.Sleep(Sleep * 1000);

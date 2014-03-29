@@ -22,6 +22,15 @@ namespace MultiCommandConsole.Util
             _getScreenWidth = getScreenWidth;
         }
 
+        public void WriteLine(object obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+            WriteLine(obj.ToString());
+        }
+
         public void WriteLine(string format, params object[] args)
         {
             var text = args.IsNullOrEmpty() ? format : string.Format(format, args);

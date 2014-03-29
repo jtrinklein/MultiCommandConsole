@@ -255,7 +255,7 @@ namespace MultiCommandConsole
 
 			}
 
-			Console.Out.WriteLine("Unknown command: " + commandName);
+			Config.ConsoleWriter.WriteLine("Unknown command: " + commandName);
 			return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 		}
 
