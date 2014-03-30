@@ -17,7 +17,7 @@ namespace MultiCommandConsole.Services
 
             static Defaults()
             {
-                Account = ServiceAccount.LocalService;
+                Account = ServiceAccount.LocalSystem;
                 StartMode = ServiceStartMode.Automatic;
             }
         }
