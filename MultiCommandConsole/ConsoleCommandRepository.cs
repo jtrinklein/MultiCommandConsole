@@ -261,7 +261,7 @@ namespace MultiCommandConsole
 
         private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, List<ISetupAndCleanup> setterUppers, object obj, Dictionary<Arg, object> commandArgs)
 		{
-            obj.SetPropertyOrFieldValue(Config.ConsoleWriter);
+            obj.SetServiceOnPropertyOrField(Config.ConsoleWriter);
 
             var options = ArgsHelper.GetOptions(obj.GetType()).ToList();
 

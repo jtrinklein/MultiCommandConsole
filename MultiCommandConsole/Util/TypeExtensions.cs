@@ -54,12 +54,20 @@ namespace MultiCommandConsole.Util
             return false;
         }
 
-
-        public static void SetPropertyOrFieldValue<T>(this object host, T value) where T: class 
+        /// <summary>
+        /// Sets the first property it finds or the first field if no property was found.
+        /// It is assumed their is no value to defining multiple fields or properties of this type
+        /// and that when both a field and property exist, the field is a backing field for the property.
+        /// </summary>
+        /// <typeparam name="TService">the type of property or field to set</typeparam>
+        /// <param name="host"></param>
+        /// <param name="value"></param>
+        public static void SetServiceOnPropertyOrField<TService>(this object host, TService value) 
+            where TService: class 
         {
             var writerProp = host.GetType()
                                  .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                 .FirstOrDefault(p => p.CanWrite && typeof(T).IsAssignableFrom(p.PropertyType));
+                                 .FirstOrDefault(p => p.CanWrite && typeof(TService).IsAssignableFrom(p.PropertyType));
 
             if (writerProp != null)
             {
@@ -72,7 +80,7 @@ namespace MultiCommandConsole.Util
 
             var writerField = host.GetType()
                                  .GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                 .FirstOrDefault(f => typeof(T).IsAssignableFrom(f.FieldType));
+                                 .FirstOrDefault(f => typeof(TService).IsAssignableFrom(f.FieldType));
 
             if (writerField != null)
             {

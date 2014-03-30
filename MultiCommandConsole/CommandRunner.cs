@@ -101,7 +101,7 @@ namespace MultiCommandConsole
             DateTime started = Config.NowDelegate();
             var stopwatch = Stopwatch.StartNew();
 
-            Log.InfoFormat("Running: {0}", string.Join(" ", args));
+            Log.InfoFormat("Running: {0}", args.IsNullOrEmpty() ? "{null}" : string.Join(" ", args));
             if (Config.ConsoleMode.ArgumentsInterceptor != null)
             {
                 var modifiedArgs = Config.ConsoleMode.ArgumentsInterceptor(args);
@@ -128,7 +128,7 @@ namespace MultiCommandConsole
                 }
             }
 
-            _runData.Command.SetPropertyOrFieldValue((IStoplight)stoplight);
+            _runData.Command.SetServiceOnPropertyOrField((IStoplight)stoplight);
 
             _commandLoaded.Set();
 
