@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Threading;
-using Common.Logging;
 using MultiCommandConsole.Services;
 using MultiCommandConsole.Util;
 using ObjectPrinter;
@@ -13,10 +12,8 @@ namespace MultiCommandConsole.Example
     [ConsoleCommand("ping", "pings the specified sites every N minutes and reports success and failure")]
     public class PingConsoleCommand : IConsoleCommand, ICanRunAsService, ICanBePaused
     {
-        private static readonly ILog Log = LogManager.GetLogger<PingConsoleCommand>();
-
-        private IStoplight _stoplight;
-        private IConsoleWriter _writer;
+        internal IStoplight Stoplight { get; set; }
+        internal IConsoleWriter Writer { get; set; }
 
         public string ServiceName { get { return "SimplePingService"; } }
         public string DisplayName { get { return "Simple Ping Service"; } }
@@ -73,7 +70,7 @@ namespace MultiCommandConsole.Example
             _timer.AutoReset = true;
             _timer.Start();
 
-            _stoplight.Token.WaitHandle.WaitOne();
+            Stoplight.Token.WaitHandle.WaitOne();
         }
 
         public void Stop()
@@ -107,17 +104,17 @@ namespace MultiCommandConsole.Example
 
                     if (reply != null && reply.Status == IPStatus.Success)
                     {
-                        _writer.WriteLine("successful ping: {0} ({1}) took {2}", site, reply.Address,
+                        Writer.WriteLine("successful ping: {0} ({1}) took {2}", site, reply.Address,
                                        TimeSpan.FromMilliseconds(reply.RoundtripTime));
                     }
                     else
                     {
-                        _writer.WriteErrorLine("failed ping: {0} \n {1}", site, reply.DumpToString());
+                        Writer.WriteErrorLine("failed ping: {0} \n {1}", site, reply.DumpToString());
                     }
                 }
                 catch (Exception e)
                 {
-                    _writer.WriteErrorLine("failed ping: {0} \n {1}", site, e.DumpToString());
+                    Writer.WriteErrorLine("failed ping: {0} \n {1}", site, e.DumpToString());
                 }
 
                 if (_shouldStop)

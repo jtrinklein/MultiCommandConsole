@@ -17,7 +17,7 @@ namespace MultiCommandConsole
         private volatile CommandRunData _runData;
         private Stoplight _stoplight;
         private EventWaitHandle _commandLoaded;
-        private IConsoleWriter _writer = Config.ConsoleWriter;
+        private readonly IConsoleWriter _writer = Config.ConsoleWriter;
 
         public CommandRunner(IConsoleCommandRepository consoleCommandRepository)
         {

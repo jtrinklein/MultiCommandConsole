@@ -10,7 +10,7 @@ namespace MultiCommandConsole.Example
 	public class RepeatConsoleCommand : IConsoleCommand, ICanBeStopped, ICanBePaused
 	{
 		private static readonly ILog Log = LogManager.GetLogger<RepeatConsoleCommand>();
-        private IConsoleWriter _writer;
+        internal IConsoleWriter Writer { get; set; }
 
 		[Arg("text|t", "the text to be repeated", Required = true)]
 		public string Text { get; set; }
@@ -63,7 +63,7 @@ namespace MultiCommandConsole.Example
                     Thread.Sleep(1000);
                 }
 
-                _writer.WriteLine(Text);
+                Writer.WriteLine(Text);
                 if (Sleep > 0)
                 {
                     Thread.Sleep(Sleep * 1000);

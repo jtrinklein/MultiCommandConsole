@@ -12,7 +12,7 @@ namespace MultiCommandConsole.Services
         private readonly IServicesRepository _servicesRepository;
         private CommandRunData _commandRunData;
         private ICanRunAsService _serviceCommand;
-        private IConsoleWriter _writer;
+        internal IConsoleWriter Writer { get; set; }
 
         public CommandsOptions CommandsOptions { get; set; }
         public AlterDataOptions AlterDataOptions { get; set; }
@@ -148,10 +148,10 @@ namespace MultiCommandConsole.Services
                     CommandLine = CommandLine
                 };
 
-            _writer.WriteLine("You are about to install this service:");
-            _writer.WriteLine("  service name: " + service.ServiceName);
-            _writer.WriteLine("  display name: " + service.DisplayName);
-            _writer.WriteLine("  description : " + service.Description);
+            Writer.WriteLine("You are about to install this service:");
+            Writer.WriteLine("  service name: " + service.ServiceName);
+            Writer.WriteLine("  display name: " + service.DisplayName);
+            Writer.WriteLine("  description : " + service.Description);
            
             if (!AlterDataOptions.Continue("Would you like to continue?"))
             {
@@ -176,13 +176,13 @@ namespace MultiCommandConsole.Services
 
             if (commands.Count == 0)
             {
-                _writer.WriteLine("no commands implement ICanRunAsService");
+                Writer.WriteLine("no commands implement ICanRunAsService");
             }
             else
             {
                 foreach (var command in commands)
                 {
-                    _writer.WriteLine(command.Attribute.FirstPrototype);
+                    Writer.WriteLine(command.Attribute.FirstPrototype);
                 }
             }
         }

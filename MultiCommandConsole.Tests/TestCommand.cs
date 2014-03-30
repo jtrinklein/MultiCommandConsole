@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MultiCommandConsole.Commands;
 using MultiCommandConsole.Util;
@@ -15,9 +14,7 @@ namespace MultiCommandConsole.Tests
         [Arg("someswitch|ss", "some switch to test switches")]
         public bool Switch { get; set; }
 
-        private IConsoleWriter _writer;
-
-        public IConsoleWriter Writer { get { return _writer; } }
+        internal IConsoleWriter Writer { get; set; }
 
         public CommandsOptions CommandsOptions { get; set; }
 
@@ -35,7 +32,7 @@ namespace MultiCommandConsole.Tests
 
         public void Run()
         {
-            _writer.WriteLine(Message);
+            Writer.WriteLine(Message);
         }
     }
 }

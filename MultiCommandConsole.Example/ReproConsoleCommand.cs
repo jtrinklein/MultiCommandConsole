@@ -7,7 +7,7 @@ namespace MultiCommandConsole.Example
 	[ConsoleCommand("repro", "this command is used to repro whatever bug i'm currently working on")]
 	public class ReproConsoleCommand : IConsoleCommand
     {
-        private IConsoleWriter _writer;
+        internal IConsoleWriter Writer { get; set; }
 
 		public LogOptions LogOptions { get; set; }
 
@@ -28,7 +28,7 @@ namespace MultiCommandConsole.Example
 
 		public void Run()
 		{
-			_writer.WriteLine("RequiredArg=" + RequiredArg);
+			Writer.WriteLine("RequiredArg=" + RequiredArg);
 		}
 	}
 }
