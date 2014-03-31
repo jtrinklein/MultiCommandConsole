@@ -1,9 +1,28 @@
-﻿using System.ServiceProcess;
+﻿using System;
+using System.ServiceProcess;
+using Common.Logging;
 
 namespace MultiCommandConsole.Services
 {
     public static class Config
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof (Config));
+
+        public static void EnableServiceMode()
+        {
+            if (!Environment.UserInteractive)
+            {
+                MultiCommandConsole.Config.GetRunnerDelegate =
+                    repository => new ServiceCommandRunner(new CommandRunner(repository));
+
+                Log.Info("Service mode enabled");
+            }
+            else
+            {
+                Log.Info("Service mode not enabled");
+            }
+        }
+
         public static class Defaults
         {
             /// <summary>The command line args used to run the command that will run as a service</summary>

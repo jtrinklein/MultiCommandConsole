@@ -12,7 +12,7 @@ namespace MultiCommandConsole.Tests
 			Config.ConsoleWriter.WriteLine("*********************************************");
             Config.ConsoleWriter.WriteLine("***** Running: " + consoleInput);
             Config.ConsoleWriter.WriteLine("*********************************************");
-			new Engine(new []{typeof(TestCommand),typeof(UncFileCommand)}).GetRunner().Run(consoleInput.SplitCmdLineArgs());
+			new Engine(new []{typeof(TestCommand),typeof(UncFileCommand)}).Run(consoleInput.SplitCmdLineArgs());
 		}
 		
 		[Test]

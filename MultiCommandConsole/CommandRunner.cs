@@ -9,7 +9,7 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole
 {
-    internal class CommandRunner : ICommandRunner
+    public class CommandRunner : ICommandRunner
     {
         private static readonly ILog Log = LogManager.GetLogger<CommandRunner>();
 

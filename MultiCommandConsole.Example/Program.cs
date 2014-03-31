@@ -15,6 +15,10 @@ namespace MultiCommandConsole.Example
                 Debugger.Break();
             }
 
+            LogManager.Adapter = Log4NetFactoryAdapter.Load();
+		    var logger = LogManager.GetLogger(typeof (Program));
+		    logger.InfoFormat("Logging configured");
+
             Config.ConsoleMode.Enabled = true;
 			Config.ConsoleMode.CommandPromptText = "console";
 		    Config.ConsoleMode.HistorySize = 5;
@@ -23,8 +27,8 @@ namespace MultiCommandConsole.Example
 		    //Config.DefaultCommand = typeof (RepeatConsoleCommand);
 
             Services.Config.Defaults.CommandLine = "ping /s=google.com /i=10";
+            Services.Config.EnableServiceMode();
 
-		    LogManager.Adapter = Log4NetFactoryAdapter.Load();
 
 		    try
 		    {
@@ -32,7 +36,7 @@ namespace MultiCommandConsole.Example
 		            {
 		                typeof(Program).Assembly, 
 		                typeof(InstallServiceCommand).Assembly
-		            }).GetRunner().Run(args);
+		            }).Run(args);
 		    }
 		    catch (Exception e)
 		    {

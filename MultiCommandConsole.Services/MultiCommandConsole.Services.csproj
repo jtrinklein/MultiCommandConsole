@@ -64,6 +64,9 @@
     <Compile Include="Service.cs" />
     <Compile Include="InstallServiceCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceCommandRunner.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ServicesRepository.cs" />
     <Compile Include="UninstallServiceCommand.cs" />
   </ItemGroup>

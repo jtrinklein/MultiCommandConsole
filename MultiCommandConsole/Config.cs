@@ -90,6 +90,7 @@ namespace MultiCommandConsole
             set { _nowDelegate = value ?? (() => DateTime.Now); }
         }
 
+        public static Func<IConsoleCommandRepository, ICommandRunner> GetRunnerDelegate { get; set; } 
 
 	    static Config()
 		{
@@ -102,6 +103,8 @@ namespace MultiCommandConsole
 	        ConsoleWriter = Environment.UserInteractive 
                 ? (IConsoleWriter) new ConsoleWriter() 
                 : new LoggingConsoleWriter();
+
+            GetRunnerDelegate = repository => new CommandRunner(repository);
 		}
 	}
 }
