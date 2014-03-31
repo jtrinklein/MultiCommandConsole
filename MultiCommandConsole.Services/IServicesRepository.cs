@@ -9,5 +9,6 @@ namespace MultiCommandConsole.Services
         void Add(Service options);
         void Delete(string serviceName);
         Service GetCurrent();
+        Service GetByProcessId(int processId);
     }
 }

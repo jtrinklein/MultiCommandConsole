@@ -45,7 +45,7 @@ namespace MultiCommandConsole.Services
                 {
                     ServiceName = _service.ServiceName,
                     DisplayName = _service.DisplayName,
-                    Description = _service.Description,
+                    Description = _service.DescriptionWithCommandLine,
                     StartType = _service.StartMode,
                 };
         }

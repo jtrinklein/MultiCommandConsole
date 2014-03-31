@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MultiCommandConsole.Util;
+using ObjectPrinter;
 
 namespace MultiCommandConsole.Services
 {
@@ -9,6 +10,9 @@ namespace MultiCommandConsole.Services
     {
         private readonly IServicesRepository _servicesRepository;
         internal IConsoleWriter Writer { get; set; }
+
+        [Arg("pid", "process id of service to display")]
+        public int ProcessId { get; set; }
 
         public ListServiceCommand() 
             : this(new ServicesRepository())
@@ -33,6 +37,13 @@ namespace MultiCommandConsole.Services
 
         public void Run()
         {
+            if (ProcessId > 0)
+            {
+                var service = _servicesRepository.GetByProcessId(ProcessId);
+                Writer.WriteLine(service.Dump());
+                return;
+            }
+
             var services = _servicesRepository.All().ToList();
             foreach (var service in services.OrderBy(s => s.DisplayName))
             {

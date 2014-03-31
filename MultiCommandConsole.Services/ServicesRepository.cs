@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -20,10 +21,15 @@ namespace MultiCommandConsole.Services
 
         public Service GetCurrent()
         {
+            return GetByProcessId(Process.GetCurrentProcess().Id);
+        }
+
+        public Service GetByProcessId(int processId)
+        {
             //http://stackoverflow.com/questions/1841790/how-can-a-windows-service-determine-its-servicename
-            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
-            String query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
-            return new ManagementObjectSearcher(query).Get().Cast<ManagementObject>().Select(Map).First();
+            //String query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
+            //return new ManagementObjectSearcher(query).Get().Cast<ManagementObject>().Select(Map).First();
+            return All().First(s => s.ProcessId == processId);
         }
 
         public IEnumerable<Service> All()
@@ -42,7 +48,8 @@ namespace MultiCommandConsole.Services
                 {
                     ServiceName = mo.GetPropertyValue("Name").ToString(),
                     DisplayName = mo.GetPropertyValue("DisplayName").ToString(),
-                    Description = mo.GetPropertyValue("Description").ToString(),
+                    DescriptionWithCommandLine = mo.GetPropertyValue("Description").ToString(),
+                    ProcessId = int.Parse(mo.GetPropertyValue("ProcessID").ToString())
                 };
         }
 
