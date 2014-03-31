@@ -12,17 +12,17 @@ namespace MultiCommandConsole.Services
 
         public static void EnableServiceMode()
         {
-            if (!Environment.UserInteractive)
+            if (Environment.UserInteractive)
+            {
+                Log.Info("Service mode not enabled. Environment.UserInteractive=false");
+            }
+            else
             {
                 MccConfig.GetConsoleWriterDelegate = type => new LoggingConsoleWriter(type);
                 MccConfig.GetRunnerDelegate =
                     repository => new ServiceCommandRunner(new CommandRunner(repository));
 
                 Log.Info("Service mode enabled");
-            }
-            else
-            {
-                Log.Info("Service mode not enabled");
             }
         }
 
