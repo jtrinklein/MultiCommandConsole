@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ServiceProcess;
 using Common.Logging;
+using MultiCommandConsole.Util;
+using MccConfig = MultiCommandConsole.Config;
 
 namespace MultiCommandConsole.Services
 {
@@ -12,7 +14,8 @@ namespace MultiCommandConsole.Services
         {
             if (!Environment.UserInteractive)
             {
-                MultiCommandConsole.Config.GetRunnerDelegate =
+                MccConfig.GetConsoleWriterDelegate = type => new LoggingConsoleWriter(type);
+                MccConfig.GetRunnerDelegate =
                     repository => new ServiceCommandRunner(new CommandRunner(repository));
 
                 Log.Info("Service mode enabled");

@@ -12,12 +12,12 @@ namespace MultiCommandConsole
     public class CommandRunner : ICommandRunner
     {
         private static readonly ILog Log = LogManager.GetLogger<CommandRunner>();
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<CommandRunner>();
 
         private readonly IConsoleCommandRepository _consoleCommandRepository;
         private volatile CommandRunData _runData;
         private Stoplight _stoplight;
         private EventWaitHandle _commandLoaded;
-        private readonly IConsoleWriter _writer = Config.ConsoleWriter;
 
         public CommandRunner(IConsoleCommandRepository consoleCommandRepository)
         {
@@ -52,7 +52,7 @@ namespace MultiCommandConsole
             if (stoppable != null)
             {
                 Log.Info("stopping");
-                _writer.WriteLine("stopping");
+                Writer.WriteLine("stopping");
                 stoppable.Stop();
                 _stoplight.Stop();
             }
@@ -68,7 +68,7 @@ namespace MultiCommandConsole
             if (pausable != null)
             {
                 Log.Info("pausing");
-                _writer.WriteLine("pausing");
+                Writer.WriteLine("pausing");
                 pausable.Pause();
             }
             else
@@ -83,7 +83,7 @@ namespace MultiCommandConsole
             if (pausable != null)
             {
                 Log.Info("resuming");
-                _writer.WriteLine("resuming");
+                Writer.WriteLine("resuming");
                 pausable.Resume();
             }
             else
@@ -118,10 +118,9 @@ namespace MultiCommandConsole
             _runData = _consoleCommandRepository.LoadCommand(args);
             if (_runData.Errors.Any())
             {
-                var writer = Config.ConsoleWriter;
                 foreach (var error in _runData.Errors)
                 {
-                    writer.WriteLines("", "!!!", error, "");
+                    Writer.WriteLines("", "!!!", error, "");
                 }
             }
 
@@ -200,7 +199,7 @@ namespace MultiCommandConsole
                 {
                     e.SetContext("command", runData.Command);
                 }
-                _writer.WriteLine(e.Message + " see logs for details");
+                Writer.WriteLine(e.Message + " see logs for details");
                 var error = (e.InnerException ?? e).DumpToString();
                 Log.Error(error);
             }
@@ -210,7 +209,7 @@ namespace MultiCommandConsole
                 {
                     e.SetContext("command", runData.Command);
                 }
-                _writer.WriteLine(e.Message + " see logs for details");
+                Writer.WriteLine(e.Message + " see logs for details");
                 var error = e.DumpToString();
                 Log.Error(error);
             }

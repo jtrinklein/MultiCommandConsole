@@ -60,7 +60,7 @@ namespace MultiCommandConsole
         /// The console writer used to write messages for the console window 
         /// (or to the logger when in running as a service)
         /// </summary>
-        public static IConsoleWriter ConsoleWriter { get; set; }
+        public static Func<Type, IConsoleWriter> GetConsoleWriterDelegate { get; set; }
 
 	    /// <summary>
 		/// By default, commands and arg sets are created by Activator.  
@@ -100,9 +100,7 @@ namespace MultiCommandConsole
             ConsoleMode.CommandPromptText = "$";
 		    ConsoleMode.HistorySize = 50;
 
-	        ConsoleWriter = Environment.UserInteractive 
-                ? (IConsoleWriter) new ConsoleWriter() 
-                : new LoggingConsoleWriter();
+	        GetConsoleWriterDelegate = type => new ConsoleWriter(type);
 
             GetRunnerDelegate = repository => new CommandRunner(repository);
 		}

@@ -11,6 +11,9 @@ namespace MultiCommandConsole.Commands
 	internal class HelpCommand : IConsoleCommand
 	{
 		public const string Prototype = "help|?|h";
+
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<ConsoleCommandRepository>();
+
 		private IEnumerable<ConsoleCommandInfo> _commands;
 		private ConsoleCommandInfo _command;
 		private IConsoleCommand _instance;
@@ -65,15 +68,13 @@ namespace MultiCommandConsole.Commands
 
 	    private void PrintHelp4CommandList()
         {
-            var writer = UserInteractiveOptions.Writer;
-
-	        writer.WriteLines(
+	        Writer.WriteLines(
 	            " - type '{command} --help' to see the help for a given command",
 	            "Commands:",
                 ""
 	            );
 
-	        writer.WriteTable(
+	        Writer.WriteTable(
 	            null,
 	            _commands.OrderBy(c => c.Attribute.FirstPrototype).Select(ToTableRow),
 	            _tableFormat);
@@ -81,13 +82,11 @@ namespace MultiCommandConsole.Commands
 
 	    private void PrintHelp4SingleCommand()
         {
-            var writer = UserInteractiveOptions.Writer;
-
-	        writer.WriteLines(
+	        Writer.WriteLines(
 	           _command.Attribute.FirstPrototype + " " + FormatShortNames(_command.Attribute.PrototypeArray.Skip(1)),
 	            _instance.GetDetailedHelp() ?? string.Empty);
 
-	        writer.WriteTable(
+	        Writer.WriteTable(
 	            null,
 	            ToArgHelpInfo(_command.CommandType, _instance).Distinct().Select(ToTableRow),
 	            _tableFormat);

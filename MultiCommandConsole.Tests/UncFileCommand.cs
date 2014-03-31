@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Tests
 {
     [ConsoleCommand("uncfile", "test unc file paths console command")]
     public class UncFileCommand : IConsoleCommand
     {
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<UncFileCommand>();
+
         [Arg("file|f", "this message will be output to the console")]
         public string File { get; set; }
 
@@ -28,7 +30,7 @@ namespace MultiCommandConsole.Tests
 
         public void Run()
         {
-            Config.ConsoleWriter.WriteLine(File);
+            Writer.WriteLine(File);
         }
     }
 }

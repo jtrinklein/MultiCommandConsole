@@ -14,6 +14,8 @@ namespace MultiCommandConsole.Commands
         public const string CommandName = "console";
         static readonly char[] ArgPrefixes = new[] { '/', '-' };
 
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<ConsoleCommandRepository>();
+
         public CommandsOptions CommandsOptions { get; set; }
         public ConsoleRunOptions ConsoleRunOptions { get; set; }
         public UserInteractiveOptions UserInteractiveOptions { get; set; } 
@@ -44,11 +46,10 @@ namespace MultiCommandConsole.Commands
 
 			using (CommandsOptions.HideCommandOfType<ConsoleCommand>())
 			{
-                UserInteractiveOptions.Writer
-                    .WriteLines(
-                    "Type \"quit\" to exit.",
-                    "Type \"cls\" to clear the console window.",
-                    "Type \"> filename\" to redirect output to a file.");
+			    Writer.WriteLines(
+			        "Type \"quit\" to exit.",
+			        "Type \"cls\" to clear the console window.",
+			        "Type \"> filename\" to redirect output to a file.");
 				
 				do
 				{

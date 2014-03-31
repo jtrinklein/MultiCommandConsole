@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Commands
 {
 	[ConsoleCommand(CommandName, "experiment with how the command line splits your arguments")]
 	internal class ViewArgsCommand : IConsoleCommand
-	{
+    {
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<UserInteractiveOptions>();
+
 		public const string CommandName = "viewargparsing"; 
 		public string GetDetailedHelp()
 		{
@@ -29,7 +32,7 @@ namespace MultiCommandConsole.Commands
 		{
 			foreach (var arg in ExtraArgs)
 			{
-				Config.ConsoleWriter.WriteLine(arg);
+				Writer.WriteLine(arg);
 			}
 		}
 	}

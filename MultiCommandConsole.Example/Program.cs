@@ -2,12 +2,15 @@
 using System.Diagnostics;
 using Common.Logging;
 using MultiCommandConsole.Services;
+using MultiCommandConsole.Util;
 using ObjectPrinter;
 
 namespace MultiCommandConsole.Example
 {
 	class Program
-	{
+    {
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<Program>();
+
 		static void Main(string[] args)
 		{
             if (Array.Exists(args, s => s == "/debug") && Environment.UserInteractive)
@@ -39,7 +42,7 @@ namespace MultiCommandConsole.Example
 		    }
 		    catch (Exception e)
 		    {
-		        Config.ConsoleWriter.WriteLine(e.Dump());
+		        Writer.WriteLine(e.Dump());
 		    }
 		}
 	}

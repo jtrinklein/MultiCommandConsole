@@ -6,12 +6,14 @@ namespace MultiCommandConsole.Tests
 {
     [TestFixture, Explicit]
 	public class ImitateConsole
-	{
+    {
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<ImitateConsole>();
+
 		private void Run(string consoleInput)
 		{
-			Config.ConsoleWriter.WriteLine("*********************************************");
-            Config.ConsoleWriter.WriteLine("***** Running: " + consoleInput);
-            Config.ConsoleWriter.WriteLine("*********************************************");
+			Writer.WriteLine("*********************************************");
+            Writer.WriteLine("***** Running: " + consoleInput);
+            Writer.WriteLine("*********************************************");
 			new Engine(new []{typeof(TestCommand),typeof(UncFileCommand)}).Run(consoleInput.SplitCmdLineArgs());
 		}
 		

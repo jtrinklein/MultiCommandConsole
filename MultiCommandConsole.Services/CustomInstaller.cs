@@ -4,12 +4,15 @@ using System.Configuration.Install;
 using System.IO;
 using System.Reflection;
 using System.ServiceProcess;
+using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole.Services
 {
     [RunInstaller(true)]
     public class CustomInstaller : Installer
     {
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<CustomInstaller>();
+
         private readonly Service _service;
 
         public CustomInstaller(Service service)
@@ -29,7 +32,7 @@ namespace MultiCommandConsole.Services
 
             foreach (string key in Context.Parameters.Keys)
             {
-                MultiCommandConsole.Config.ConsoleWriter.WriteLine("{0}={1}", key, Context.Parameters[key]);
+                Writer.WriteLine("{0}={1}", key, Context.Parameters[key]);
             }
 
             if (_service.StartMode == ServiceStartMode.Automatic)

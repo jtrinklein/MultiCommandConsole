@@ -12,7 +12,8 @@ namespace MultiCommandConsole
 {
     internal class ConsoleCommandRepository : IConsoleCommandRepository
     {
-	    private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
+        private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
+        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<ConsoleCommandRepository>();
 
         internal readonly Dictionary<string, ConsoleCommandInfo> CommandsByName = new Dictionary<string, ConsoleCommandInfo>(StringComparer.OrdinalIgnoreCase);
         internal readonly Dictionary<Type, ConsoleCommandInfo> CommandsByType = new Dictionary<Type, ConsoleCommandInfo>();
@@ -255,13 +256,13 @@ namespace MultiCommandConsole
 
 			}
 
-			Config.ConsoleWriter.WriteLine("Unknown command: " + commandName);
+			Writer.WriteLine("Unknown command: " + commandName);
 			return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 		}
 
         private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, List<ISetupAndCleanup> setterUppers, object obj, Dictionary<Arg, object> commandArgs)
 		{
-            obj.SetServiceOnPropertyOrField(Config.ConsoleWriter);
+            obj.SetServiceOnPropertyOrField(Writer);
 
             var options = ArgsHelper.GetOptions(obj.GetType()).ToList();
 

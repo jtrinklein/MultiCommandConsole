@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common.Logging;
@@ -7,7 +8,12 @@ namespace MultiCommandConsole.Util
 {
     public class LoggingConsoleWriter : IConsoleWriter
     {
-        private static readonly ILog Log = LogManager.GetLogger<LoggingConsoleWriter>();
+        private readonly ILog Log;
+
+        public LoggingConsoleWriter(Type type)
+        {
+            Log = LogManager.GetLogger(type);
+        }
 
         public void WriteErrorLine(object obj)
         {
