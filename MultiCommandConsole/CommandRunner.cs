@@ -25,12 +25,12 @@ namespace MultiCommandConsole
             _consoleCommandRepository = consoleCommandRepository;
         }
 
-        public void Run(string[] args)
+        public void Run(string[] args, Stoplight stoplight = null)
         {
             _commandLoaded = new ManualResetEvent(false);
-            _stoplight = new Stoplight();
+            _stoplight = stoplight ?? new Stoplight();
 
-            new Thread(() => Run(args, _stoplight)).Start();
+            new Thread(() => RunOnThread(args, _stoplight)).Start();
 
             _commandLoaded.WaitOne();
             if (Environment.UserInteractive)
@@ -39,10 +39,6 @@ namespace MultiCommandConsole
                     _stoplight,
                     CanBeStopped, CanBePaused,
                     Stop, Pause, Resume);
-            }
-            else
-            {
-                _stoplight.Token.WaitHandle.WaitOne();
             }
         }
 
@@ -96,7 +92,7 @@ namespace MultiCommandConsole
             }
         }
 
-        public void Run(string[] args, Stoplight stoplight)
+        private void RunOnThread(string[] args, Stoplight stoplight)
         {
             DateTime started = Config.NowDelegate();
             var stopwatch = Stopwatch.StartNew();
@@ -114,6 +110,7 @@ namespace MultiCommandConsole
 
             if (Config.ConsoleMode.OnBeginRunCommand != null)
             {
+                Log.Info("call OnBeginRunCommand");
                 Config.ConsoleMode.OnBeginRunCommand();
             }
 
@@ -121,7 +118,7 @@ namespace MultiCommandConsole
             _runData = _consoleCommandRepository.LoadCommand(args);
             if (_runData.Errors.Any())
             {
-                var writer = new ConsoleWriter();
+                var writer = Config.ConsoleWriter;
                 foreach (var error in _runData.Errors)
                 {
                     writer.WriteLines("", "!!!", error, "");
@@ -131,10 +128,12 @@ namespace MultiCommandConsole
             _runData.Command.SetServiceOnPropertyOrField((IStoplight)stoplight);
 
             _commandLoaded.Set();
+            Log.Info("command loaded");
 
             //TODO: exclude console command
             if (CanBeStopped)
             {
+                Log.Info("CanBeStopped: subscribe unhandled exceptions and cancel key press");
                 AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
                 Console.CancelKeyPress += OnCancelKeyPress;
             }
@@ -143,12 +142,14 @@ namespace MultiCommandConsole
 
             if (CanBeStopped)
             {
+                Log.Info("CanBeStopped: unsubscribe unhandled exceptions and cancel key press");
                 Console.CancelKeyPress -= OnCancelKeyPress;
                 AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
             }
 
             if (Config.ConsoleMode.OnEndRunCommand != null)
             {
+                Log.Info("call OnEndRunCommand");
                 Config.ConsoleMode.OnEndRunCommand();
             }
 
@@ -164,10 +165,15 @@ namespace MultiCommandConsole
         {
             try
             {
-                runData.SetterUppers.ForEach(su => su.Setup());
+                runData.SetterUppers.ForEach(su =>
+                    {
+                        Log.InfoFormat("{0}.Setup()", su.GetType().Name);
+                        su.Setup();
+                    });
 
                 try
                 {
+                    Log.InfoFormat("{0}.Run()", runData.Command.GetType().Name);
                     runData.Command.Run();
                 }
                 finally
@@ -177,6 +183,7 @@ namespace MultiCommandConsole
                         {
                             try
                             {
+                                Log.InfoFormat("{0}.Cleanup()", su.GetType().Name);
                                 su.Cleanup();
                             }
                             catch (Exception e)

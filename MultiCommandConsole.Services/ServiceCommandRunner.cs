@@ -1,11 +1,18 @@
-﻿using System.ServiceProcess;
+﻿using System;
+using System.IO;
+using System.ServiceProcess;
+using Common.Logging;
 using MultiCommandConsole.Util;
+using ObjectPrinter;
 
 namespace MultiCommandConsole.Services
 {
     public class ServiceCommandRunner : ServiceBase, ICommandRunner
     {
+        private static readonly ILog Log = LogManager.GetLogger<ServiceCommandRunner>();
+
         private readonly ICommandRunner _innerRunner;
+        private Stoplight _stoplight;
 
         public ServiceCommandRunner(ICommandRunner innerRunner)
         {
@@ -16,10 +23,18 @@ namespace MultiCommandConsole.Services
         {
             //args will be empty when running as a service
 
-            var currentService = new ServicesRepository().GetCurrent();
-            _innerRunner.Run(currentService.CommandLine.SplitCmdLineArgs());
-            CanStop = _innerRunner.CanBeStopped;
-            CanPauseAndContinue = _innerRunner.CanBePaused;
+            try
+            {
+                var currentService = new ServicesRepository().GetCurrent();
+                _innerRunner.Run(currentService.CommandLine.SplitCmdLineArgs(), _stoplight);
+                Log.Debug("OnStart completed");
+            }
+            catch (Exception e)
+            {
+                e.SetContext("args", args);
+                Log.Error(e);
+                throw;
+            }
         }
 
         protected override void OnStop()
@@ -37,9 +52,20 @@ namespace MultiCommandConsole.Services
             _innerRunner.Resume();
         }
 
-        void ICommandRunner.Run(string[] args)
+        void ICommandRunner.Run(string[] args, Stoplight stoplight)
         {
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+
+            _stoplight = stoplight ?? new Stoplight();
+
+            //TODO: figure out how to load the service config before the service is running.
+            //      CanStop and CanPauseAndContinue can only be set before the service starts
+            //      but we can't get the current service until there's a process id.  ARG!!!!
+            CanStop = true;
+
             Run(this);
+
+            Log.Debug("Run(this) completed");
         }
 
         void ICommandRunner.Stop()

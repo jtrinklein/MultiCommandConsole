@@ -29,7 +29,6 @@ namespace MultiCommandConsole.Example
             Services.Config.Defaults.CommandLine = "ping /s=google.com /i=10";
             Services.Config.EnableServiceMode();
 
-
 		    try
 		    {
 		        new Engine(new[]

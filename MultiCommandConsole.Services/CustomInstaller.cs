@@ -31,6 +31,11 @@ namespace MultiCommandConsole.Services
             {
                 MultiCommandConsole.Config.ConsoleWriter.WriteLine("{0}={1}", key, Context.Parameters[key]);
             }
+
+            if (_service.StartMode == ServiceStartMode.Automatic)
+            {
+                Committed += (sender, args) => new ServiceController(service.ServiceName).Start();
+            }
         }
 
         protected override void OnBeforeInstall(System.Collections.IDictionary savedState)
