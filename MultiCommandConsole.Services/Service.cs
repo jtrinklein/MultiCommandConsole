@@ -24,8 +24,6 @@ namespace MultiCommandConsole.Services
             set
             {
                 var parts = value.Split(new[] {"\n>>>"}, StringSplitOptions.RemoveEmptyEntries);
-                Log.DebugFormat("Description={0}", Description);
-                Log.DebugFormat("CommandLine={0}", CommandLine);
                 if (parts.Length > 0)
                 {
                     Description = parts[0];
@@ -34,6 +32,8 @@ namespace MultiCommandConsole.Services
                 {
                     CommandLine = parts[1];
                 }
+                Log.DebugFormat("Description={0}", Description);
+                Log.DebugFormat("CommandLine={0}", CommandLine);
             }
         }
 

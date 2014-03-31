@@ -27,9 +27,9 @@ namespace MultiCommandConsole.Services
         public Service GetByProcessId(int processId)
         {
             //http://stackoverflow.com/questions/1841790/how-can-a-windows-service-determine-its-servicename
-            //String query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
-            //return new ManagementObjectSearcher(query).Get().Cast<ManagementObject>().Select(Map).First();
-            return All().First(s => s.ProcessId == processId);
+            String query = "SELECT * FROM Win32_Service where ProcessId = " + processId;
+            Log.Debug(query);
+            return new ManagementObjectSearcher(query).Get().Cast<ManagementObject>().Select(Map).First();
         }
 
         public IEnumerable<Service> All()
