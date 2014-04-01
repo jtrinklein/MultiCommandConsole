@@ -25,7 +25,11 @@ namespace MultiCommandConsole.Util
                     var key = Console.ReadKey(true);
                     if (isPaused)
                     {
-                        if (key.Key == ConsoleKey.R)
+                        if (key.Key == ConsoleKey.S)
+                        {
+                            onStop();
+                        } 
+                        else if (key.Key == ConsoleKey.R)
                         {
                             onResume();
                             isPaused = false;
