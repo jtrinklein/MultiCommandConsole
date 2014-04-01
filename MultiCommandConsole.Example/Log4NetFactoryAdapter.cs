@@ -5,7 +5,13 @@ using Common.Logging;
 
 namespace MultiCommandConsole.Example
 {
-    internal class Log4NetFactoryAdapter : ILoggerFactoryAdapter
+    /// <summary>
+    /// Uses config file to configure Log4Net.  
+    /// Reads from local log4net.config file first, 
+    /// then any specified assembly config, 
+    /// then the entry assembly config.
+    /// </summary>
+    public class Log4NetFactoryAdapter : ILoggerFactoryAdapter
     {
         public static Log4NetFactoryAdapter Load()
         {

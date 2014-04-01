@@ -11,9 +11,11 @@ del nuget\. /Q
 ECHO.
 
 SET NUGET=.nuget\nuget.exe
-SET OP=MultiCommandConsole\MultiCommandConsole.csproj
+SET MCC=MultiCommandConsole\MultiCommandConsole.csproj
+SET MCCS=MultiCommandConsole.Services\MultiCommandConsole.Services.csproj
 
-%NUGET% pack %OP% -OutputDirectory nuget -Prop Configuration=Release
+%NUGET% pack %MCC% -OutputDirectory nuget -Prop Configuration=Release
+%NUGET% pack %MCCS% -OutputDirectory nuget -Prop Configuration=Release
 
 ECHO.
 ECHO ending with:

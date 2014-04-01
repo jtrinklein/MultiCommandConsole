@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>MultiCommandConsole.Services</id>
+		<version>$version$</version>
+		<title>MultiCommandConsole.Services</title>
+		<authors>Drew Burlingame</authors>
+		<owners>Drew Burlingame</owners>
+		<projectUrl>https://github.com/drewburlingame/MultiCommandConsole</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<summary>
+			Enables MultiCommandConsole commands to be run as services
+		</summary>
+		<description>
+      Enables MultiCommandConsole commands to be run as services
+    </description>
+		<tags>.net console service</tags>
+		<releaseNotes>
+		</releaseNotes>
+	</metadata>
+</package>
