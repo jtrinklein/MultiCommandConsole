@@ -72,7 +72,7 @@ namespace MultiCommandConsole
 		/// If true, an additional command will be displayed to allow the user to see how the text they 
 		/// enter is converted into arguments.  Useful when arguments need to escape quotes.
 		/// </summary>
-		public static bool ShowVierArgsCommand { get; set; }
+		public static bool ShowViewArgsCommand { get; set; }
 
 		/// <summary>
 		/// In a standard dos console, Escape clears the current line. 
@@ -94,7 +94,7 @@ namespace MultiCommandConsole
 
 	    static Config()
 		{
-			ShowVierArgsCommand = false;
+			ShowViewArgsCommand = false;
 		    ResolveTypeDelegate = Activator.CreateInstance;
 
             ConsoleMode.CommandPromptText = "$";

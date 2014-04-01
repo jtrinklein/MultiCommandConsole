@@ -26,7 +26,7 @@ namespace MultiCommandConsole.Example
 			Config.ConsoleMode.CommandPromptText = "console";
 		    Config.ConsoleMode.HistorySize = 5;
 		    Config.ConsoleMode.AppName = "example_console";
-			Config.ShowVierArgsCommand = true;
+			Config.ShowViewArgsCommand = true;
 		    //Config.DefaultCommand = typeof (RepeatConsoleCommand);
 
             Services.Config.Defaults.CommandLine = "ping /s=google.com /i=10";

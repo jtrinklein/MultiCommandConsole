@@ -46,7 +46,7 @@ namespace MultiCommandConsole
 			{
 				AddCommand(BuildCommandInfo(ConsoleCommand = new ConsoleCommand()));
 			}
-			if (Config.ShowVierArgsCommand)
+			if (Config.ShowViewArgsCommand)
 			{
 				AddCommand(BuildCommandInfo(new ViewArgsCommand()));
 			}
