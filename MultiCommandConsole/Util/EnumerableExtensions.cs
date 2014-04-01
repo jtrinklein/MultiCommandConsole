@@ -20,9 +20,8 @@ namespace MultiCommandConsole.Util
 			foreach (var item in enumerable)
 			{
 				action(item);
+			    yield return item;
 			}
-
-			return enumerable;
 		}
 
         public static T SafeFromIndex<T>(this IList<T> items, int index)
