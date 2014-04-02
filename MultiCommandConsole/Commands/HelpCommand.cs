@@ -66,6 +66,12 @@ namespace MultiCommandConsole.Commands
 			}
 		}
 
+        private class CommandWithCategory
+        {
+            public string Category { get; set; }
+            public ConsoleCommandInfo CommandInfo { get; set; }
+        }
+
 	    private void PrintHelp4CommandList()
         {
 	        Writer.WriteLines(
@@ -76,9 +82,24 @@ namespace MultiCommandConsole.Commands
 
 	        Writer.WriteTable(
 	            null,
-	            _commands.OrderBy(c => c.Attribute.FirstPrototype).Select(ToTableRow),
+	            _commands.Select(c => new CommandWithCategory {CommandInfo = c, Category = GetCategory(c)})
+	                     .GroupBy(c => c.Category)
+	                     .OrderBy(c => c.Key)
+	                     .SelectMany(g =>
+	                                 CategoryToTableRows(g.Key)
+	                                     .Union(
+	                                         g.Select(c => c.CommandInfo)
+	                                          .OrderBy(c => c.Attribute.FirstPrototype)
+	                                          .Select(CommandToTableRow))),
 	            _tableFormat);
         }
+
+	    private static string GetCategory(ConsoleCommandInfo c)
+	    {
+	        return Config.Help.GetCategoryDelegate == null 
+                ? null 
+                : Config.Help.GetCategoryDelegate(c.Attribute.FirstPrototype, c.CommandType);
+	    }
 
 	    private void PrintHelp4SingleCommand()
         {
@@ -92,18 +113,35 @@ namespace MultiCommandConsole.Commands
 	            _tableFormat);
         }
 
-        private static string[] ToTableRow(ConsoleCommandInfo c)
+        private static IEnumerable<string[]> CategoryToTableRows(string category)
         {
+            if (category.IsNullOrEmpty())
+            {
+                return Enumerable.Empty<string[]>();
+            }
             return new[]
-	            {
-	                c.Attribute.FirstPrototype,
-	                c.Attribute.PrototypeArray.Length > 1
-	                    ? FormatShortNames(c.Attribute.PrototypeArray) + c.Attribute.Descripion
-	                    : c.Attribute.Descripion
-	            };
+                {
+                    new[] {""}, 
+                    new[] {category}
+                };
         }
 
-        private string[] ToTableRow(ArgHelpInfo arg)
+        private static string[] CommandToTableRow(ConsoleCommandInfo c)
+        {
+            var lines = new[]
+                {
+                    c.Attribute.FirstPrototype,
+                    c.Attribute.PrototypeArray.Length > 1
+                        ? FormatShortNames(c.Attribute.PrototypeArray) + c.Attribute.Descripion
+                        : c.Attribute.Descripion
+                };
+            return Config.Help.GetAddlHelpDelegate == null
+                       ? lines
+                       : lines.Union(Config.Help.GetAddlHelpDelegate(c.Attribute.FirstPrototype, c.CommandType))
+                              .ToArray();
+        }
+
+	    private string[] ToTableRow(ArgHelpInfo arg)
         {
             var sb = new StringBuilder();
             if (!arg.OtherPrototypes.IsNullOrEmpty())

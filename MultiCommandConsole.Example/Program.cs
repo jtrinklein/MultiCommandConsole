@@ -28,6 +28,18 @@ namespace MultiCommandConsole.Example
 		    Config.ConsoleMode.AppName = "example_console";
 			Config.ShowViewArgsCommand = true;
 		    //Config.DefaultCommand = typeof (RepeatConsoleCommand);
+		    Config.Help.GetCategoryDelegate = (s, type) =>
+		        {
+		            if (s.EndsWith("-service"))
+		            {
+		                return " - service -";
+		            }
+                    if (type.Assembly == typeof (Program).Assembly)
+                    {
+                        return " - example -";
+                    }
+		            return "";
+		        };
 
             Services.Config.Defaults.CommandLine = "ping /s=google.com /i=10";
             Services.Config.EnableServiceMode();

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MultiCommandConsole.Commands;
 using MultiCommandConsole.Util;
 
@@ -42,6 +43,20 @@ namespace MultiCommandConsole
             /// <hint>This is where you should cleanup any DI container lifecycles</hint>.
             /// </summary>
             public static Action OnEndRunCommand { get; set; }
+        }
+
+        public static class Help
+        {
+            /// <summary>
+            /// Allows specifying a category for a command.  
+            /// The first prototype argument and the type will be returned.
+            /// </summary>
+            public static Func<string, Type, string> GetCategoryDelegate { get; set; }
+
+            /// <summary>
+            /// Allows specifying additional help lines for a command
+            /// </summary>
+            public static Func<string, Type, IEnumerable<string>> GetAddlHelpDelegate { get; set; }
         }
 
 	    private static Type _defaultCommand = typeof(HelpCommand);
@@ -90,7 +105,12 @@ namespace MultiCommandConsole
             set { _nowDelegate = value ?? (() => DateTime.Now); }
         }
 
-        public static Func<IConsoleCommandRepository, ICommandRunner> GetRunnerDelegate { get; set; } 
+        /// <summary>
+        /// Delegate to return a CommandRunner.  
+        /// Defaults to using CommandRunner.  
+        /// When ServiceMode is enabled, uses a ServiceBase runner.
+        /// </summary>
+        public static Func<IConsoleCommandRepository, ICommandRunner> GetRunnerDelegate { get; set; }
 
 	    static Config()
 		{
