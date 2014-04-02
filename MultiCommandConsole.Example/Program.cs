@@ -39,7 +39,8 @@ namespace MultiCommandConsole.Example
                         return " - example -";
                     }
 		            return "";
-		        };
+                };
+            Config.Help.GetAddlHelpDelegate = (s, type) => new[] { type.FullName };
 
             Services.Config.Defaults.CommandLine = "ping /s=google.com /i=10";
             Services.Config.EnableServiceMode();

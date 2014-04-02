@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -88,57 +89,64 @@ namespace MultiCommandConsole.Commands
 	                     .SelectMany(g =>
 	                                 CategoryToTableRows(g.Key)
 	                                     .Union(
-	                                         g.Select(c => c.CommandInfo)
-	                                          .OrderBy(c => c.Attribute.FirstPrototype)
-	                                          .Select(CommandToTableRow))),
+	                                         CommandsToTableRows(g))),
 	            _tableFormat);
         }
 
-	    private static string GetCategory(ConsoleCommandInfo c)
-	    {
-	        return Config.Help.GetCategoryDelegate == null 
-                ? null 
-                : Config.Help.GetCategoryDelegate(c.Attribute.FirstPrototype, c.CommandType);
-	    }
-
-	    private void PrintHelp4SingleCommand()
+        private static string GetCategory(ConsoleCommandInfo c)
         {
-	        Writer.WriteLines(
-	           _command.Attribute.FirstPrototype + " " + FormatShortNames(_command.Attribute.PrototypeArray.Skip(1)),
-	            _instance.GetDetailedHelp() ?? string.Empty);
-
-	        Writer.WriteTable(
-	            null,
-	            ToArgHelpInfo(_command.CommandType, _instance).Distinct().Select(ToTableRow),
-	            _tableFormat);
+            return Config.Help.GetCategoryDelegate == null
+                ? null
+                : Config.Help.GetCategoryDelegate(c.Attribute.FirstPrototype, c.CommandType);
         }
 
         private static IEnumerable<string[]> CategoryToTableRows(string category)
         {
-            if (category.IsNullOrEmpty())
-            {
-                return Enumerable.Empty<string[]>();
-            }
-            return new[]
-                {
-                    new[] {""}, 
-                    new[] {category}
-                };
+            return category.IsNullOrEmpty()
+                       ? Enumerable.Empty<string[]>()
+                       : new[]
+                           {
+                               new[] {""},
+                               new[] {category}
+                           };
         }
+
+	    private static IEnumerable<string[]> CommandsToTableRows(IEnumerable<CommandWithCategory> commands)
+	    {
+	        return commands.Select(c => c.CommandInfo)
+	                       .OrderBy(c => c.Attribute.FirstPrototype)
+	                       .Select(CommandToTableRow);
+	    }
 
         private static string[] CommandToTableRow(ConsoleCommandInfo c)
         {
-            var lines = new[]
+            var helpPrefix = c.Attribute.PrototypeArray.Length > 1
+                                 ? FormatShortNames(c.Attribute.PrototypeArray)
+                                 : null;
+
+            var addHelpLines = Config.Help.GetAddlHelpDelegate == null
+                                   ? null
+                                   : Environment.NewLine +
+                                   string.Join(Environment.NewLine,
+                                                 Config.Help.GetAddlHelpDelegate(c.Attribute.FirstPrototype, c.CommandType));
+
+            return new[]
                 {
                     c.Attribute.FirstPrototype,
-                    c.Attribute.PrototypeArray.Length > 1
-                        ? FormatShortNames(c.Attribute.PrototypeArray) + c.Attribute.Descripion
-                        : c.Attribute.Descripion
+                    helpPrefix + c.Attribute.Descripion + addHelpLines
                 };
-            return Config.Help.GetAddlHelpDelegate == null
-                       ? lines
-                       : lines.Union(Config.Help.GetAddlHelpDelegate(c.Attribute.FirstPrototype, c.CommandType))
-                              .ToArray();
+        }
+
+        private void PrintHelp4SingleCommand()
+        {
+            Writer.WriteLines(
+               _command.Attribute.FirstPrototype + " " + FormatShortNames(_command.Attribute.PrototypeArray.Skip(1)),
+                _instance.GetDetailedHelp() ?? string.Empty);
+
+            Writer.WriteTable(
+                null,
+                ToArgHelpInfo(_command.CommandType, _instance).Distinct().Select(ToTableRow),
+                _tableFormat);
         }
 
 	    private string[] ToTableRow(ArgHelpInfo arg)
