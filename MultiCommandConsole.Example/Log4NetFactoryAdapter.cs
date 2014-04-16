@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Common.Logging;
 
@@ -21,17 +22,21 @@ namespace MultiCommandConsole.Example
 
         private static FileInfo GetLogFileInfo(Assembly assembly = null)
         {
-            if (File.Exists("log4net.config"))
+            assembly = assembly ?? Assembly.GetEntryAssembly();
+
+            var paths = new[]
+                {
+                    Path.GetDirectoryName(assembly.Location) + "\\log4net.config",
+                    assembly.Location + ".config"
+                };
+
+            var config = paths.FirstOrDefault(File.Exists);
+            if (config == null)
             {
-                return new FileInfo("log4net.config");
+                throw new FileNotFoundException("Unable to locate log4net configs. tried:" + string.Join(",", paths));
             }
 
-            var appConfig = (assembly ?? Assembly.GetEntryAssembly()).Location + ".config";
-            if (File.Exists(appConfig))
-            {
-                return new FileInfo(appConfig);
-            }
-            throw new FileNotFoundException("Unable to locate log4net configs at log4net.config or " + appConfig);
+            return new FileInfo(config);
         }
 
         public ILog GetLogger(Type type)
