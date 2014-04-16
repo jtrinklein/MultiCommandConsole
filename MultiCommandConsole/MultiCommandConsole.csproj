@@ -69,6 +69,7 @@
     <Compile Include="IConsoleCommandRepository.cs" />
     <Compile Include="IStoplight.cs" />
     <Compile Include="Stoplight.cs" />
+    <Compile Include="Util\Assemblies.cs" />
     <Compile Include="Util\ConsoleReader.cs" />
     <Compile Include="ConsoleCommandAttribute.cs" />
     <Compile Include="ConsoleCommandInfo.cs" />

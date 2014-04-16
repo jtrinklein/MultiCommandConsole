@@ -32,5 +32,10 @@ namespace MultiCommandConsole.Util
         {
             return items.Length > index ? items[index] : default(T);
         }
+
+        internal static HashSet<T> ToSet<T>(this IEnumerable<T> enumerable)
+        {
+            return new HashSet<T>(enumerable);
+        } 
 	}
 }
