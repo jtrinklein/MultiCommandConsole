@@ -149,13 +149,27 @@ namespace MultiCommandConsole
             if (Config.ConsoleMode.OnEndRunCommand != null)
             {
                 Log.Info("call OnEndRunCommand");
-                Config.ConsoleMode.OnEndRunCommand();
+                Config.ConsoleMode.OnEndRunCommand(new RunTime
+                    {
+                        Elapsed = stopwatch.Elapsed,
+                        StartedOn = started,
+                        EndedOn = Config.NowDelegate()
+                    });
             }
 
-            Log.InfoFormat("Command execution took:{0} started:{1} ended:{2}",
-                           stopwatch.Elapsed,
-                           started.ToString("hh:mm:ss"),
-                           Config.NowDelegate().ToString("hh:mm:ss"));
+            var runTimeMsg = string.Format("Command execution took:{0} started:{1} ended:{2}",
+                                           stopwatch.Elapsed,
+                                           started.ToString("hh:mm:ss"),
+                                           Config.NowDelegate().ToString("hh:mm:ss"));
+
+            if (Config.ConsoleMode.WriteRunTimeToConsole)
+            {
+                Writer.WriteLine(runTimeMsg);
+            }
+            else
+            {
+                Log.InfoFormat(runTimeMsg);
+            }
 
             stoplight.Stop();
         }
@@ -215,8 +229,6 @@ namespace MultiCommandConsole
             }
         }
 
-
-
         private void OnUnhandledException(object sender, UnhandledExceptionEventArgs eventArgs)
         {
             if (eventArgs.IsTerminating)
@@ -235,5 +247,12 @@ namespace MultiCommandConsole
             e.Cancel = true;
             Stop();
         }
+    }
+
+    public class RunTime
+    {
+        public DateTime StartedOn { get; set; }
+        public DateTime EndedOn { get; set; }
+        public TimeSpan Elapsed { get; set; }
     }
 }
