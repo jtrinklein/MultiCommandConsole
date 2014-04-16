@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Common.Logging;
+using MultiCommandConsole.Commands;
 using MultiCommandConsole.Util;
 using ObjectPrinter;
 
@@ -181,13 +182,17 @@ namespace MultiCommandConsole
                                            started.ToString("hh:mm:ss"),
                                            Config.NowDelegate().ToString("hh:mm:ss"));
 
-            if (Config.WriteRunTimeToConsole)
+            if (!(_runData.Command is HelpCommand) 
+                && !(_runData.Command is ViewArgsCommand))
             {
-                Writer.WriteLine(runTimeMsg);
-            }
-            else
-            {
-                Log.InfoFormat(runTimeMsg);
+                if (Config.WriteRunTimeToConsole)
+                {
+                    Writer.WriteLine(runTimeMsg);
+                }
+                else
+                {
+                    Log.InfoFormat(runTimeMsg);
+                }
             }
 
             stoplight.Stop();
