@@ -47,7 +47,7 @@ namespace MultiCommandConsole.Commands
 			using (CommandsOptions.HideCommandOfType<ConsoleCommand>())
 			{
 			    Writer.WriteLines(
-			        "Type \"quit\" to exit.",
+			        "Type ctrl+c to exit.",
 			        "Type \"cls\" to clear the console window.",
 			        "Type \"> filename\" to redirect output to a file.");
 				
@@ -59,11 +59,7 @@ namespace MultiCommandConsole.Commands
 						args = le.Edit(Config.ConsoleMode.CommandPromptText +  "> ", string.Empty).SplitCmdLineArgs();
 					} while (args.IsNullOrEmpty());
 
-					if (args[0].Equals("quit", StringComparison.OrdinalIgnoreCase))
-					{
-						le.SaveHistory();
-					}
-					else if (args[0].Equals("cls", StringComparison.OrdinalIgnoreCase))
+					if (args[0].Equals("cls", StringComparison.OrdinalIgnoreCase))
 					{
 						Console.Clear();
 					}
