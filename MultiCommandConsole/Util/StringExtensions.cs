@@ -90,7 +90,7 @@ namespace MultiCommandConsole.Util
                 yield break;
             }
 
-	        var lines = text.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+	        var lines = text.Split(new[] {Environment.NewLine, "\n", "\r"}, StringSplitOptions.None);
 
 	        foreach (var line in lines)
 	        {

@@ -12,7 +12,14 @@ namespace MultiCommandConsole.Example
 		public LogOptions LogOptions { get; set; }
 
 		[Arg("required", "this arg is required", Required = true)]
-		public string RequiredArg { get; set; }
+        public string RequiredArg { get; set; }
+
+        [Arg("superComment", 
+            "this arg has some detailed comments" +
+            "\r NOTE:" +
+            "\r - this arg has formatting", 
+            Required = true)]
+        public string SuperComments { get; set; }
 
 		public IEnumerable<string> GetArgValidationErrors()
 		{
