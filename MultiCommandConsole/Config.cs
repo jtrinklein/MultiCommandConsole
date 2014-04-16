@@ -48,11 +48,6 @@ namespace MultiCommandConsole
             /// <hint>This is where you should cleanup any DI container lifecycles</hint>.
             /// </summary>
             public static Action<RunTime> OnEndRunCommand { get; set; }
-
-            /// <summary>
-            /// When true, the start and stop times as well as the run time will be output to console
-            /// </summary>
-            public static bool WriteRunTimeToConsole { get; set; }
         }
 
         public static class Help
@@ -80,6 +75,11 @@ namespace MultiCommandConsole
 	        get { return _defaultCommand; }
 	        set { _defaultCommand = value ?? typeof(HelpCommand); }
 	    }
+
+        /// <summary>
+        /// When true, the start and stop times as well as the run time will be output to console
+        /// </summary>
+        public static bool WriteRunTimeToConsole { get; set; }
 
         /// <summary>
         /// The console writer used to write messages for the console window 

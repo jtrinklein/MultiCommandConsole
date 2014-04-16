@@ -181,7 +181,7 @@ namespace MultiCommandConsole
                                            started.ToString("hh:mm:ss"),
                                            Config.NowDelegate().ToString("hh:mm:ss"));
 
-            if (Config.ConsoleMode.WriteRunTimeToConsole)
+            if (Config.WriteRunTimeToConsole)
             {
                 Writer.WriteLine(runTimeMsg);
             }

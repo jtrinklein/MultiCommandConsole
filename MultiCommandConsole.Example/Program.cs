@@ -27,6 +27,7 @@ namespace MultiCommandConsole.Example
 		    Config.ConsoleMode.HistorySize = 5;
 		    Config.ConsoleMode.AppName = "example_console";
 			Config.ShowViewArgsCommand = true;
+		    Config.WriteRunTimeToConsole = true;
 		    //Config.DefaultCommand = typeof (RepeatConsoleCommand);
 		    Config.Help.GetCategoryDelegate = (s, type) =>
 		        {
