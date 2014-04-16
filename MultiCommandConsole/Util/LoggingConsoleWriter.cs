@@ -25,7 +25,7 @@ namespace MultiCommandConsole.Util
             Log.ErrorFormat(format, args);
         }
 
-        public void WriteLine(object obj)
+        public void WriteLine(object obj = null)
         {
             Log.Info(obj);
         }

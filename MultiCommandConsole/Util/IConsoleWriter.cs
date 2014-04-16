@@ -6,7 +6,7 @@ namespace MultiCommandConsole.Util
     {
         void WriteErrorLine(object obj);
         void WriteErrorLine(string format, params object[] args);
-        void WriteLine(object obj);
+        void WriteLine(object obj = null);
         void WriteLine(string format, params object[] args);
         void WriteLines(params string[] lines);
         void WriteTable(string[] headers, IEnumerable<string[]> rows, TableFormat tableFormat = null);

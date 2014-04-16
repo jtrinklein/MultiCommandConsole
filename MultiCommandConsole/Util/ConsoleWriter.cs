@@ -51,13 +51,16 @@ namespace MultiCommandConsole.Util
             WriteLine(_errorWriter, format, args);
         }
 
-        public void WriteLine(object obj)
+        public void WriteLine(object obj = null)
         {
             if (obj == null)
             {
-                return;
+                _writer.WriteLine();
             }
-            WriteLine(obj.ToString());
+            else
+            {
+                WriteLine(obj.ToString());
+            }
         }
 
         public void WriteLine(string format, params object[] args)
