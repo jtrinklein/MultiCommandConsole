@@ -108,42 +108,61 @@ namespace MultiCommandConsole
                 }
             }
 
-            if (Config.ConsoleMode.OnBeginRunCommand != null)
+            IDisposable cleanup = null;
+            if (Config.ConsoleMode.OnWrapRunCommand != null)
             {
-                Log.Info("call OnBeginRunCommand");
-                Config.ConsoleMode.OnBeginRunCommand();
+                Log.Info("call OnWrapRunCommand");
+                cleanup = Config.ConsoleMode.OnWrapRunCommand();
             }
 
-            //load command after OnBeginRunCommand to let DI containers be configured
-            _runData = _consoleCommandRepository.LoadCommand(args);
-            if (_runData.Errors.Any())
+            try
             {
-                foreach (var error in _runData.Errors)
+//load command after OnWrapRunCommand to let DI containers be configured
+                _runData = _consoleCommandRepository.LoadCommand(args);
+
+                if (Config.ConsoleMode.OnBeginRunCommand != null)
                 {
-                    Writer.WriteLines("", "!!!", error, "");
+                    Log.Info("call OnBeginRunCommand");
+                    Config.ConsoleMode.OnBeginRunCommand(_runData.Command);
+                }
+
+                if (_runData.Errors.Any())
+                {
+                    foreach (var error in _runData.Errors)
+                    {
+                        Writer.WriteLines("", "!!!", error, "");
+                    }
+                }
+
+                _runData.Command.SetServiceOnPropertyOrField((IStoplight)stoplight);
+
+                _commandLoaded.Set();
+                Log.Info("command loaded");
+
+                //TODO: exclude console command
+                if (CanBeStopped)
+                {
+                    Log.Info("CanBeStopped: subscribe unhandled exceptions and cancel key press");
+                    AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+                    Console.CancelKeyPress += OnCancelKeyPress;
+                }
+
+                RunSafely(_runData);
+
+                if (CanBeStopped)
+                {
+                    Log.Info("CanBeStopped: unsubscribe unhandled exceptions and cancel key press");
+                    Console.CancelKeyPress -= OnCancelKeyPress;
+                    AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
                 }
             }
-
-            _runData.Command.SetServiceOnPropertyOrField((IStoplight)stoplight);
-
-            _commandLoaded.Set();
-            Log.Info("command loaded");
-
-            //TODO: exclude console command
-            if (CanBeStopped)
+            finally
             {
-                Log.Info("CanBeStopped: subscribe unhandled exceptions and cancel key press");
-                AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-                Console.CancelKeyPress += OnCancelKeyPress;
-            }
-
-            RunSafely(_runData);
-
-            if (CanBeStopped)
-            {
-                Log.Info("CanBeStopped: unsubscribe unhandled exceptions and cancel key press");
-                Console.CancelKeyPress -= OnCancelKeyPress;
-                AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
+                if (cleanup != null)
+                {
+                    Log.Info("dispose OnWrapRunCommand");
+                    cleanup.Dispose();
+                } 
             }
 
             if (Config.ConsoleMode.OnEndRunCommand != null)

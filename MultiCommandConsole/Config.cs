@@ -33,10 +33,15 @@ namespace MultiCommandConsole
             public static Func<string[], string[]> ArgumentsInterceptor { get; set; }
 
             /// <summary>
-            /// Indicates a command is about to be run.  
+            /// Provides a way to setup an environment before a command is run and cleanup after.
             /// <hint>This is where you should setup any DI container lifecycles</hint>.
             /// </summary>
-            public static Action OnBeginRunCommand { get; set; }
+            public static Func<IDisposable> OnWrapRunCommand { get; set; }
+
+            /// <summary>
+            /// Indicates a command is about to be run.
+            /// </summary>
+            public static Action<IConsoleCommand> OnBeginRunCommand { get; set; }
 
             /// <summary>
             /// Indicates a command has finished running.  
