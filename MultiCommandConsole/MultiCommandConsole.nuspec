@@ -12,7 +12,12 @@
 			Framework for creating console apps with multiple commands
 		</summary>
 		<description>
-			Framework for creating console apps with multiple commands
+      Framework for creating console apps with multiple commands
+
+      IoC Registration:
+      register all types where 
+      - type.IsAssignableTo&lt;IConsoleCommand&gt;()
+      - type.HasCustomAttribute&lt;ArgSetAttribute&gt;()
 		</description>
 		<references>
 			<reference file="MultiCommandConsole.dll" />
@@ -21,7 +26,7 @@
 		<releaseNotes>
 			Initial release.  
 			- This has been in a production system for nearly 2 years and has made composing our console apps with multiple commands and shared options a breeze.
-			- Uses NDesk and Mono for interfacing with the command line.  We have some oddities with history and escape keys with the Mono code, but it's never been painful for us address... but almost.
+			- Uses NDesk and Mono for interfacing with the command line.  We have some oddities with history and escape keys with the Mono code, but it's never been painful enough for us address... but almost.
 			- Accepting Pull Requests
 		</releaseNotes>
 	</metadata>
