@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using ObjectPrinter;
@@ -89,7 +90,7 @@ namespace Mono.Options
 			try
 			{
 			    // KeyedCollection.InsertItem/SetItem handle the 0th name.
-			    foreach (var name in option.Names)
+			    foreach (var name in option.Names.Skip(1))
 			    {
 			        currentName = name;
 			        Dictionary.Add(name, option);
