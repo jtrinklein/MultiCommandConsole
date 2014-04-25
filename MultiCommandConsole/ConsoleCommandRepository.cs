@@ -192,11 +192,14 @@ namespace MultiCommandConsole
 			{
 				if (info.CommandType == typeof(HelpCommand))
 				{
-					if (args.Length > 1)
+                    ConsoleCommandInfo infoForHelp;
+					if (args.Length > 1 
+                        && CommandsByName.TryGetValue(args[1].TrimStart(optionPrefixes), out infoForHelp))
 					{
-						return LoadCommand(new[]{args[1], "/" + commandName});
+					    var instance = (IConsoleCommand) infoForHelp.CommandType.Resolve();
+					    return new CommandRunData { Command = HelpCommand.ForCommand(infoForHelp, instance) };
 					}
-					return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
+				    return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 				}
 
 				IConsoleCommand command;

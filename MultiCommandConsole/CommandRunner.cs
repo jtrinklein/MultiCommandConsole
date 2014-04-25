@@ -118,7 +118,7 @@ namespace MultiCommandConsole
 
             try
             {
-//load command after OnWrapRunCommand to let DI containers be configured
+                //load command after OnWrapRunCommand to let DI containers be configured
                 _runData = _consoleCommandRepository.LoadCommand(args);
 
                 if (Config.ConsoleMode.OnBeginRunCommand != null)
