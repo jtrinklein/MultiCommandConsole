@@ -4,7 +4,7 @@ using MultiCommandConsole.Services;
 
 namespace MultiCommandConsole.Tests
 {
-    [ConsoleCommand("test|t", "test console command")]
+    [ConsoleCommand("test", "test console command")]
     public class TestServiceCommand : IConsoleCommand, ICanRunAsService
     {
         public string ServiceName { get { return "TestService"; } }

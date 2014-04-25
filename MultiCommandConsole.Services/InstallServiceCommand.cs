@@ -110,9 +110,9 @@ namespace MultiCommandConsole.Services
                     }
                     else
                     {
-                        ServiceName = _serviceCommand.ServiceName;
-                        DisplayName = _serviceCommand.DisplayName;
-                        Description = _serviceCommand.Description;
+                        ServiceName = ServiceName ?? _serviceCommand.ServiceName;
+                        DisplayName = DisplayName ?? _serviceCommand.DisplayName;
+                        Description = Description ?? _serviceCommand.Description;
                     }
                 }
             }
