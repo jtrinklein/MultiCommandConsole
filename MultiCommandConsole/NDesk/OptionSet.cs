@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using ObjectPrinter;
 
 namespace Mono.Options
 {
@@ -79,21 +80,37 @@ namespace Mono.Options
 		private void AddImpl(Option option)
 		{
 			if (option == null)
-				throw new ArgumentNullException("option");
-			List<string> added = new List<string>(option.Names.Length);
+			{
+			    throw new ArgumentNullException("option");
+			}
+
+			var added = new List<string>(option.Names.Length);
+		    string currentName = null;
 			try
 			{
-				// KeyedCollection.InsertItem/SetItem handle the 0th name.
-				for (int i = 1; i < option.Names.Length; ++i)
-				{
-					Dictionary.Add(option.Names[i], option);
-					added.Add(option.Names[i]);
-				}
+			    // KeyedCollection.InsertItem/SetItem handle the 0th name.
+			    foreach (var name in option.Names)
+			    {
+			        currentName = name;
+			        Dictionary.Add(name, option);
+			        added.Add(name);
+			    }
 			}
-			catch (Exception)
-			{
+			catch (ArgumentException aex)
+            {
+                foreach (string name in added)
+                {
+                    Dictionary.Remove(name);
+                }
+			    throw new ArgumentException("option=" + currentName + " " + aex.Message, aex);
+			}
+			catch (Exception ex)
+            {
 				foreach (string name in added)
-					Dictionary.Remove(name);
+				{
+				    Dictionary.Remove(name);
+                }
+                ex.SetContext("option", currentName);
 				throw;
 			}
 		}
