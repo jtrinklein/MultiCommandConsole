@@ -100,7 +100,7 @@ namespace MultiCommandConsole.Util
 	            }
                 else if (chunkSize > line.Length)
                 {
-                    yield return line.Trim();
+                    yield return line.TrimEnd();
                 }
                 else
                 {

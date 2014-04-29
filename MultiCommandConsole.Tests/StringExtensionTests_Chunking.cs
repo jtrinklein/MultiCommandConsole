@@ -114,7 +114,7 @@ namespace MultiCommandConsole.Tests
         {
             //             012345678901234567890
             var chunks1 = "this textdoes not".GetChunks(13).ToList();
-            var chunks2 = "this text\nwraps".GetChunks(13).ToList();
+            var chunks2 = "this text\n  wraps".GetChunks(13).ToList();
             chunks1.Should().Equal(new []
                 {
                     "this textdoes",
@@ -123,7 +123,7 @@ namespace MultiCommandConsole.Tests
             chunks2.Should().Equal(new[]
                 {
                     "this text",
-                    "wraps"
+                    "  wraps"
                 });
         }
 
