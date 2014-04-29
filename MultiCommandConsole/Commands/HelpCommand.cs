@@ -143,6 +143,8 @@ namespace MultiCommandConsole.Commands
                _command.Attribute.FirstPrototype + " " + FormatShortNames(_command.Attribute.PrototypeArray.Skip(1)),
                 _instance.GetDetailedHelp() ?? string.Empty);
 
+            Writer.WriteLine();
+
             Writer.WriteTable(
                 null,
                 ToArgHelpInfo(_command.CommandType, _instance).Distinct().Select(ToTableRow),
