@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 
 namespace MultiCommandConsole
@@ -11,5 +12,6 @@ namespace MultiCommandConsole
         CancellationToken Token { get; }
         bool IsGreen { get; }
         bool IsRed { get; }
+        void Sleep(TimeSpan timeout);
     }
 }
