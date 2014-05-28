@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace MultiCommandConsole
 {
-	public class Arg
+    public class Arg
 	{
 		public PropertyInfo PropertyInfo { get; set; }
 		public ArgAttribute ArgAttribute { get; set; }

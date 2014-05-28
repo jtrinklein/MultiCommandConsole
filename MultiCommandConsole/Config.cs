@@ -5,8 +5,14 @@ using MultiCommandConsole.Util;
 
 namespace MultiCommandConsole
 {
+    /// <summary>
+    /// The entry point for MultiCommandConsole configuration
+    /// </summary>
 	public static class Config
     {
+        /// <summary>
+        /// Configs to support ConsoleMode
+        /// </summary>
         public static class ConsoleMode
         {
             /// <summary>
@@ -50,6 +56,9 @@ namespace MultiCommandConsole
             public static Action<RunTime> OnEndRunCommand { get; set; }
         }
 
+        /// <summary>
+        /// Configs for augmenting help
+        /// </summary>
         public static class Help
         {
             /// <summary>

@@ -9,9 +9,26 @@ namespace MultiCommandConsole
     /// </summary>
     public interface IStoplight
     {
+        /// <summary>
+        /// The CancellationToken
+        /// </summary>
         CancellationToken Token { get; }
+
+        /// <summary>
+        /// When true, cancel has not been called
+        /// </summary>
         bool IsGreen { get; }
+
+        /// <summary>
+        /// When true, cancel has been called
+        /// </summary>
         bool IsRed { get; }
+
+        /// <summary>
+        /// Same as Thread.Sleep, but thread wake when cancel is called.
+        /// Prevents app from not closing while waiting for Thread.Sleep to finish.
+        /// </summary>
+        /// <param name="timeout"></param>
         void Sleep(TimeSpan timeout);
     }
 }

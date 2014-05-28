@@ -4,8 +4,14 @@ using System.Threading;
 
 namespace MultiCommandConsole.Util
 {
+    /// <summary>
+    /// Ctrl+C is broken in .net 4.0, so this provides a mechanism for reading stopping and pausing the command
+    /// </summary>
     public static class ConsoleReader
     {
+        /// <summary>
+        /// Watch for stop and pause requests
+        /// </summary>
         public static void Watch(IStoplight stoplight, bool canBeStopped, bool canBePaused, Action onStop, Action onPause, Action onResume, int checkEveryNMilliSeconds = 100)
         {
             //all this because Ctrl+C is broken in .net 4.0
@@ -57,7 +63,7 @@ namespace MultiCommandConsole.Util
             }
         }
 
-        public static void ShowConsoleOptions(bool canBeStopped, bool canBePaused, bool isPaused = false)
+        private static void ShowConsoleOptions(bool canBeStopped, bool canBePaused, bool isPaused = false)
         {
             var sb = new StringBuilder();
             if (canBeStopped)

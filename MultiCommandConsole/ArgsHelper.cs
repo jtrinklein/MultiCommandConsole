@@ -8,15 +8,15 @@ namespace MultiCommandConsole
 {
 	public static class ArgsHelper
 	{
-		private static Dictionary<Type, IEnumerable<Arg>> _optionsCache = new Dictionary<Type, IEnumerable<Arg>>();
-		private static Dictionary<Type, List<string>> _flattenedMetaDataCache = new Dictionary<Type, List<string>>();
+		private static readonly Dictionary<Type, IEnumerable<Arg>> OptionsCache = new Dictionary<Type, IEnumerable<Arg>>();
+		private static readonly Dictionary<Type, List<string>> FlattenedMetaDataCache = new Dictionary<Type, List<string>>();
 
 		public static IEnumerable<Arg> GetOptions(Type type)
 		{
 			IEnumerable<Arg> args;
-			if (!_optionsCache.TryGetValue(type, out args))
+			if (!OptionsCache.TryGetValue(type, out args))
 			{
-				_optionsCache[type] = args = GetOptionsImpl(type).ToList();
+				OptionsCache[type] = args = GetOptionsImpl(type).ToList();
 			}
 			return args;
 		}
@@ -24,12 +24,12 @@ namespace MultiCommandConsole
 		public static List<string> GetFlattenedOptionNames(Type type)
 		{
 			List<string> data;
-			if (!_flattenedMetaDataCache.TryGetValue(type, out data))
+			if (!FlattenedMetaDataCache.TryGetValue(type, out data))
 			{
 				data = GetOptionsImpl(type, true)
 					.Select(a => a.ArgAttribute.Prototype.GetPrototypeArray().First())
 					.ToList();
-				_flattenedMetaDataCache[type] = data;
+				FlattenedMetaDataCache[type] = data;
 			}
 			return data;
 		}

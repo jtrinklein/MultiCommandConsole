@@ -5,38 +5,48 @@ using System.Linq;
 
 namespace MultiCommandConsole.Util
 {
+    /// <summary>
+    /// An IConsoleWriter implementation
+    /// </summary>
     public class ConsoleWriter : IConsoleWriter
     {
+        /// <summary>
+        /// Gets a console writer for the given type
+        /// </summary>
         public static IConsoleWriter Get<T>()
         {
             return Config.GetConsoleWriterDelegate(typeof (T));
         }
+        /// <summary>
+        /// Gets a console writer for the given type
+        /// </summary>
         public static IConsoleWriter Get(Type type)
         {
             return Config.GetConsoleWriterDelegate(type);
         }
 
         private readonly TextWriter _errorWriter;
-        private readonly Type _type;
         private readonly TextWriter _writer;
         private readonly Func<int> _getScreenWidth;
 
+        /// <summary></summary>
         public ConsoleWriter(Type type)
             : this(type, Console.Out, Console.Error, () => Math.Min(Console.BufferWidth, Console.WindowWidth))
         {
         }
 
+        /// <summary></summary>
         public ConsoleWriter(Type type, TextWriter writer, TextWriter errorWriter, Func<int> getScreenWidth)
         {
             if (type == null) throw new ArgumentNullException("type");
             if (writer == null) throw new ArgumentNullException("writer");
             if (errorWriter == null) throw new ArgumentNullException("errorWriter");
-            _type = type;
             _writer = writer;
             _errorWriter = errorWriter;
             _getScreenWidth = getScreenWidth;
         }
 
+        /// <summary></summary>
         public void WriteErrorLine(object obj)
         {
             if (obj == null)
@@ -46,11 +56,13 @@ namespace MultiCommandConsole.Util
             WriteErrorLine(obj.ToString());
         }
 
+        /// <summary></summary>
         public void WriteErrorLine(string format, params object[] args)
         {
             WriteLine(_errorWriter, format, args);
         }
 
+        /// <summary></summary>
         public void WriteLine(object obj = null)
         {
             if (obj == null)
@@ -63,6 +75,7 @@ namespace MultiCommandConsole.Util
             }
         }
 
+        /// <summary></summary>
         public void WriteLine(string format, params object[] args)
         {
             WriteLine(_writer, format, args);
@@ -78,6 +91,7 @@ namespace MultiCommandConsole.Util
             }
         }
 
+        /// <summary></summary>
         public void WriteLines(params string[] lines)
         {
             if (lines.IsNullOrEmpty())
@@ -91,6 +105,7 @@ namespace MultiCommandConsole.Util
             }
         }
 
+        /// <summary></summary>
         public void WriteTable(string[] headers, IEnumerable<string[]> rows, TableFormat tableFormat = null)
         {
             tableFormat = tableFormat == null

@@ -19,9 +19,6 @@
       - type.IsAssignableTo&lt;IConsoleCommand&gt;()
       - type.HasCustomAttribute&lt;ArgSetAttribute&gt;()
 		</description>
-		<references>
-			<reference file="MultiCommandConsole.dll" />
-		</references>
 		<tags>.net console</tags>
 		<releaseNotes>
 			Initial release.  
@@ -30,4 +27,8 @@
 			- Accepting Pull Requests
 		</releaseNotes>
 	</metadata>
+  <files>
+    <file src="bin\Release\MultiCommandConsole.dll" target="lib\Net40" />
+    <file src="bin\Release\MultiCommandConsole.xml" target="lib\Net40" />
+  </files>
 </package>

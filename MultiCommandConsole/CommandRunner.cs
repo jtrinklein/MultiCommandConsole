@@ -10,6 +10,9 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole
 {
+    /// <summary>
+    /// An ICommandRunner implementation
+    /// </summary>
     public class CommandRunner : ICommandRunner
     {
         private static readonly ILog Log = LogManager.GetLogger<CommandRunner>();
@@ -20,12 +23,14 @@ namespace MultiCommandConsole
         private Stoplight _stoplight;
         private EventWaitHandle _commandLoaded;
 
+        /// <summary></summary>
         public CommandRunner(IConsoleCommandRepository consoleCommandRepository)
         {
             if (consoleCommandRepository == null) throw new ArgumentNullException("consoleCommandRepository");
             _consoleCommandRepository = consoleCommandRepository;
         }
 
+        /// <summary></summary>
         public void Run(string[] args, Stoplight stoplight = null)
         {
             _commandLoaded = new ManualResetEvent(false);
@@ -43,8 +48,10 @@ namespace MultiCommandConsole
             }
         }
 
+        /// <summary></summary>
         public bool CanBeStopped { get { return _runData.Command is ICanBeStopped; } }
 
+        /// <summary></summary>
         public bool CanBePaused { get { return _runData.Command is ICanBePaused; } }
 
         public void Stop()
@@ -273,10 +280,16 @@ namespace MultiCommandConsole
         }
     }
 
+    /// <summary>
+    /// Class to story how long the command took to run
+    /// </summary>
     public class RunTime
     {
+        /// <summary>When the command started</summary>
         public DateTime StartedOn { get; set; }
+        /// <summary>When the command ended</summary>
         public DateTime EndedOn { get; set; }
+        /// <summary>How long the command took</summary>
         public TimeSpan Elapsed { get; set; }
     }
 }

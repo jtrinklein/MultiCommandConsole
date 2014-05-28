@@ -15,27 +15,34 @@ namespace MultiCommandConsole
         private readonly CancellationTokenSource _source;
         private readonly ManualResetEventSlim _wait;
 
+        /// <summary></summary>
         public Stoplight(CancellationTokenSource cancellationTokenSource = null)
         {
             _source = cancellationTokenSource ?? new CancellationTokenSource();
             _wait = new ManualResetEventSlim();
         }
 
+        /// <summary></summary>
         public CancellationToken Token
         {
             get { return _source.Token; }
         }
 
+        /// <summary></summary>
         public bool IsGreen
         {
             get { return !IsRed; }
         }
 
+        /// <summary></summary>
         public bool IsRed
         {
             get { return _source.IsCancellationRequested; }
         }
 
+        /// <summary>
+        /// calls cancel on underlying CancellationTokenSource
+        /// </summary>
         public void Stop()
         {
             if (_source.IsCancellationRequested)
@@ -46,6 +53,7 @@ namespace MultiCommandConsole
             _source.Cancel();
         }
 
+        /// <summary></summary>
         public void Sleep(TimeSpan timeout)
         {
             if (timeout == TimeSpan.Zero || IsRed)
