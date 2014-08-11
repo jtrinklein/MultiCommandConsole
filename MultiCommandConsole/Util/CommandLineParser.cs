@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MultiCommandConsole.Util
 {
-    public class CommandLineParser
+    internal class CommandLineParser
     {
         public string EscapeDoubleQuotes(string text)
         {

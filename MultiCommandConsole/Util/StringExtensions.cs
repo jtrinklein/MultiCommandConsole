@@ -6,24 +6,32 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole.Util
 {
+	/// <summary>
+	/// string extension methods
+	/// </summary>
 	public static class StringExtensions
 	{
-		public static string[] GetPrototypeArray(this string prototype)
+        internal static string[] GetPrototypeArray(this string prototype)
 		{
 			return prototype.Split(new[] {'|'}, StringSplitOptions.RemoveEmptyEntries);
 		}
 
+        /// <summary>
+        /// splits string the same way a windows console would
+        /// </summary>
+        /// <param name="consoleInput"></param>
+        /// <returns></returns>
 		public static string[] SplitCmdLineArgs(this string consoleInput)
 		{
 		    return new CommandLineParser().Parse(consoleInput);
 		}
 
-        public static IEnumerable<string> PivotChunks(this string[] cells, string spacer, int[] widths)
+        internal static IEnumerable<string> PivotChunks(this string[] cells, string spacer, int[] widths)
         {
             return PivotChunks(cells, spacer, spacer, widths);
         }
 
-        public static IEnumerable<string> PivotChunks(this string[] cells, string spacer4FirstRow, string spacer4OtherRows, int[] widths)
+        internal static IEnumerable<string> PivotChunks(this string[] cells, string spacer4FirstRow, string spacer4OtherRows, int[] widths)
         {
             return PivotChunks(cells, new TableFormat
                 {
@@ -33,7 +41,7 @@ namespace MultiCommandConsole.Util
                 });
         }
 
-	    public static IEnumerable<string> PivotChunks(this string[] cells, TableFormat tableFormat)
+        internal static IEnumerable<string> PivotChunks(this string[] cells, TableFormat tableFormat)
         {
             if (cells.IsNullOrEmpty())
             {
@@ -78,7 +86,7 @@ namespace MultiCommandConsole.Util
 	        }
         }
 
-	    public static IEnumerable<string> GetChunks(this string text, int chunkSize)
+        internal static IEnumerable<string> GetChunks(this string text, int chunkSize)
         {
             if (text == null)
             {

@@ -7,6 +7,9 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole.Services
 {
+    /// <summary>
+    /// ServiceBase implementation to run a command installed via MCC
+    /// </summary>
     public class ServiceCommandRunner : ServiceBase, ICommandRunner
     {
         private static readonly ILog Log = LogManager.GetLogger<ServiceCommandRunner>();
@@ -14,6 +17,7 @@ namespace MultiCommandConsole.Services
         private readonly ICommandRunner _innerRunner;
         private Stoplight _stoplight;
 
+        /// <summary>ctor</summary>
         public ServiceCommandRunner(ICommandRunner innerRunner)
         {
             _innerRunner = innerRunner;
