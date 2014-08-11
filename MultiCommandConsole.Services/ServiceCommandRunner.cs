@@ -23,15 +23,18 @@ namespace MultiCommandConsole.Services
         {
             //args will be empty when running as a service
 
+            Service currentService = null;
+
             try
             {
-                var currentService = new ServicesRepository().GetCurrent();
+                currentService = new ServicesRepository().GetCurrent();
                 _innerRunner.Run(currentService.CommandLine.SplitCmdLineArgs(), _stoplight);
                 Log.Debug("OnStart completed");
             }
             catch (Exception e)
             {
                 e.SetContext("args", args);
+                e.SetContext("currentService", currentService);
                 Log.Error(e);
                 throw;
             }
