@@ -13,6 +13,11 @@ namespace MultiCommandConsole.Util
 
         public string[] Parse(string consoleInput)
         {
+            if (consoleInput.IsNullOrEmpty())
+            {
+                return new string[0];
+            }
+
             var args = new List<string>();
 
             const char escapeChar = '\\';
