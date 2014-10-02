@@ -35,7 +35,7 @@ namespace MultiCommandConsole.Commands
                                 "\nuse -1 to repeat infinitely i.e. s10w5r-1")]
         public string BurstPattern { get; set; }
 
-        [Arg("repeat", "repeats burstPattern the specified number of times.  0=don't repeate  -1=repeat infinitely")]
+        [Arg("repeat", "repeats burstPattern the specified number of times.  0=don't repeat  -1=repeat infinitely")]
         public int RepeatPattern { get; set; }
 
         public BurstOptions(IStoplight stoplight)
