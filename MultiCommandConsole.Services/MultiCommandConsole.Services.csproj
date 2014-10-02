@@ -41,9 +41,8 @@
     <Reference Include="Common.Logging.Core">
       <HintPath>..\packages\Common.Logging.Core.2.2.0\lib\net40\Common.Logging.Core.dll</HintPath>
     </Reference>
-    <Reference Include="ObjectPrinter, Version=2.0.20.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ObjectPrinter.2.0.20.0\lib\Net40\ObjectPrinter.dll</HintPath>
+    <Reference Include="ObjectPrinter">
+      <HintPath>..\packages\ObjectPrinter.1.2.5140.3134\lib\net40\ObjectPrinter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
