@@ -60,12 +60,10 @@
     <Compile Include="ArgAttribute.cs" />
     <Compile Include="ArgSetAttribute.cs" />
     <Compile Include="ArgsHelper.cs" />
-    <Compile Include="Commands\BurstSegment.cs" />
     <Compile Include="CommandRunData.cs" />
     <Compile Include="CommandRunner.cs" />
     <Compile Include="Commands\AlterDataOptions.cs" />
     <Compile Include="Commands\AlterDataOptionsWithDryRun.cs" />
-    <Compile Include="Commands\BurstOptions.cs" />
     <Compile Include="Commands\CommandsOptions.cs" />
     <Compile Include="Commands\ConsoleCommand.cs" />
     <Compile Include="Commands\ConsoleRunOptions.cs" />

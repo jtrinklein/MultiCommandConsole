@@ -58,7 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BurstSegmentTests.cs" />
     <Compile Include="ImitateConsole.cs" />
     <Compile Include="InstallServiceCommandTests.cs" />
     <Compile Include="NDesk\DefaultOption.cs" />
