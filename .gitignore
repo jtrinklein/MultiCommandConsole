@@ -6,3 +6,7 @@ _TeamCity*
 *.user
 *.ncrunchsolution
 *.nupkg
+
+#nuget
+/packages/
+!packages/repositories.config
