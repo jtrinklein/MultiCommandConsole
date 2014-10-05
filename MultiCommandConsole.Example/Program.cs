@@ -26,12 +26,14 @@ namespace MultiCommandConsole.Example
 			Config.ConsoleMode.CommandPromptText = "console";
 		    Config.ConsoleMode.HistorySize = 5;
 		    Config.ConsoleMode.AppName = "example_console";
+		    Config.ConsoleMode.OnBeginRunCommand += cmd => Writer.WriteLine(cmd.Dump());
+
 			Config.ShowViewArgsCommand = true;
 		    Config.WriteRunTimeToConsole = true;
 		    //Config.DefaultCommand = typeof (RepeatConsoleCommand);
-		    Config.Help.GetCategoryDelegate = (s, type) =>
+		    Config.Help.GetCategoryDelegate = (name, type) =>
 		        {
-		            if (s.EndsWith("-service"))
+		            if (name.EndsWith("-service"))
 		            {
 		                return " - service -";
 		            }
