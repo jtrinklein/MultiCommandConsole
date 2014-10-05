@@ -139,7 +139,7 @@ namespace MultiCommandConsole
             ConsoleMode.CommandPromptText = "$";
 		    ConsoleMode.HistorySize = 50;
 
-	        GetConsoleWriterDelegate = type => new ConsoleWriter(type);
+	        GetConsoleWriterDelegate = type => new ConsoleWriter();
 
             GetRunnerDelegate = repository => new CommandRunner(repository);
 		}

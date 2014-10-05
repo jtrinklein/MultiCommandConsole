@@ -30,15 +30,14 @@ namespace MultiCommandConsole.Util
         private readonly Func<int> _getScreenWidth;
 
         /// <summary></summary>
-        public ConsoleWriter(Type type)
-            : this(type, Console.Out, Console.Error, () => Math.Min(Console.BufferWidth, Console.WindowWidth))
+        public ConsoleWriter()
+            : this(Console.Out, Console.Error, () => Math.Min(Console.BufferWidth, Console.WindowWidth))
         {
         }
 
         /// <summary></summary>
-        public ConsoleWriter(Type type, TextWriter writer, TextWriter errorWriter, Func<int> getScreenWidth)
+        public ConsoleWriter(TextWriter writer, TextWriter errorWriter, Func<int> getScreenWidth)
         {
-            if (type == null) throw new ArgumentNullException("type");
             if (writer == null) throw new ArgumentNullException("writer");
             if (errorWriter == null) throw new ArgumentNullException("errorWriter");
             _writer = writer;
