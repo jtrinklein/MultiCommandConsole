@@ -6,10 +6,12 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole.Util
 {
+    ///<summary>writes to the logging system</summary>
     public class LoggingConsoleWriter : IConsoleWriter
     {
         private readonly ILog Log;
 
+        ///<summary>ctors with the given type</summary>
         public LoggingConsoleWriter(Type type)
         {
             Log = LogManager.GetLogger(type);

@@ -95,6 +95,7 @@
     <Compile Include="NDesk\OptionValueType.cs" />
     <Compile Include="Util\CommandLineParser.cs" />
     <Compile Include="Util\ConsoleWriter.cs" />
+    <Compile Include="Util\DelegatedConsoleWriter.cs" />
     <Compile Include="Util\DisposableAction.cs" />
     <Compile Include="Engine.cs" />
     <Compile Include="Commands\HelpCommand.cs" />

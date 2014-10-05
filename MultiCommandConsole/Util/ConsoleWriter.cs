@@ -5,9 +5,7 @@ using System.Linq;
 
 namespace MultiCommandConsole.Util
 {
-    /// <summary>
-    /// An IConsoleWriter implementation
-    /// </summary>
+    ///<summary>writes to Console.Out and Console.Error</summary>
     public class ConsoleWriter : IConsoleWriter
     {
         /// <summary>
