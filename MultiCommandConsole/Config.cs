@@ -156,8 +156,8 @@ namespace MultiCommandConsole
             ConsoleMode.CommandPromptText = "$";
 		    ConsoleMode.HistorySize = 50;
 
-            GetConsoleWriterByTypeDelegate = type => new DelegatedConsoleWriter(new ConsoleWriter(), new LoggingConsoleWriter(type));
-            GetConsoleWriterByNameDelegate = name => new DelegatedConsoleWriter(new ConsoleWriter(), new LoggingConsoleWriter(name));
+            GetConsoleWriterByTypeDelegate = type => new ConsoleWriter();
+            GetConsoleWriterByNameDelegate = name => new ConsoleWriter();
 
             GetRunnerDelegate = repository => new CommandRunner(repository);
 		}
