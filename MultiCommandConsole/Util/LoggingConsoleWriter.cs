@@ -17,6 +17,12 @@ namespace MultiCommandConsole.Util
             Log = LogManager.GetLogger(type);
         }
 
+        ///<summary>ctors with the given name</summary>
+        public LoggingConsoleWriter(string name)
+        {
+            Log = LogManager.GetLogger(name);
+        }
+
         public void WriteErrorLine(object obj)
         {
             Log.Error(obj);

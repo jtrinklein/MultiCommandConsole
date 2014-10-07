@@ -24,7 +24,8 @@ namespace MultiCommandConsole.Services
             }
             else
             {
-                MccConfig.GetConsoleWriterDelegate = type => new LoggingConsoleWriter(type);
+                MccConfig.GetConsoleWriterByTypeDelegate = type => new LoggingConsoleWriter(type);
+                MccConfig.GetConsoleWriterByNameDelegate = name => new LoggingConsoleWriter(name);
                 MccConfig.GetRunnerDelegate =
                     repository => new ServiceCommandRunner(new CommandRunner(repository));
 

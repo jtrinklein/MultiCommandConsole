@@ -13,14 +13,29 @@ namespace MultiCommandConsole.Util
         /// </summary>
         public static IConsoleWriter Get<T>()
         {
-            return Config.GetConsoleWriterDelegate(typeof (T));
+            return Get(typeof(T));
         }
         /// <summary>
         /// Gets a console writer for the given type
         /// </summary>
         public static IConsoleWriter Get(Type type)
         {
-            return Config.GetConsoleWriterDelegate(type);
+            if (Config.GetConsoleWriterByTypeDelegate == null)
+            {
+                throw new InvalidOperationException("Config.GetConsoleWriterByTypeDelegate has not yet been set");
+            }
+            return Config.GetConsoleWriterByTypeDelegate(type);
+        }
+        /// <summary>
+        /// Gets a console writer for the given name
+        /// </summary>
+        public static IConsoleWriter Get(string name)
+        {
+            if (Config.GetConsoleWriterByNameDelegate == null)
+            {
+                throw new InvalidOperationException("Config.GetConsoleWriterByNameDelegate has not yet been set");
+            }
+            return Config.GetConsoleWriterByNameDelegate(name);
         }
 
         private readonly TextWriter _errorWriter;

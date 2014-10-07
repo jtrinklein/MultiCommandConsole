@@ -94,7 +94,24 @@ namespace MultiCommandConsole
         /// The console writer used to write messages for the console window 
         /// (or to the logger when in running as a service)
         /// </summary>
-        public static Func<Type, IConsoleWriter> GetConsoleWriterDelegate { get; set; }
+        [Obsolete("use GetConsoleWriterByTypeDelegate")] //2014-10-06  v.2.0.34
+        public static Func<Type, IConsoleWriter> GetConsoleWriterDelegate
+        {
+            get { return GetConsoleWriterByTypeDelegate; }
+            set { GetConsoleWriterByTypeDelegate = value; }
+        }
+
+        /// <summary>
+        /// The console writer used to write messages for the console window 
+        /// (or to the logger when running as a service)
+        /// </summary>
+        public static Func<Type, IConsoleWriter> GetConsoleWriterByTypeDelegate { get; set; }
+
+        /// <summary>
+        /// The console writer used to write messages for the console window 
+        /// (or to the logger when running as a service)
+        /// </summary>
+        public static Func<string, IConsoleWriter> GetConsoleWriterByNameDelegate { get; set; }
 
 	    /// <summary>
 		/// By default, commands and arg sets are created by Activator.  
@@ -139,7 +156,8 @@ namespace MultiCommandConsole
             ConsoleMode.CommandPromptText = "$";
 		    ConsoleMode.HistorySize = 50;
 
-	        GetConsoleWriterDelegate = type => new DelegatedConsoleWriter(new ConsoleWriter(), new LoggingConsoleWriter(type));
+            GetConsoleWriterByTypeDelegate = type => new ConsoleWriter();
+            GetConsoleWriterByNameDelegate = name => new ConsoleWriter();
 
             GetRunnerDelegate = repository => new CommandRunner(repository);
 		}
