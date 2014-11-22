@@ -205,38 +205,31 @@ namespace MultiCommandConsole
             stoplight.Stop();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="preRun"></param>
+        /// <param name="postRun"></param>
+        public void Run<T>(Action<T> preRun = null, Action<T> postRun = null)
+        {
+            var commandRunData = _consoleCommandRepository.LoadCommand<T>();
+            if (preRun != null)
+            {
+                preRun((T)commandRunData.Command);
+            }
+            RunUnsafely(commandRunData);
+            if (postRun != null)
+            {
+                postRun((T)commandRunData.Command);
+            }
+        }
+
         private void RunSafely(CommandRunData runData)
         {
             try
             {
-                runData.SetterUppers.ForEach(su =>
-                    {
-                        Log.InfoFormat("{0}.Setup()", su.GetType().Name);
-                        su.Setup();
-                    });
-
-                try
-                {
-                    Log.InfoFormat("{0}.Run()", runData.Command.GetType().Name);
-                    runData.Command.Run();
-                }
-                finally
-                {
-                    runData.SetterUppers.Reverse();
-                    runData.SetterUppers.ForEach(su =>
-                        {
-                            try
-                            {
-                                Log.InfoFormat("{0}.Cleanup()", su.GetType().Name);
-                                su.Cleanup();
-                            }
-                            catch (Exception e)
-                            {
-                                e.SetContext("cleaner upper", su);
-                                Log.ErrorFormat("failed cleanup for {0}", e, su.GetType().Name);
-                            }
-                        });
-                }
+                RunUnsafely(runData);
             }
             catch (TargetInvocationException e)
             {
@@ -257,6 +250,38 @@ namespace MultiCommandConsole
                 Writer.WriteLine(e.Message + " see logs for details");
                 var error = e.DumpToString();
                 Log.Error(error);
+            }
+        }
+
+        private void RunUnsafely(CommandRunData runData)
+        {
+            runData.SetterUppers.ForEach(su =>
+                {
+                    Log.InfoFormat("{0}.Setup()", su.GetType().Name);
+                    su.Setup();
+                });
+
+            try
+            {
+                Log.InfoFormat("{0}.Run()", runData.Command.GetType().Name);
+                runData.Command.Run();
+            }
+            finally
+            {
+                runData.SetterUppers.Reverse();
+                runData.SetterUppers.ForEach(su =>
+                    {
+                        try
+                        {
+                            Log.InfoFormat("{0}.Cleanup()", su.GetType().Name);
+                            su.Cleanup();
+                        }
+                        catch (Exception e)
+                        {
+                            e.SetContext("cleaner upper", su);
+                            Log.ErrorFormat("failed cleanup for {0}", e, su.GetType().Name);
+                        }
+                    });
             }
         }
 

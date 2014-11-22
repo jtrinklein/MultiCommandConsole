@@ -185,12 +185,11 @@ namespace MultiCommandConsole
                 }
             }
 
-			bool showHelp = false;
 			var options = new OptionSet();
 
             if (info != null || CommandsByName.TryGetValue(commandName, out info))
-			{
-				if (info.CommandType == typeof(HelpCommand))
+            {
+                if (info.CommandType == typeof(HelpCommand))
 				{
                     ConsoleCommandInfo infoForHelp;
 					if (args.Length > 1 
@@ -202,66 +201,81 @@ namespace MultiCommandConsole
 				    return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
 				}
 
-				IConsoleCommand command;
-				try
-				{
-					command = info.Instance ?? (IConsoleCommand)info.CommandType.Resolve();
-				}
-				catch (Exception e)
-				{
-					e.SetContext("commandInfo", info);
-					throw;
-				}
+                return GetCommandRunData(info, args, options);
+            }
+
+		    Writer.WriteLine("Unknown command: " + commandName);
+			return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
+		}
+
+        public CommandRunData LoadCommand<T>()
+        {
+            return GetCommandRunData(GetByType(typeof (T)), null, null);
+        }
+
+        private CommandRunData GetCommandRunData(ConsoleCommandInfo info, string[] args, OptionSet options)
+        {
+            IConsoleCommand command;
+            try
+            {
+                command = info.Instance ?? (IConsoleCommand) info.CommandType.Resolve();
+            }
+            catch (Exception e)
+            {
+                e.SetContext("commandInfo", info);
+                throw;
+            }
 
 
-                var errors = new List<string>();
-                var commandArgs = new Dictionary<Arg,object>();
-				var validators = new List<IValidatable> { command };
-				var setterUppers = new List<ISetupAndCleanup>();
+            var errors = new List<string>();
+            var commandArgs = new Dictionary<Arg, object>();
+            var validators = new List<IValidatable> {command};
+            var setterUppers = new List<ISetupAndCleanup>();
 
-			    command.As<ISetupAndCleanup>(setterUppers.Add);
-				LoadArgs(options, validators, setterUppers, command, commandArgs);
-				options.Add(HelpCommand.Prototype, "show this message and exit", a => showHelp = true);
+            command.As<ISetupAndCleanup>(setterUppers.Add);
+            LoadArgs(options, validators, setterUppers, command, commandArgs);
 
-				try
-				{
-					command.ExtraArgs = options.Parse(args.Skip(1));
-					if (showHelp)
-					{
-						return new CommandRunData { Command = HelpCommand.ForCommand(info, command) };
-					}
+            bool showHelp = false;
 
-				    errors.AddRange(validators.OrderBy(v => v is IConsoleCommand)
-				                              .SelectMany(v => v.GetArgValidationErrors()));
+            if (options != null)
+            {
+                options.Add(HelpCommand.Prototype, "show this message and exit", a => showHelp = true);
 
-				    errors.AddRange(from arg in commandArgs
-                                    where arg.Key.ArgAttribute.Required
-                                    let value = arg.Key.PropertyInfo.GetValue(arg.Value, null) 
-                                    where value == null 
-                                    select arg.Key.ArgAttribute.FirstPrototype + " is required");
-				}
-				catch (Exception e)
-				{
-                    Log.Error(e.Dump());
-				    errors = new List<string> {e.Message};
-				}
-
-                if (errors.Count > 0)
+                try
                 {
-                    return new CommandRunData
+                    command.ExtraArgs = options.Parse(args.Skip(1));
+                    if (showHelp)
+                    {
+                        return new CommandRunData {Command = HelpCommand.ForCommand(info, command)};
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e.Dump());
+                    errors = new List<string> {e.Message};
+                }
+            }
+
+            errors.AddRange(validators.OrderBy(v => v is IConsoleCommand)
+                                      .SelectMany(v => v.GetArgValidationErrors()));
+
+            errors.AddRange(from arg in commandArgs
+                            where arg.Key.ArgAttribute.Required
+                            let value = arg.Key.PropertyInfo.GetValue(arg.Value, null)
+                            where value == null
+                            select arg.Key.ArgAttribute.FirstPrototype + " is required");
+
+            if (errors.Count > 0)
+            {
+                return new CommandRunData
                     {
                         Command = HelpCommand.ForCommand(info, command),
                         Errors = errors
                     };
-                }
+            }
 
-				return new CommandRunData { Command = command, SetterUppers = setterUppers};
-
-			}
-
-			Writer.WriteLine("Unknown command: " + commandName);
-			return new CommandRunData { Command = HelpCommand.ForCommands(Commands) };
-		}
+            return new CommandRunData {Command = command, SetterUppers = setterUppers};
+        }
 
         private void LoadArgs(OptionSet optionSet, List<IValidatable> validators, List<ISetupAndCleanup> setterUppers, object obj, Dictionary<Arg, object> commandArgs)
 		{

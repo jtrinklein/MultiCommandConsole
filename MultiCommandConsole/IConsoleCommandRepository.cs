@@ -10,5 +10,6 @@ namespace MultiCommandConsole
         ConsoleCommandInfo GetByType(Type type);
         CommandRunData LoadCommand(string[] args);
         IDisposable HideCommandOfType<T>() where T : IConsoleCommand;
+        CommandRunData LoadCommand<T>();
     }
 }
