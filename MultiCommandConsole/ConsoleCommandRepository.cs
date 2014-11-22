@@ -10,7 +10,7 @@ using ObjectPrinter;
 
 namespace MultiCommandConsole
 {
-    internal class ConsoleCommandRepository : IConsoleCommandRepository
+    public class ConsoleCommandRepository : IConsoleCommandRepository
     {
         private static readonly ILog Log = LogManager.GetLogger<ConsoleCommandRepository>();
         private static readonly IConsoleWriter Writer = ConsoleWriter.Get<ConsoleCommandRepository>();
