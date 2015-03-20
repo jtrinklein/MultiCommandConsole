@@ -36,7 +36,7 @@ namespace MultiCommandConsole
             _commandLoaded = new ManualResetEvent(false);
             _stoplight = stoplight ?? new Stoplight();
 
-            new Thread(() => RunOnThreadAndLogError(args, _stoplight)).Start();
+            new Thread(() => RunOnThread(args, _stoplight)).Start();
 
             _commandLoaded.WaitOne();
             if (Environment.UserInteractive)
@@ -97,19 +97,6 @@ namespace MultiCommandConsole
             else
             {
                 Log.InfoFormat("{0} does not implement {1}", _runData.Command.GetType(), typeof(ICanBePaused));
-            }
-        }
-
-        private void RunOnThreadAndLogError(string[] args, Stoplight stoplight)
-        {
-            try
-            {
-                RunOnThread(args, stoplight);
-            }
-            catch (Exception e)
-            {
-                Log.Error(e.Dump());
-                throw;
             }
         }
 

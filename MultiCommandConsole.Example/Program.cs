@@ -18,6 +18,8 @@ namespace MultiCommandConsole.Example
                 Debugger.Break();
             }
 
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
+
             LogManager.Adapter = Log4NetFactoryAdapter.Load();
 		    var logger = LogManager.GetLogger(typeof (Program));
 		    logger.InfoFormat("Logging configured");
@@ -61,5 +63,11 @@ namespace MultiCommandConsole.Example
 		        Writer.WriteLine(e.Dump());
 		    }
 		}
+
+        private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        {
+            Console.Out.WriteLine(unhandledExceptionEventArgs.ExceptionObject.Dump());
+            ((Stoplight)Config.ResolveTypeDelegate(typeof(Stoplight))).Stop();
+        }
 	}
 }
