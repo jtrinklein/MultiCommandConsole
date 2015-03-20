@@ -60,7 +60,14 @@ namespace MultiCommandConsole
             {
                 return;
             }
-            _wait.Wait(timeout, Token);
+            try
+            {
+                _wait.Wait(timeout, Token);
+            }
+            catch (OperationCanceledException)
+            {
+                //expected.  nothing to do here except return
+            }
         }
     }
 }
