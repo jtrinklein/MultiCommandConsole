@@ -3,6 +3,7 @@ using System.Linq;
 using System.ServiceProcess;
 using MultiCommandConsole.Commands;
 using MultiCommandConsole.Util;
+using ObjectPrinter;
 
 namespace MultiCommandConsole.Services
 {
@@ -47,6 +48,9 @@ namespace MultiCommandConsole.Services
         [Arg("command|c", "the command and arguments to run.  should be the last argument provided")]
         public string CommandLine { get; set; }
 
+        [Arg("showServiceDefaults|ssd", "shows the default service info for a given command")]
+        public bool ShowDefaults { get; set; }
+
         public InstallServiceCommand() 
             : this(new ServicesRepository())
         {
@@ -71,7 +75,8 @@ namespace MultiCommandConsole.Services
             {
                 return errors;
             }
-            if (Account == ServiceAccount.User)
+
+            if (!ShowDefaults && Account == ServiceAccount.User)
             {
                 if (string.IsNullOrWhiteSpace(Username))
                 {
@@ -82,6 +87,7 @@ namespace MultiCommandConsole.Services
                     errors.Add("pwd is required when account=User");
                 }
             }
+
             if (string.IsNullOrWhiteSpace(CommandLine))
             {
                 errors.Add("command is required");
@@ -147,6 +153,12 @@ namespace MultiCommandConsole.Services
                     StartMode = StartMode,
                     CommandLine = CommandLine
                 };
+
+            if (ShowDefaults)
+            {
+                Writer.WriteLine(service.Dump());
+                return;
+            }
 
             Writer.WriteLine("You are about to install this service:");
             Writer.WriteLine("  service name: " + service.ServiceName);
