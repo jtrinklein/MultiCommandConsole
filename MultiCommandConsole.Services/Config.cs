@@ -20,7 +20,7 @@ namespace MultiCommandConsole.Services
         {
             if (Environment.UserInteractive)
             {
-                Log.Info("Service mode not enabled. Environment.UserInteractive=false");
+                Log.Info("Service mode not enabled. Environment.UserInteractive=true");
             }
             else
             {
