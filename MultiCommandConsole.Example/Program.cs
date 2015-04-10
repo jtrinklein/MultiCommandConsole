@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using Common.Logging;
 using MultiCommandConsole.Services;
 using MultiCommandConsole.Util;
@@ -9,9 +10,10 @@ namespace MultiCommandConsole.Example
 {
 	class Program
     {
-        private static readonly IConsoleWriter Writer = ConsoleWriter.Get<Program>();
+        private static IConsoleWriter _writer;
+	    private static ILog _logger;
 
-		static void Main(string[] args)
+	    static void Main(string[] args)
 		{
             if (Array.Exists(args, s => s == "/debug") && Environment.UserInteractive)
             {
@@ -21,14 +23,17 @@ namespace MultiCommandConsole.Example
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
 
             LogManager.Adapter = Log4NetFactoryAdapter.Load();
-		    var logger = LogManager.GetLogger(typeof (Program));
-		    logger.InfoFormat("Logging configured");
+		    _logger = LogManager.GetLogger(typeof (Program));
+            _logger.InfoFormat("Logging configured");
+
+            Services.Config.EnableServiceMode();
+		    _writer = ConsoleWriter.Get<Program>();
 
             Config.ConsoleMode.Enabled = true;
 			Config.ConsoleMode.CommandPromptText = "console";
 		    Config.ConsoleMode.HistorySize = 5;
 		    Config.ConsoleMode.AppName = "example_console";
-		    Config.ConsoleMode.OnBeginRunCommand += cmd => Writer.WriteLine(cmd.Dump());
+		    Config.ConsoleMode.OnBeginRunCommand += cmd => _writer.WriteLine(cmd.Dump());
 
 			Config.ShowViewArgsCommand = true;
 		    Config.WriteRunTimeToConsole = true;
@@ -48,7 +53,6 @@ namespace MultiCommandConsole.Example
             Config.Help.GetAddlHelpDelegate = (s, type) => new[] { type.FullName };
 
             Services.Config.Defaults.CommandLine = "ping /s=google.com /i=10";
-            Services.Config.EnableServiceMode();
 
 		    try
 		    {
@@ -60,13 +64,20 @@ namespace MultiCommandConsole.Example
 		    }
 		    catch (Exception e)
 		    {
-		        Writer.WriteLine(e.Dump());
+		        _writer.WriteLine(e.Dump());
 		    }
 		}
 
         private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
         {
-            Console.Out.WriteLine(unhandledExceptionEventArgs.ExceptionObject.Dump());
+            try
+            {
+                _writer.WriteErrorLine(unhandledExceptionEventArgs.ExceptionObject.Dump());
+            }
+            catch (Exception e)
+            {
+                _logger.Fatal(unhandledExceptionEventArgs.ExceptionObject.Dump());
+            }
             ((Stoplight)Config.ResolveTypeDelegate(typeof(Stoplight))).Stop();
         }
 	}
