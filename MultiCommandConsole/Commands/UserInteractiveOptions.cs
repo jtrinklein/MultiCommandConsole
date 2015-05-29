@@ -12,7 +12,7 @@ namespace MultiCommandConsole.Commands
 
         public IEnumerable<string> GetArgValidationErrors()
         {
-            if (!Environment.UserInteractive)
+            if (!MCCEnvironment.UserInteractive)
             {
                 return new[] { "console command is only available when the app is run in the console" };
             }

@@ -43,8 +43,8 @@ namespace MultiCommandConsole.Commands
 
 	    public string GetDetailedHelp()
 		{
-			return "\"help\" will display the list of commands available in this console application. " 
-				+ Environment.NewLine
+			return "\"help\" will display the list of commands available in this console application. "
+				+ MCCEnvironment.NewLine
 				+ "\"help commandName\" or \"commandName /help\" will display help for the given command.";
 		}
 
@@ -126,8 +126,8 @@ namespace MultiCommandConsole.Commands
 
             var addHelpLines = Config.Help.GetAddlHelpDelegate == null
                                    ? null
-                                   : Environment.NewLine +
-                                   string.Join(Environment.NewLine,
+                                   : MCCEnvironment.NewLine +
+                                   string.Join(MCCEnvironment.NewLine,
                                                  Config.Help.GetAddlHelpDelegate(c.Attribute.FirstPrototype, c.CommandType));
 
             return new[]

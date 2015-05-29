@@ -76,8 +76,8 @@ namespace MultiCommandConsole.Util
                     {
                         line.Append(spacer);
                     }
-                    line.Append(cellLine == null 
-                        ? "".PadRight(width) 
+                    line.Append(cellLine == null
+                        ? "".PadRight(width)
                         : cellLine.PadRight(width));
                 }
 	            yield return line.ToString();
@@ -98,7 +98,7 @@ namespace MultiCommandConsole.Util
                 yield break;
             }
 
-	        var lines = text.Split(new[] {Environment.NewLine, "\n", "\r"}, StringSplitOptions.None);
+	        var lines = text.Split(new[] {MCCEnvironment.NewLine, "\n", "\r"}, StringSplitOptions.None);
 
 	        foreach (var line in lines)
 	        {
@@ -175,8 +175,8 @@ namespace MultiCommandConsole.Util
                     currentIndex++;
                 }
 
-                if (endOfString 
-                    || currentIndex == lastLineBreak || currentIndex == lastPunctuation 
+                if (endOfString
+                    || currentIndex == lastLineBreak || currentIndex == lastPunctuation
                     || char.IsWhiteSpace(nextChar) || char.IsPunctuation(nextChar))
                 {
                     endIndex = currentIndex;

@@ -18,9 +18,9 @@ namespace MultiCommandConsole.Services
         /// </summary>
         public static void EnableServiceMode()
         {
-            if (Environment.UserInteractive)
+            if (MCCEnvironment.UserInteractive)
             {
-                Log.Info("Service mode not enabled. Environment.UserInteractive=true");
+                Log.Info("Service mode not enabled. MCCEnvironment.UserInteractive=true");
             }
             else
             {

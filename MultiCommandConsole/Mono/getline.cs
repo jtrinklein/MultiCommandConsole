@@ -901,7 +901,7 @@ namespace Mono.Terminal {
 					throw new ArgumentException ("size");
 
 				if (app != null){
-					string dir = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
+					string dir = MCCEnvironment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
 					//Console.WriteLine (dir);
 					if (!Directory.Exists (dir)){
 						try {

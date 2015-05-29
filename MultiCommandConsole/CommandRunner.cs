@@ -39,7 +39,7 @@ namespace MultiCommandConsole
             new Thread(() => RunOnThread(args, _stoplight)).Start();
 
             _commandLoaded.WaitOne();
-            if (Environment.UserInteractive)
+            if (MCCEnvironment.UserInteractive)
             {
                 ConsoleReader.Watch(
                     _stoplight,
@@ -170,7 +170,7 @@ namespace MultiCommandConsole
                 {
                     Log.Info("dispose OnWrapRunCommand");
                     cleanup.Dispose();
-                } 
+                }
             }
 
             if (Config.ConsoleMode.OnEndRunCommand != null)
@@ -189,7 +189,7 @@ namespace MultiCommandConsole
                                            started.ToString("hh:mm:ss"),
                                            Config.NowDelegate().ToString("hh:mm:ss"));
 
-            if (!(_runData.Command is HelpCommand) 
+            if (!(_runData.Command is HelpCommand)
                 && !(_runData.Command is ViewArgsCommand))
             {
                 if (Config.WriteRunTimeToConsole)
@@ -206,7 +206,7 @@ namespace MultiCommandConsole
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="preRun"></param>

@@ -10,14 +10,14 @@ namespace MultiCommandConsole.Commands
     {
         private static readonly IConsoleWriter Writer = ConsoleWriter.Get<UserInteractiveOptions>();
 
-		public const string CommandName = "viewargparsing"; 
+		public const string CommandName = "viewargparsing";
 		public string GetDetailedHelp()
 		{
 			return
 				"Use this to experiment with how to use double quotes to keep args with spaces "
 				+ "from being split and how to escape double quotes."
-				+ Environment.NewLine
-				+ Environment.NewLine
+				+ MCCEnvironment.NewLine
+				+ MCCEnvironment.NewLine
 				+ "try this: " + CommandName + " \"arg with spaces \\\"and with quotes\\\"\" \\\"args without spaces but with quotes\\\"";
 		}
 

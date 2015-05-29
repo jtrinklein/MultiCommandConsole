@@ -16,7 +16,7 @@ namespace MultiCommandConsole.Util
         {
             //all this because Ctrl+C is broken in .net 4.0
 
-            if (!Environment.UserInteractive)
+            if (!MCCEnvironment.UserInteractive)
             {
                 throw new InvalidOperationException("expected UserInteractive mode");
             }
@@ -34,7 +34,7 @@ namespace MultiCommandConsole.Util
                         if (key.Key == ConsoleKey.S)
                         {
                             onStop();
-                        } 
+                        }
                         else if (key.Key == ConsoleKey.R)
                         {
                             onResume();

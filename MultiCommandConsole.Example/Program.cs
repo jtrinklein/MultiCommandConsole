@@ -15,7 +15,7 @@ namespace MultiCommandConsole.Example
 
 	    static void Main(string[] args)
 		{
-            if (Array.Exists(args, s => s == "/debug") && Environment.UserInteractive)
+            if (Array.Exists(args, s => s == "/debug") && MCCEnvironment.UserInteractive)
             {
                 Debugger.Break();
             }
@@ -58,7 +58,7 @@ namespace MultiCommandConsole.Example
 		    {
 		        new Engine(new[]
 		            {
-		                typeof(Program).Assembly, 
+		                typeof(Program).Assembly,
 		                typeof(InstallServiceCommand).Assembly
 		            }).Run(args);
 		    }
